@@ -16,7 +16,7 @@ const siteConfig = {
   // ── Contact Details ──
   phone: "0400 000 000",
   phoneRaw: "0400000000",          // used in tel: links (no spaces)
-  email: "info@prestiva.com.au",
+  email: "admin@prestiva.com.au",
   whatsapp: "0400 000 000",
 
   // ── Locations ──
@@ -94,7 +94,9 @@ const siteConfig = {
     "🌿 Landscaping & Gardening",
     "✅ Fully Insured & Police Checked",
     "⭐ 5-Star Google Rated",
-    "⏰ 7 Days a Week"
+    "⏰ 7 Days a Week",
+    "📞 Call us at 0400 000 000",
+    "📧 Email us at admin@prestiva.com.au"
   ]
 };
 

@@ -1,6 +1,6 @@
 exports.submitContact = async (req, res) => {
   try {
-    const { fullName, phone, email, service, suburb, message } = req.body;
+    const { fullName, phone, email, service, suburb, message, mapLat, mapLng } = req.body;
     const adminEmail = process.env.ADMIN_EMAIL || 'info@prestiva.com.au';
 
     // Send the email via Resend API (HTTPS port 443) instead of Nodemailer (Port 465)
@@ -56,7 +56,10 @@ exports.submitContact = async (req, res) => {
                     </tr>
                     <tr style="border-bottom: 1px solid #f0f0f0;">
                       <td style="padding: 14px 0; font-weight: 600; color: #666;">📍 Location</td>
-                      <td style="padding: 14px 0; color: #111; font-weight: 500;">${suburb}</td>
+                      <td style="padding: 14px 0; color: #111; font-weight: 500;">
+                        ${suburb}
+                        ${mapLat && mapLng ? `<br/><a href="https://www.google.com/maps?q=${mapLat},${mapLng}" target="_blank" style="color: #0f4c81; text-decoration: none; font-size: 13px; margin-top: 5px; display: inline-block;">🗺️ View on Google Maps</a>` : ''}
+                      </td>
                     </tr>
                   </tbody>
                 </table>

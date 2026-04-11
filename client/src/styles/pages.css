@@ -28,6 +28,11 @@
   color: rgba(255, 255, 255, 0.9);
   max-width: 600px;
 }
+.contact-hero-subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 40px;
+  color: rgba(255, 255, 255, 0.9);
+}
 
 .hero-btns {
   display: flex;

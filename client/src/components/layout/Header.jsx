@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaPhoneAlt, FaBars, FaTimes } from 'react-icons/fa';
 import siteConfig from '../../config/siteConfig';
+import logo from '../../assets/images/logo.png';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,8 +14,8 @@ const Header = () => {
   return (
     <header className="header">
       <div className="container">
-        <Link to="/" className="logo">
-          {siteConfig.businessNameShort.toUpperCase()}<span>.</span>
+        <Link to="/" className="logo" style={{ display: 'flex', alignItems: 'center' }}>
+          <img src={logo} alt={`${siteConfig.businessNameShort} Logo`} style={{ maxHeight: '100px', width: 'auto' }} />
         </Link>
 
         <nav className={`nav-links ${isMobileMenuOpen ? 'active' : ''}`}>
@@ -27,9 +28,9 @@ const Header = () => {
         </nav>
 
         <div className="header-actions">
-          <a href={`tel:${siteConfig.phoneRaw}`} className="phone-link">
+          {/* <a href={`tel:${siteConfig.phoneRaw}`} className="phone-link">
             <FaPhoneAlt /> {siteConfig.phone}
-          </a>
+          </a> */}
           <Link to="/contact" className="btn btn-primary">Get a Free Quote</Link>
           <div className={`mobile-nav-toggle ${isMobileMenuOpen ? 'toggled' : ''}`} onClick={toggleMobileMenu}>
             {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
