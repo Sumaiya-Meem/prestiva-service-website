@@ -1,0 +1,69 @@
+const nodemailer = require('nodemailer');
+
+exports.submitContact = async (req, res) => {
+  try {
+    const { fullName, phone, email, service, suburb, message } = req.body;
+    
+    // Configure Nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      service: process.env.EMAIL_SERVICE || 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    // Determine the admin email from environment variables or use a default
+    const adminEmail = process.env.ADMIN_EMAIL || 'info@prestiva.com.au';
+
+    // Set up email data
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: adminEmail,
+      subject: `New Request for Free Quote - ${service}`,
+      text: `You have received a new quote request.
+      
+Details:
+Name: ${fullName}
+Phone: ${phone}
+Email: ${email}
+Service: ${service}
+Suburb: ${suburb}
+Message: ${message || 'No additional message'}
+      `,
+      html: `
+        <h3>New Quote Request</h3>
+        <p><strong>Name:</strong> ${fullName}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Service:</strong> ${service}</p>
+        <p><strong>Suburb:</strong> ${suburb}</p>
+        <p><strong>Message:</strong> ${message || 'No additional message'}</p>
+      `
+    };
+
+    // Send the email (we do this asynchronously, or await if we want to catch errors)
+    // Sometimes email configurations aren't set up yet, so let's log the error instead of failing the request
+    try {
+      if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+        await transporter.sendMail(mailOptions);
+        console.log('Email notification sent successfully');
+      } else {
+        console.warn('Email notification skipped: EMAIL_USER and/or EMAIL_PASS not configured');
+      }
+    } catch (emailError) {
+      console.error('Failed to send email notification:', emailError.message);
+    }
+
+    res.status(201).json({ 
+      success: true, 
+      message: "Contact request submitted successfully" 
+    });
+  } catch (error) {
+    console.error("Contact Submission Error:", error.message);
+    res.status(500).json({ 
+      success: false, 
+      message: "Server Error. Please try again later." 
+    });
+  }
+};
