@@ -24,13 +24,52 @@ exports.submitContact = async (req, res) => {
           to: adminEmail,
           subject: `New Request for Free Quote - ${service}`,
           html: `
-            <h3>New Quote Request</h3>
-            <p><strong>Name:</strong> ${fullName}</p>
-            <p><strong>Phone:</strong> ${phone}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Service:</strong> ${service}</p>
-            <p><strong>Suburb:</strong> ${suburb}</p>
-            <p><strong>Message:</strong> ${message || 'No additional message'}</p>
+            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e6e6e6; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+              <div style="background-color: #0b1c36; color: #ffffff; padding: 25px; text-align: center;">
+                <h2 style="margin: 0; font-size: 24px; font-weight: 600;">New Quote Request</h2>
+                <p style="margin: 8px 0 0; font-size: 15px; opacity: 0.85;">Prestiva Property Services</p>
+              </div>
+              <div style="padding: 30px; background-color: #ffffff;">
+                <p style="font-size: 16px; color: #444; line-height: 1.5; margin-top: 0;">You have received a new service inquiry. Here are the details:</p>
+                
+                <table style="width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 15px;">
+                  <tbody>
+                    <tr style="border-bottom: 1px solid #f0f0f0;">
+                      <td style="padding: 14px 0; font-weight: 600; color: #666; width: 35%;">👤 Full Name</td>
+                      <td style="padding: 14px 0; color: #111; font-weight: 500;">${fullName}</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #f0f0f0;">
+                      <td style="padding: 14px 0; font-weight: 600; color: #666;">📞 Phone</td>
+                      <td style="padding: 14px 0;">
+                        <a href="tel:${phone}" style="color: #0f4c81; text-decoration: none; font-weight: 500;">${phone}</a>
+                      </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #f0f0f0;">
+                      <td style="padding: 14px 0; font-weight: 600; color: #666;">✉️ Email</td>
+                      <td style="padding: 14px 0;">
+                        <a href="mailto:${email}" style="color: #0f4c81; text-decoration: none; font-weight: 500;">${email}</a>
+                      </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #f0f0f0;">
+                      <td style="padding: 14px 0; font-weight: 600; color: #666;">🧹 Service</td>
+                      <td style="padding: 14px 0; color: #111; font-weight: 500; text-transform: capitalize;">${service.replace(/-/g, ' ')}</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #f0f0f0;">
+                      <td style="padding: 14px 0; font-weight: 600; color: #666;">📍 Location</td>
+                      <td style="padding: 14px 0; color: #111; font-weight: 500;">${suburb}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                
+                <div style="margin-top: 30px; background-color: #f7f9fa; padding: 20px; border-left: 4px solid #cfaa5e; border-radius: 0 6px 6px 0;">
+                  <h4 style="margin: 0 0 10px; color: #333; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">💬 Additional Message</h4>
+                  <p style="margin: 0; color: #444; font-size: 15px; line-height: 1.6; white-space: pre-wrap;">${message ? message : '<i>No additional message provided.</i>'}</p>
+                </div>
+              </div>
+              <div style="background-color: #f5f7f9; color: #999; padding: 20px; text-align: center; font-size: 13px; border-top: 1px solid #eee;">
+                This automated email was sent securely via <a href="https://prestiva-website.vercel.app/" style="color: #0f4c81; text-decoration: none;">Prestiva Service Website</a>.
+              </div>
+            </div>
           `
         })
       });
