@@ -34,7 +34,7 @@ const FAQ = () => {
   return (
     <section className="section faq-section">
       <div className="container">
-        <div className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
+        <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2 className="section-title">Frequently Asked Questions</h2>
           <p className="section-subtitle">Everything you need to know about our services</p>
         </div>

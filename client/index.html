@@ -2,9 +2,66 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./src/assets/images/logo.png" />
+    <link rel="icon" type="image/svg+xml" href="/logo-icon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Prestiva</title>
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#0A1628" />
+    <script>
+      // Apply saved/preferred theme before paint to avoid a flash
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', t);
+        } catch (e) {}
+      })();
+    </script>
+    <meta name="description" content="Prestiva Property Services — professional commercial & residential cleaning, after-construction cleaning, gutter cleaning, turf laying, irrigation and landscaping. Call 0403 540 227 for a free quote." />
+    <meta name="keywords" content="cleaning, commercial cleaning, residential cleaning, after construction cleaning, gutter cleaning, turf laying, irrigation, landscaping, Adelaide, Sydney, Prestiva" />
+
+    <!-- Open Graph / social sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Prestiva Property Services | Cleaning & Property Services" />
+    <meta property="og:description" content="Professional cleaning, landscaping, turf & irrigation. Reliable results, every time. Get a free quote today — call 0403 540 227." />
+    <meta property="og:image" content="/logo-icon.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <title>Prestiva Property Services | Cleaning & Property Services</title>
+
+    <!-- Local business structured data (helps Google show phone, hours & area) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HomeAndConstructionBusiness",
+      "name": "Prestiva Property Services",
+      "image": "https://www.prestiva.com.au/logo-icon.svg",
+      "url": "https://www.prestiva.com.au",
+      "telephone": "+61403540227",
+      "email": "admin@prestiva.com.au",
+      "priceRange": "$$",
+      "slogan": "Reliable results, every time.",
+      "areaServed": ["Adelaide", "Sydney"],
+      "address": {
+        "@type": "PostalAddress",
+        "addressRegion": "SA",
+        "addressCountry": "AU"
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+        "opens": "07:00",
+        "closes": "19:00"
+      },
+      "makesOffer": [
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Commercial Cleaning" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Residential & End-of-Lease Cleaning" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "After-Construction Cleaning" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Gutter Cleaning" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Landscaping, Turf Laying & Irrigation" } }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

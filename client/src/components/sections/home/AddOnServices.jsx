@@ -22,7 +22,7 @@ const AddOnServices = () => {
   return (
     <section className="section add-on-services">
       <div className="container">
-        <div className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
+        <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2 className="section-title">Add-On Services</h2>
           <p className="section-subtitle">Customise your cleaning with these extra services</p>
         </div>

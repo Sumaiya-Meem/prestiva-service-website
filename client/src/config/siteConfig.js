@@ -14,10 +14,11 @@ const siteConfig = {
   tagline: "Reliable results, every time.",
 
   // ── Contact Details ──
-  phone: "0400 000 000",
-  phoneRaw: "0400000000",          // used in tel: links (no spaces)
+  phone: "0403 540 227",
+  phoneRaw: "0403540227",          // used in tel: links (no spaces)
   email: "admin@prestiva.com.au",
-  whatsapp: "0400 000 000",
+  whatsapp: "0403 540 227",
+  whatsappRaw: "61403540227",      // international format for wa.me links
 
   // ── Locations ──
   locations: ["Adelaide", "Sydney"],
@@ -77,7 +78,60 @@ const siteConfig = {
     availability: "7 Days"
   },
 
-  // ── Services Dropdown Options (for contact form) ──
+  // ── Service Taxonomy (single source of truth for nav, pages & forms) ──
+  serviceCategories: [
+    {
+      slug: "cleaning",
+      title: "Cleaning Services",
+      path: "/cleaning",
+      blurb: "Spotless results for homes, offices and everything in between.",
+      services: [
+        { name: "Commercial Cleaning", to: "/commercial" },
+        { name: "Office Cleaning" },
+        { name: "Builders & After-Construction Cleaning" },
+        { name: "Real Estate Cleaning" },
+        { name: "Airbnb Cleaning" },
+        { name: "End-of-Lease Cleaning", to: "/residential" },
+        { name: "Carpet Cleaning" },
+        { name: "Window Cleaning" },
+        { name: "Deep Cleaning" }
+      ]
+    },
+    {
+      slug: "landscaping",
+      title: "Landscaping",
+      path: "/landscaping",
+      blurb: "Transforming outdoor spaces with turf, irrigation and design.",
+      services: [
+        { name: "Turf Laying" },
+        { name: "Irrigation" },
+        { name: "Soil Preparation" },
+        { name: "Lawn Repair" },
+        { name: "Garden Clean-Up" },
+        { name: "Outdoor Area Preparation" },
+        { name: "Fencing", comingSoon: true },
+        { name: "Retaining Walls", comingSoon: true }
+      ]
+    },
+    {
+      slug: "property-maintenance",
+      title: "Property Maintenance",
+      path: "/property-maintenance",
+      blurb: "Reliable upkeep to keep every property in top condition.",
+      services: [
+        { name: "General Property Maintenance" },
+        { name: "Garden & Lawn Care" },
+        { name: "Gutter Cleaning" },
+        { name: "Site Clean-Ups" },
+        { name: "Green Waste Removal" },
+        { name: "Lawn Mowing" },
+        { name: "Weeding & Edging" },
+        { name: "Pressure Cleaning" }
+      ]
+    }
+  ],
+
+  // ── Services Dropdown Options (for contact form) — kept as a flat fallback ──
   serviceOptions: [
     { value: "commercial", label: "Commercial Cleaning" },
     { value: "residential", label: "Residential Cleaning" },
@@ -95,7 +149,7 @@ const siteConfig = {
     "✅ Fully Insured & Police Checked",
     "⭐ 5-Star Google Rated",
     "⏰ 7 Days a Week",
-    "📞 Call us at 0400 000 000",
+    "📞 Call us at 0403 540 227",
     "📧 Email us at admin@prestiva.com.au"
   ]
 };

@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaPhoneAlt, FaCheckCircle, FaStar, FaShieldAlt } from 'react-icons/fa';
 import siteConfig from '../config/siteConfig';
-import heroImg from '../assets/images/residential_hero.png';
+import Seo from '../components/utils/Seo';
+import ContactLine from '../components/sections/ContactLine';
+import heroImg from '../assets/gallery/end-of-lease/2.webp';
 
 const ResidentialPage = () => {
   const [activeTab, setActiveTab] = useState('kitchen');
@@ -25,6 +27,11 @@ const ResidentialPage = () => {
 
   return (
     <div className="residential-page">
+      <Seo
+        title="Residential & End-of-Lease Cleaning Adelaide & Sydney | Prestiva"
+        description="House cleaning, end-of-lease bond cleaning, deep cleans, move in/out and carpet steam cleaning across Adelaide & Sydney. Fully insured & police-checked. Get a free quote — 0403 540 227."
+        path="/residential"
+      />
       {/* Hero */}
       <section className="hero-section subpage-hero" style={{ backgroundImage: `linear-gradient(rgba(10, 22, 40, 0.6), rgba(10, 22, 40, 0.6)), url(${heroImg})` }}>
         <div className="container">
@@ -89,7 +96,7 @@ const ResidentialPage = () => {
           </div>
           <div style={{ maxWidth: '600px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr', gap: '15px' }}>
             {checklistData[activeTab].map((item, i) => (
-              <div key={i} style={{ display: 'flex', gap: '15px', alignItems: 'center', padding: '15px', backgroundColor: '#fff', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+              <div key={i} style={{ display: 'flex', gap: '15px', alignItems: 'center', padding: '15px', backgroundColor: 'var(--surface)', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
                 <FaCheckCircle color="var(--primary-gold)" />
                 <span>{item}</span>
               </div>
@@ -102,7 +109,7 @@ const ResidentialPage = () => {
       <section className="section">
         <div className="container">
           <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '50px' }}>Transparent Home Pricing</h2>
-          <div style={{ maxWidth: '800px', margin: '0 auto', backgroundColor: '#fff', borderRadius: '20px', overflowX: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
+          <div style={{ maxWidth: '800px', margin: '0 auto', backgroundColor: 'var(--surface)', borderRadius: '20px', overflowX: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '400px' }}>
               <thead>
                 <tr style={{ backgroundColor: 'var(--primary-navy)', color: '#fff', textAlign: 'left' }}>
@@ -132,6 +139,7 @@ const ResidentialPage = () => {
             <Link to="/contact" className="btn btn-primary">Book Now</Link>
             <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ color: '#fff', borderColor: '#fff' }}>Call Now</a>
           </div>
+          <ContactLine />
         </div>
       </section>
     </div>

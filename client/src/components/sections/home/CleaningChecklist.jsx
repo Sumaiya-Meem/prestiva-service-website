@@ -42,7 +42,7 @@ const CleaningChecklist = () => {
   return (
     <section className="section cleaning-checklist">
       <div className="container">
-        <div className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
+        <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2 className="section-title">What’s Included in Every Clean</h2>
           <p className="section-subtitle">Our comprehensive checklist ensures no corner is missed</p>
         </div>

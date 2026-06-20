@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaBuilding, FaStar, FaShieldAlt, FaCalendarAlt } from 'react-icons/fa';
 import siteConfig from '../../../config/siteConfig';
+import CountUpStat from '../../utils/CountUpStat';
 
 const TrustStats = () => {
   const stats = [
@@ -17,7 +18,7 @@ const TrustStats = () => {
           {stats.map((stat, index) => (
             <div key={index} className="stat-item">
               <div className="stat-icon">{stat.icon}</div>
-              <div className="stat-number">{stat.number}</div>
+              <div className="stat-number"><CountUpStat value={stat.number} /></div>
               <div className="stat-label">{stat.label}</div>
             </div>
           ))}

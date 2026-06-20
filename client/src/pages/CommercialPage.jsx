@@ -2,7 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaPhoneAlt, FaBuilding, FaUtensils, FaHardHat, FaMedkit, FaShoppingBag, FaWarehouse, FaCity, FaFileAlt, FaCheckCircle } from 'react-icons/fa';
 import siteConfig from '../config/siteConfig';
-import heroImg from '../assets/images/commercial_hero.png';
+import Seo from '../components/utils/Seo';
+import ContactLine from '../components/sections/ContactLine';
+import heroImg from '../assets/gallery/office/3.webp';
 
 const CommercialPage = () => {
   const industries = [
@@ -18,6 +20,11 @@ const CommercialPage = () => {
 
   return (
     <div className="commercial-page">
+      <Seo
+        title="Commercial Cleaning Adelaide & Sydney | Offices, Strata & Builders | Prestiva"
+        description="Professional commercial cleaning for offices, restaurants, medical, retail, warehouses, strata and after-builders. Fully insured contract cleaning across Adelaide & Sydney. Get a free quote."
+        path="/commercial"
+      />
       {/* Hero Section */}
       <section className="hero-section subpage-hero" style={{ backgroundImage: `linear-gradient(rgba(10, 22, 40, 0.7), rgba(10, 22, 40, 0.7)), url(${heroImg})` }}>
         <div className="container">
@@ -36,14 +43,14 @@ const CommercialPage = () => {
       {/* Who We Clean For */}
       <section className="section industries-section">
         <div className="container">
-          <div className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
+          <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
             <h2 className="section-title">Who We Clean For</h2>
             <p className="section-subtitle">Expert cleaning solutions across diverse industries</p>
           </div>
           <div className="industries-grid responsive-grid-4">
             {industries.map((item, index) => (
               <div key={index} className="industry-box" style={{ textAlign: 'center', padding: '30px', backgroundColor: 'var(--off-white)', borderRadius: '15px', transition: 'var(--transition-smooth)' }}>
-                <div style={{ fontSize: '2.5rem', color: 'var(--primary-gold)', marginBottom: '15px' }}>{item.icon}</div>
+                <div style={{ fontSize: '2.5rem', color: 'var(--accent)', marginBottom: '15px' }}>{item.icon}</div>
                 <h4 style={{ fontSize: '1.1rem', fontWeight: '700' }}>{item.name}</h4>
               </div>
             ))}
@@ -54,13 +61,13 @@ const CommercialPage = () => {
       {/* What's Included */}
       <section className="section bg-navy" style={{ color: 'var(--white)' }}>
         <div className="container">
-          <div className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
+          <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
             <h2 className="section-title" style={{ color: 'var(--white)' }}>What's Included</h2>
             <p className="section-subtitle" style={{ color: 'rgba(255,255,255,0.8)' }}>Detailed cleaning for every area of your business</p>
           </div>
           <div className="checklist-grid responsive-grid-2">
             <div>
-              <h3 style={{ color: 'var(--primary-gold)', marginBottom: '20px' }}>Office & Working Areas</h3>
+              <h3 style={{ color: 'var(--accent)', marginBottom: '20px' }}>Office & Working Areas</h3>
               <ul className="spotlight-list">
                 <li style={{ marginBottom: '12px' }}>✓ Dusting & sanitising all desks & surfaces</li>
                 <li style={{ marginBottom: '12px' }}>✓ Emptying bins & replacing liners</li>
@@ -69,7 +76,7 @@ const CommercialPage = () => {
               </ul>
             </div>
             <div>
-              <h3 style={{ color: 'var(--primary-gold)', marginBottom: '20px' }}>Kitchens & Bathrooms</h3>
+              <h3 style={{ color: 'var(--accent)', marginBottom: '20px' }}>Kitchens & Bathrooms</h3>
               <ul className="spotlight-list">
                 <li style={{ marginBottom: '12px' }}>✓ Deep clean of all bathroom fixtures</li>
                 <li style={{ marginBottom: '12px' }}>✓ Refilling soap & paper dispensers</li>
@@ -115,6 +122,7 @@ const CommercialPage = () => {
             <Link to="/contact" className="btn btn-primary">Get a Quote</Link>
             <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ color: '#fff', borderColor: '#fff' }}>Call Now</a>
           </div>
+          <ContactLine />
         </div>
       </section>
     </div>

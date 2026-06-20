@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaFacebook, FaInstagram, FaLinkedin, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
 import siteConfig from '../../config/siteConfig';
+import footerLogo from '../../assets/logos/prestiva-logo-stacked-navy-gold.svg';
 
 const Footer = () => {
   return (
@@ -9,8 +10,8 @@ const Footer = () => {
       <div className="container">
         <div className="footer-grid">
           <div className="footer-brand">
-            <Link to="/" className="logo" style={{ color: '#fff', marginBottom: '20px' }}>
-              {siteConfig.businessNameShort.toUpperCase()}<span style={{ color: '#D4A853' }}>.</span>
+            <Link to="/" className="footer-logo-badge" aria-label={`${siteConfig.businessName} home`}>
+              <img src={footerLogo} alt={`${siteConfig.businessName} Logo`} loading="lazy" decoding="async" />
             </Link>
             <p style={{ marginTop: '20px', color: '#6C757D' }}>
               Your trusted partner for professional commercial cleaning, residential cleaning, and landscaping services. {siteConfig.tagline}
@@ -27,7 +28,7 @@ const Footer = () => {
             <ul className="footer-links">
               <li><Link to="/">Home</Link></li>
               <li><Link to="/about">About Us</Link></li>
-              <li><Link to="/commercial">All Services</Link></li>
+              <li><Link to="/gallery">Gallery</Link></li>
               <li><Link to="/contact">Get a Quote</Link></li>
             </ul>
           </div>
@@ -35,9 +36,9 @@ const Footer = () => {
           <div className="footer-nav">
             <h4 className="footer-title">Services</h4>
             <ul className="footer-links">
-              <li><Link to="/commercial">Commercial Cleaning</Link></li>
-              <li><Link to="/residential">Residential Cleaning</Link></li>
-              <li><Link to="/landscaping">Landscaping</Link></li>
+              {siteConfig.serviceCategories.map((cat) => (
+                <li key={cat.slug}><Link to={cat.path}>{cat.title}</Link></li>
+              ))}
               <li><Link to="/contact">Get a Quote</Link></li>
             </ul>
           </div>
@@ -59,7 +60,12 @@ const Footer = () => {
         </div>
 
         <div className="footer-bottom">
-          <p>&copy; {new Date().getFullYear()} {siteConfig.businessName}. All Rights Reserved. Fully Insured & Police Checked.</p>
+          <p>&copy; {new Date().getFullYear()} {siteConfig.businessName}. All Rights Reserved. Fully Insured &amp; Police Checked.</p>
+          <p style={{ marginTop: '8px' }}>
+            <Link to="/privacy" style={{ color: 'var(--primary-gold)' }}>Privacy Policy</Link>
+            <span style={{ margin: '0 10px', opacity: 0.4 }}>|</span>
+            <Link to="/terms" style={{ color: 'var(--primary-gold)' }}>Terms of Service</Link>
+          </p>
         </div>
       </div>
     </footer>

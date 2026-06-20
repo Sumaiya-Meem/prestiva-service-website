@@ -33,12 +33,12 @@ const WhyChoose = () => {
   return (
     <section className="section why-choose">
       <div className="container">
-        <div className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
+        <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2 className="section-title">Why Choose Prestiva?</h2>
           <p className="section-subtitle">A higher standard of service in every space we touch</p>
         </div>
         
-        <div className="why-grid">
+        <div data-reveal className="why-grid">
           {reasons.map((reason, index) => (
             <div key={index} className="why-card">
               <div className="why-icon">{reason.icon}</div>

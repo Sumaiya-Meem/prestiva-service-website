@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaPhoneAlt, FaEnvelope, FaWhatsapp, FaMapMarkerAlt, FaClock, FaCheckCircle, FaCrosshairs } from 'react-icons/fa';
 import axios from 'axios';
 import siteConfig from '../config/siteConfig';
+import Seo from '../components/utils/Seo';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -25,6 +26,7 @@ const ContactPage = () => {
     service: '',
     suburb: '',
     message: '',
+    website: '', // honeypot — must stay empty
     mapLat: null,
     mapLng: null
   });
@@ -33,28 +35,30 @@ const ContactPage = () => {
   const defaultLocation = { lat: -34.9285, lng: 138.6007 }; // Default to Adelaide approx
 
   const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
-  const [mapCenter, setMapCenter] = useState([defaultLocation.lat, defaultLocation.lng]); 
+  const [mapCenter, setMapCenter] = useState([defaultLocation.lat, defaultLocation.lng]);
   const [markerPos, setMarkerPos] = useState(defaultLocation);
   const [isGeolocating, setIsGeolocating] = useState(false);
+  const [isResolvingAddress, setIsResolvingAddress] = useState(false);
 
-  useEffect(() => {
-    // Reverse geocode the default location without aggressively requesting user tracking
-    reverseGeocode(defaultLocation.lat, defaultLocation.lng);
-  }, []);
-
+  // Turn a map point into a full street address and fill the (still-editable) field.
   const reverseGeocode = async (lat, lon) => {
+    setIsResolvingAddress(true);
     try {
-      const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-      if (res.data && res.data.address) {
-        const addr = res.data.address;
-        const newSuburb = addr.suburb || addr.city_district || addr.city || addr.town || addr.village || addr.county || 'Unidentified Location';
-        setFormData(prev => ({ ...prev, suburb: newSuburb, mapLat: lat, mapLng: lon }));
-      } else {
-        setFormData(prev => ({ ...prev, mapLat: lat, mapLng: lon }));
-      }
+      const res = await axios.get(
+        `https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&lat=${lat}&lon=${lon}`
+      );
+      const fullAddress = res?.data?.display_name || '';
+      setFormData(prev => ({
+        ...prev,
+        suburb: fullAddress || prev.suburb,
+        mapLat: lat,
+        mapLng: lon
+      }));
     } catch (err) {
       console.error("Geocoding failed", err);
       setFormData(prev => ({ ...prev, mapLat: lat, mapLng: lon }));
+    } finally {
+      setIsResolvingAddress(false);
     }
   };
 
@@ -122,6 +126,7 @@ const ContactPage = () => {
           service: '',
           suburb: '',
           message: '',
+          website: '',
           mapLat: null,
           mapLng: null
         });
@@ -134,8 +139,37 @@ const ContactPage = () => {
     }
   };
 
+  // Auto-dismiss the confirmation/error toast after a few seconds
+  useEffect(() => {
+    if (!submitStatus) return;
+    const timer = setTimeout(() => setSubmitStatus(null), submitStatus === 'success' ? 6000 : 8000);
+    return () => clearTimeout(timer);
+  }, [submitStatus]);
+
   return (
     <div className="contact-page">
+      {/* Confirmation / error toast — appears after the BE responds, then auto-vanishes */}
+      {submitStatus && (
+        <div className={`form-toast form-toast--${submitStatus}`} role="status" aria-live="polite">
+          {submitStatus === 'success' ? (
+            <>
+              <FaCheckCircle className="form-toast__icon" />
+              <div><strong>Thank you!</strong> We've received your request and will reach out to you soon.</div>
+            </>
+          ) : (
+            <>
+              <span className="form-toast__icon" aria-hidden="true">⚠️</span>
+              <div><strong>Oops!</strong> Something went wrong. Please try again or call <a href={`tel:${siteConfig.phoneRaw}`}>{siteConfig.phone}</a>.</div>
+            </>
+          )}
+          <button type="button" className="form-toast__close" onClick={() => setSubmitStatus(null)} aria-label="Dismiss">&times;</button>
+        </div>
+      )}
+      <Seo
+        title="Contact Us & Get a Free Quote | Prestiva Property Services"
+        description="Request a free, no-obligation quote for cleaning, landscaping, turf or irrigation. Call 0403 540 227 or email admin@prestiva.com.au. Serving Adelaide & Sydney, 7 days a week."
+        path="/contact"
+      />
       {/* Hero / Header */}
       <section className="section subpage-hero bg-navy" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '30vh' }}>
         <div className="container" style={{ textAlign: 'center' }}>
@@ -174,7 +208,7 @@ const ContactPage = () => {
                   <div style={{ padding: '15px', backgroundColor: 'var(--off-white)', borderRadius: '50%', color: 'var(--primary-gold)' }}><FaWhatsapp fontSize="1.5rem" /></div>
                   <div>
                     <h4 style={{ marginBottom: '5px' }}>SMS / WhatsApp</h4>
-                    <p style={{ fontWeight: '700', fontSize: '1.2rem' }}>{siteConfig.whatsapp}</p>
+                    <a href={`https://wa.me/${siteConfig.whatsappRaw}`} target="_blank" rel="noopener noreferrer" style={{ fontWeight: '700', fontSize: '1.2rem' }}>{siteConfig.whatsapp}</a>
                   </div>
                 </div>
               </div>
@@ -199,25 +233,22 @@ const ContactPage = () => {
             </div>
 
             {/* Contact Form */}
-            <div className="contact-form-container" style={{ padding: '50px', backgroundColor: '#fff', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)' }}>
+            <div className="contact-form-container" style={{ padding: '50px', backgroundColor: 'var(--surface)', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)' }}>
               <h2 className="section-title" style={{ marginBottom: '10px', fontSize: '2rem' }}>Request a Free Quote</h2>
               <p style={{ marginBottom: '30px', color: 'var(--medium-gray)' }}>Fill in your details and we'll get back to you within 2 hours.</p>
 
-              {/* Success Message */}
-              {submitStatus === 'success' && (
-                <div style={{ padding: '20px', backgroundColor: '#d4edda', color: '#155724', borderRadius: '10px', marginBottom: '25px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <FaCheckCircle /> <strong>Thank you!</strong> Your quote request has been sent. We'll contact you shortly.
-                </div>
-              )}
-
-              {/* Error Message */}
-              {submitStatus === 'error' && (
-                <div style={{ padding: '20px', backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '10px', marginBottom: '25px' }}>
-                  <strong>Oops!</strong> Something went wrong. Please try again or call us directly at <a href={`tel:${siteConfig.phoneRaw}`} style={{ fontWeight: '700' }}>{siteConfig.phone}</a>.
-                </div>
-              )}
-
               <form onSubmit={handleSubmit}>
+                {/* Honeypot: hidden from users, catches spam bots */}
+                <input
+                  type="text"
+                  name="website"
+                  value={formData.website}
+                  onChange={handleChange}
+                  tabIndex="-1"
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }}
+                />
                 <div className="contact-form-grid">
                   <div className="form-group">
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Full Name *</label>
@@ -240,36 +271,52 @@ const ContactPage = () => {
                   <div className="form-group">
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Service Required *</label>
                     <select name="service" value={formData.service} onChange={handleChange} required
-                      style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box', backgroundColor: '#fff' }}>
+                      style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box', backgroundColor: 'var(--surface)', color: 'var(--dark-text)' }}>
                       <option value="">Select Service</option>
-                      {siteConfig.serviceOptions.map((opt) => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      {siteConfig.serviceCategories.map((cat) => (
+                        <optgroup key={cat.slug} label={cat.title}>
+                          {cat.services.filter((s) => !s.comingSoon).map((s) => (
+                            <option key={s.name} value={s.name}>{s.name}</option>
+                          ))}
+                        </optgroup>
                       ))}
+                      <option value="Other">Other / Not sure</option>
                     </select>
                   </div>
                 </div>
 
                 <div style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', fontWeight: '600' }}>
-                    <span>Suburb / Location *</span>
+                    <span>Address / Location *</span>
                     <button type="button" onClick={handleLocateMe} disabled={isGeolocating} aria-label="Use Current Location"
                       style={{ padding: '6px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '5px', backgroundColor: 'var(--off-white)', border: '1px solid var(--light-gray)', borderRadius: '4px', cursor: 'pointer', transition: 'all 0.2s' }}>
                       <FaCrosshairs /> {isGeolocating ? 'Locating...' : 'Use Current Location'}
                     </button>
                   </label>
-                  
+
+                  <p style={{ fontSize: '0.82rem', color: 'var(--medium-gray)', margin: '0 0 10px' }}>
+                    Tap the map to drop a pin (or use your current location) — the full address fills in automatically, and you can still edit it below.
+                  </p>
+
                   <div style={{ height: '300px', marginBottom: '15px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--light-gray)', position: 'relative', zIndex: 1, backgroundColor: '#f0f0f0' }}>
                     <MapContainer center={mapCenter} zoom={13} style={{ height: '100%', width: '100%' }}>
-                      <TileLayer 
-                        url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}" 
-                        attribution="&copy; Google Maps" 
+                      <TileLayer
+                        url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+                        attribution="&copy; Google Maps"
                       />
                       <LocationSelector />
                     </MapContainer>
                   </div>
 
-                  <input type="text" name="suburb" value={formData.suburb} onChange={handleChange} required
-                    style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box' }} placeholder="e.g. Adelaide Hills or Select on Map" />
+                  {isResolvingAddress && (
+                    <p style={{ fontSize: '0.85rem', color: 'var(--primary-gold)', margin: '0 0 8px', fontWeight: 600 }}>
+                      📍 Detecting address…
+                    </p>
+                  )}
+
+                  <textarea name="suburb" value={formData.suburb} onChange={handleChange} required rows="2"
+                    style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box', resize: 'vertical' }}
+                    placeholder="Select a point on the map, use your location, or type your full address here" />
                 </div>
 
                 <div style={{ marginBottom: '30px' }}>
@@ -279,8 +326,9 @@ const ContactPage = () => {
                 </div>
 
                 <button type="submit" className="btn btn-primary" disabled={isSubmitting}
-                  style={{ width: '100%', padding: '16px', fontSize: '1.05rem', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}>
-                  {isSubmitting ? 'Sending...' : 'Get a Free Quote'}
+                  style={{ width: '100%', padding: '16px', fontSize: '1.05rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', opacity: isSubmitting ? 0.75 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}>
+                  {isSubmitting && <span className="btn-spinner" aria-hidden="true" />}
+                  {isSubmitting ? 'Sending…' : 'Get a Free Quote'}
                 </button>
               </form>
             </div>

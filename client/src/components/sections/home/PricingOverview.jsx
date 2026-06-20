@@ -33,7 +33,7 @@ const PricingOverview = () => {
   return (
     <section className="section pricing-overview">
       <div className="container">
-        <div className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
+        <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2 className="section-title">Simple, Transparent Pricing</h2>
           <p className="section-subtitle">Premium quality service with no hidden costs</p>
         </div>

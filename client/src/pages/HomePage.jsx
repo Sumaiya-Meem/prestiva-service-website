@@ -1,4 +1,5 @@
 import React from 'react';
+import Seo from '../components/utils/Seo';
 import HeroSection from '../components/sections/home/HeroSection';
 import TrustStats from '../components/sections/home/TrustStats';
 import ServicesOverview from '../components/sections/home/ServicesOverview';
@@ -17,6 +18,11 @@ import CTABanner from '../components/sections/home/CTABanner';
 const HomePage = () => {
   return (
     <div className="home-page">
+      <Seo
+        title="Prestiva Property Services | Cleaning, Landscaping & Turf — Adelaide & Sydney"
+        description="Professional commercial & residential cleaning, after-construction cleaning, gutter cleaning, turf laying, irrigation and landscaping in Adelaide & Sydney. Fully insured. Get a free quote — call 0403 540 227."
+        path="/"
+      />
       <HeroSection />
       <TrustStats />
       <ServicesOverview />

@@ -1,41 +1,32 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaBuilding, FaHome, FaLeaf } from 'react-icons/fa';
+import { FaBroom, FaLeaf, FaTools } from 'react-icons/fa';
+import siteConfig from '../../../config/siteConfig';
+
+const iconMap = {
+  cleaning: <FaBroom />,
+  landscaping: <FaLeaf />,
+  'property-maintenance': <FaTools />,
+};
 
 const ServicesOverview = () => {
-  const services = [
-    {
-      id: "commercial",
-      title: "Commercial Cleaning",
-      description: "Professional cleaning solutions for offices, retail, warehouses, and more.",
-      icon: <FaBuilding />,
-      link: "/commercial"
-    },
-    {
-      id: "residential",
-      title: "Residential Cleaning",
-      description: "Expert home cleaning, end of lease, deep cleans, and carpet services.",
-      icon: <FaHome />,
-      link: "/residential"
-    },
-    {
-      id: "landscaping",
-      title: "Landscaping & Gardening",
-      description: "Premium lawn care, garden maintenance, and landscaping designs.",
-      icon: <FaLeaf />,
-      link: "/landscaping"
-    }
-  ];
+  const services = siteConfig.serviceCategories.map((cat) => ({
+    id: cat.slug,
+    title: cat.title,
+    description: cat.blurb,
+    icon: iconMap[cat.slug],
+    link: cat.path,
+  }));
 
   return (
     <section className="section services-overview">
       <div className="container">
-        <div className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
+        <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
           <h2 className="section-title">Our Service Specialisations</h2>
           <p className="section-subtitle">Comprehensive property care tailored to your needs</p>
         </div>
         
-        <div className="services-grid">
+        <div data-reveal className="services-grid">
           {services.map((service) => (
             <div key={service.id} className="service-card">
               <div className="service-icon-box">{service.icon}</div>

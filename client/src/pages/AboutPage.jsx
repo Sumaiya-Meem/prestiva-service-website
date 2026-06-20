@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Seo from '../components/utils/Seo';
 import { FaPhoneAlt, FaShieldAlt, FaUserCheck, FaAward, FaStar, FaLeaf, FaTools, FaHandshake } from 'react-icons/fa';
 import siteConfig from '../config/siteConfig';
-import teamImg from '../assets/images/team.png';
+import teamImg from '../assets/images/team.webp';
 
 const AboutPage = () => {
   const values = [
@@ -21,6 +22,11 @@ const AboutPage = () => {
 
   return (
     <div className="about-page">
+      <Seo
+        title="About Us | Prestiva Property Services — Adelaide & Sydney"
+        description="Prestiva Property Services is a fully insured, police-checked team delivering reliable cleaning, landscaping and property services across Adelaide & Sydney. Reliable results, every time."
+        path="/about"
+      />
       {/* Hero */}
       <section className="hero-section subpage-hero" style={{ backgroundImage: `linear-gradient(rgba(10, 22, 40, 0.7), rgba(10, 22, 40, 0.7)), url(${teamImg})` }}>
         <div className="container">

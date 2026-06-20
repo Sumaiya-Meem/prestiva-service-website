@@ -2,18 +2,22 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaPhoneAlt, FaLeaf, FaClock, FaCheckCircle } from 'react-icons/fa';
 import siteConfig from '../config/siteConfig';
-import heroImg from '../assets/images/landscaping_hero.png';
+import Seo from '../components/utils/Seo';
+import ContactLine from '../components/sections/ContactLine';
+import heroImg from '../assets/images/landscaping_hero.webp';
 import BeforeAfterGallery from '../components/sections/home/BeforeAfterGallery';
 
 const LandscapingPage = () => {
-  const services = [
-    "Lawn Mowing", "Hedge Trimming", "Weeding", "Tree Pruning", 
-    "Garden Clean-Ups", "Mulching", "Planting", "Pressure Washing", 
-    "Irrigation", "Maintenance Packages"
-  ];
+  const landscapingCat = siteConfig.serviceCategories.find((c) => c.slug === 'landscaping');
+  const services = landscapingCat ? landscapingCat.services : [];
 
   return (
     <div className="landscaping-page">
+      <Seo
+        title="Landscaping, Turf Laying & Irrigation Adelaide & Sydney | Prestiva"
+        description="Lawn mowing, garden clean-ups, hedge trimming, mulching, turf laying, irrigation and full garden maintenance across Adelaide & Sydney. Get a free landscaping quote today."
+        path="/landscaping"
+      />
       {/* Hero */}
       <section className="hero-section subpage-hero" style={{ backgroundImage: `linear-gradient(rgba(10, 22, 40, 0.4), rgba(10, 22, 40, 0.4)), url(${heroImg})` }}>
         <div className="container">
@@ -35,9 +39,10 @@ const LandscapingPage = () => {
           <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '50px' }}>Our Garden Services</h2>
           <div className="services-grid responsive-grid-5">
             {services.map((s, i) => (
-              <div key={i} className="service-card" style={{ padding: '25px', textAlign: 'center', backgroundColor: 'var(--off-white)', borderRadius: '12px' }}>
-                <FaLeaf color="var(--primary-gold)" style={{ marginBottom: '10px' }} />
-                <h4 style={{ fontSize: '0.9rem', fontWeight: '700' }}>{s}</h4>
+              <div key={i} className="service-card" style={{ padding: '25px', textAlign: 'center', backgroundColor: 'var(--off-white)', borderRadius: '12px', opacity: s.comingSoon ? 0.7 : 1 }}>
+                <FaLeaf color={s.comingSoon ? '#9aa4b0' : '#27c281'} style={{ marginBottom: '10px' }} />
+                <h4 style={{ fontSize: '0.9rem', fontWeight: '700' }}>{s.name}</h4>
+                {s.comingSoon && <span className="svc-badge" style={{ marginTop: '8px', display: 'inline-block' }}>Coming Soon</span>}
               </div>
             ))}
           </div>
@@ -47,8 +52,8 @@ const LandscapingPage = () => {
       {/* Why Choose */}
       <section className="section bg-navy" style={{ color: '#fff' }}>
         <div className="container">
-          <div className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <h2 className="section-title" style={{ color: 'var(--primary-gold)' }}>Why Choose {siteConfig.businessNameShort}?</h2>
+          <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
+            <h2 className="section-title" style={{ color: 'var(--white)' }}>Why Choose {siteConfig.businessNameShort}?</h2>
             <p className="section-subtitle" style={{ color: 'rgba(255,255,255,0.8)' }}>Reliable outdoor maintenance for your property</p>
           </div>
           <div className="responsive-grid-3">
@@ -75,27 +80,73 @@ const LandscapingPage = () => {
       <BeforeAfterGallery />
 
       {/* Pricing */}
-      <section className="section">
+      <section className="section gardening-pricing">
         <div className="container">
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '60px' }}>Transparent Gardening Pricing</h2>
+          <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '12px' }}>
+            <h2 className="section-title">Transparent Gardening Pricing</h2>
+          </div>
+          <p style={{ textAlign: 'center', color: 'var(--medium-gray)', maxWidth: '620px', margin: '0 auto 55px' }}>
+            Clear, upfront starting prices — no hidden fees. Your exact quote is always free and tailored to your garden.
+          </p>
+
           <div className="pricing-grid">
+            {/* Lawn Mowing */}
             <div className="pricing-card">
-              <h3>{siteConfig.pricing.landscaping.mowing.label}</h3>
-              <p className="price">From {siteConfig.pricing.landscaping.mowing.price}</p>
-              <Link to="/contact" className="btn btn-outline" style={{ marginTop: '20px', width: '100%', textAlign: 'center' }}>Book Mow</Link>
+              <span className="plan-tier">Essentials</span>
+              <h3 className="plan-title">{siteConfig.pricing.landscaping.mowing.label}</h3>
+              <div className="plan-price">
+                <span className="plan-from">from</span>
+                <span className="price">{siteConfig.pricing.landscaping.mowing.price}</span>
+                <span className="unit">/visit</span>
+              </div>
+              <ul className="plan-features">
+                <li><FaCheckCircle className="plan-check" /> Mowing, edging &amp; line trimming</li>
+                <li><FaCheckCircle className="plan-check" /> Clippings cleared &amp; removed</li>
+                <li><FaCheckCircle className="plan-check" /> Paths &amp; driveway blown down</li>
+              </ul>
+              <Link to="/contact" className="btn btn-outline" style={{ marginTop: 'auto', width: '100%', textAlign: 'center' }}>Book a Mow</Link>
             </div>
+
+            {/* Full Garden Maintenance — featured */}
             <div className="pricing-card popular">
-              <div className="popular-badge">Value</div>
-              <h3>{siteConfig.pricing.landscaping.cleanup.label}</h3>
-              <p className="price">From {siteConfig.pricing.landscaping.cleanup.price}</p>
-              <Link to="/contact" className="btn btn-primary" style={{ marginTop: '20px', width: '100%', textAlign: 'center' }}>Book Clean-up</Link>
+              <div className="popular-badge">Most Popular</div>
+              <span className="plan-tier">Most Complete</span>
+              <h3 className="plan-title">{siteConfig.pricing.landscaping.maintenance.label}</h3>
+              <div className="plan-price">
+                <span className="plan-from">from</span>
+                <span className="price">{siteConfig.pricing.landscaping.maintenance.price}</span>
+                <span className="unit">/visit</span>
+              </div>
+              <ul className="plan-features">
+                <li><FaCheckCircle className="plan-check" /> Everything in Essentials</li>
+                <li><FaCheckCircle className="plan-check" /> Weeding, hedging &amp; pruning</li>
+                <li><FaCheckCircle className="plan-check" /> Mulching &amp; garden bed tidy-up</li>
+                <li><FaCheckCircle className="plan-check" /> All green waste removed</li>
+              </ul>
+              <Link to="/contact" className="btn btn-primary" style={{ marginTop: 'auto', width: '100%', textAlign: 'center' }}>Book Maintenance</Link>
             </div>
+
+            {/* Pressure Washing */}
             <div className="pricing-card">
-              <h3>{siteConfig.pricing.landscaping.pressure.label}</h3>
-              <p className="price">From {siteConfig.pricing.landscaping.pressure.price}</p>
-              <Link to="/contact" className="btn btn-outline" style={{ marginTop: '20px', width: '100%', textAlign: 'center' }}>Book Now</Link>
+              <span className="plan-tier">Restore</span>
+              <h3 className="plan-title">{siteConfig.pricing.landscaping.pressure.label}</h3>
+              <div className="plan-price">
+                <span className="plan-from">from</span>
+                <span className="price">{siteConfig.pricing.landscaping.pressure.price}</span>
+                <span className="unit">/job</span>
+              </div>
+              <ul className="plan-features">
+                <li><FaCheckCircle className="plan-check" /> Driveways, patios &amp; pavers</li>
+                <li><FaCheckCircle className="plan-check" /> Exterior walls &amp; fencing</li>
+                <li><FaCheckCircle className="plan-check" /> Mould &amp; grime removed</li>
+              </ul>
+              <Link to="/contact" className="btn btn-outline" style={{ marginTop: 'auto', width: '100%', textAlign: 'center' }}>Book Now</Link>
             </div>
           </div>
+
+          <p style={{ textAlign: 'center', color: 'var(--medium-gray)', fontSize: '0.86rem', marginTop: '35px' }}>
+            * Starting estimates. Final pricing is confirmed in your free, no-obligation quote.
+          </p>
         </div>
       </section>
 
@@ -108,6 +159,7 @@ const LandscapingPage = () => {
             <Link to="/contact" className="btn btn-primary">Book Now</Link>
             <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ color: '#fff', borderColor: '#fff' }}>Call Now</a>
           </div>
+          <ContactLine />
         </div>
       </section>
     </div>

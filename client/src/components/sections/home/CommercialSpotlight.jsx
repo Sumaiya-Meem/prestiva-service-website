@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import spotlightImg from '../../../assets/images/commercial_spotlight.png';
+import spotlightImg from '../../../assets/gallery/office/5.webp';
 
 const CommercialSpotlight = () => {
   return (
@@ -30,7 +30,7 @@ const CommercialSpotlight = () => {
             <Link to="/commercial" className="btn btn-primary">Commercial Services</Link>
           </div>
           <div className="spotlight-image-container">
-            <img src={spotlightImg} alt="Commercial Cleaning Spotlight" className="spotlight-img" />
+            <img src={spotlightImg} alt="Commercial Cleaning Spotlight" className="spotlight-img" loading="lazy" decoding="async" />
             <div className="image-accent"></div>
           </div>
         </div>
