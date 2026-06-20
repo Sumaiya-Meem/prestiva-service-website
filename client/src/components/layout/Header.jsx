@@ -87,7 +87,7 @@ const Header = () => {
                   s.comingSoon ? (
                     <li key={s.name}>
                       <span className="nav-mega__link nav-mega__link--soon">
-                        {s.name} <span className="nav-mega__soon">Soon</span>
+                        {s.name} <span className="nav-mega__soon">Coming Soon</span>
                       </span>
                     </li>
                   ) : (

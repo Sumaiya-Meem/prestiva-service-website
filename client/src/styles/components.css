@@ -525,8 +525,9 @@ html[data-theme="dark"] .icon-btn { color: var(--dark-text); }
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  background: rgba(212, 168, 83, 0.2);
-  color: var(--primary-gold);
+  white-space: nowrap;
+  background: rgba(39, 194, 129, 0.18);
+  color: #27c281;
   padding: 2px 7px;
   border-radius: 10px;
 }

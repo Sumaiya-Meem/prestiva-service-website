@@ -81,20 +81,19 @@ const siteConfig = {
   // ── Service Taxonomy (single source of truth for nav, pages & forms) ──
   serviceCategories: [
     {
-      slug: "cleaning",
-      title: "Cleaning Services",
-      path: "/cleaning",
-      blurb: "Spotless results for homes, offices and everything in between.",
+      slug: "property-maintenance",
+      title: "Property Maintenance",
+      path: "/property-maintenance",
+      blurb: "Reliable upkeep to keep every property in top condition.",
       services: [
-        { name: "Commercial Cleaning", to: "/commercial" },
-        { name: "Office Cleaning" },
-        { name: "Builders & After-Construction Cleaning" },
-        { name: "Real Estate Cleaning" },
-        { name: "Airbnb Cleaning" },
-        { name: "End-of-Lease Cleaning", to: "/residential" },
-        { name: "Carpet Cleaning" },
-        { name: "Window Cleaning" },
-        { name: "Deep Cleaning" }
+        { name: "General Property Maintenance" },
+        { name: "Garden & Lawn Care" },
+        { name: "Gutter Cleaning" },
+        { name: "Site Clean-Ups" },
+        { name: "Green Waste Removal" },
+        { name: "Lawn Mowing" },
+        { name: "Weeding & Edging" },
+        { name: "Pressure Cleaning" }
       ]
     },
     {
@@ -114,19 +113,20 @@ const siteConfig = {
       ]
     },
     {
-      slug: "property-maintenance",
-      title: "Property Maintenance",
-      path: "/property-maintenance",
-      blurb: "Reliable upkeep to keep every property in top condition.",
+      slug: "cleaning",
+      title: "Cleaning Services",
+      path: "/cleaning",
+      blurb: "Spotless results for homes, offices and everything in between.",
       services: [
-        { name: "General Property Maintenance" },
-        { name: "Garden & Lawn Care" },
-        { name: "Gutter Cleaning" },
-        { name: "Site Clean-Ups" },
-        { name: "Green Waste Removal" },
-        { name: "Lawn Mowing" },
-        { name: "Weeding & Edging" },
-        { name: "Pressure Cleaning" }
+        { name: "Commercial Cleaning", to: "/commercial" },
+        { name: "Office Cleaning" },
+        { name: "Builders & After-Construction Cleaning" },
+        { name: "Real Estate Cleaning" },
+        { name: "Airbnb Cleaning" },
+        { name: "End-of-Lease Cleaning", to: "/residential" },
+        { name: "Carpet Cleaning" },
+        { name: "Window Cleaning" },
+        { name: "Deep Cleaning" }
       ]
     }
   ],
