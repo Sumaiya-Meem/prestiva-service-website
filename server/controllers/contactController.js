@@ -1,106 +1,80 @@
+const { sendMail } = require('../utils/mailer');
+const { adminTemplate, customerTemplate, adminText, customerText } = require('../utils/emailTemplates');
+
+const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || ''));
+
+/**
+ * Send the admin notification + customer auto-reply in parallel.
+ * Runs AFTER the HTTP response so the user never waits on SMTP.
+ */
+const dispatchEmails = async (payload, adminEmail) => {
+  const results = await Promise.allSettled([
+    sendMail({
+      to: adminEmail,
+      replyTo: payload.email,
+      subject: `New Request for Free Quote - ${payload.service}`,
+      html: adminTemplate(payload),
+      text: adminText(payload),
+    }),
+    sendMail({
+      to: payload.email,
+      replyTo: adminEmail,
+      subject: "We've received your enquiry — a Prestiva representative will be in touch soon",
+      html: customerTemplate(payload),
+      text: customerText(payload),
+      headers: {
+        'List-Unsubscribe': `<mailto:${adminEmail}?subject=unsubscribe>`,
+        'X-Auto-Response-Suppress': 'OOF, AutoReply',
+      },
+    }),
+  ]);
+
+  results.forEach((r, i) => {
+    const which = i === 0 ? 'admin notification' : 'customer auto-reply';
+    if (r.status === 'rejected') {
+      console.error(`[mail] ${which} FAILED:`, r.reason?.message || r.reason);
+    } else {
+      console.log(`[mail] ${which} sent via ${r.value.channel}`);
+    }
+  });
+};
+
 exports.submitContact = async (req, res) => {
   try {
-    const { fullName, phone, email, service, suburb, message, mapLat, mapLng } = req.body;
-    const adminEmail = process.env.ADMIN_EMAIL || 'info@prestiva.com.au';
+    const { fullName, phone, email, service, suburb, message, mapLat, mapLng, website } = req.body;
 
-    // Send the email via Resend API (HTTPS port 443) instead of Nodemailer (Port 465)
-    try {
-      if (!process.env.RESEND_API_KEY) {
-        console.warn('Email notification skipped: RESEND_API_KEY not configured');
-        return res.status(500).json({ 
-          success: false, 
-          message: "Server Configuration Error: Add RESEND_API_KEY to Render." 
-        });
-      }
+    // ── Honeypot: real users never fill the hidden "website" field ──
+    if (website) {
+      return res.status(201).json({ success: true, message: 'Contact request submitted successfully' });
+    }
 
-      const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          from: 'onboarding@resend.dev', // Resend's free testing email
-          to: adminEmail,
-          subject: `New Request for Free Quote - ${service}`,
-          html: `
-            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e6e6e6; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-              <div style="background-color: #0b1c36; color: #ffffff; padding: 25px; text-align: center;">
-                <h2 style="margin: 0; font-size: 24px; font-weight: 600;">New Quote Request</h2>
-                <p style="margin: 8px 0 0; font-size: 15px; opacity: 0.85;">Prestiva Property Services</p>
-              </div>
-              <div style="padding: 30px; background-color: #ffffff;">
-                <p style="font-size: 16px; color: #444; line-height: 1.5; margin-top: 0;">You have received a new service inquiry. Here are the details:</p>
-                
-                <table style="width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 15px;">
-                  <tbody>
-                    <tr style="border-bottom: 1px solid #f0f0f0;">
-                      <td style="padding: 14px 0; font-weight: 600; color: #666; width: 35%;">👤 Full Name</td>
-                      <td style="padding: 14px 0; color: #111; font-weight: 500;">${fullName}</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #f0f0f0;">
-                      <td style="padding: 14px 0; font-weight: 600; color: #666;">📞 Phone</td>
-                      <td style="padding: 14px 0;">
-                        <a href="tel:${phone}" style="color: #0f4c81; text-decoration: none; font-weight: 500;">${phone}</a>
-                      </td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #f0f0f0;">
-                      <td style="padding: 14px 0; font-weight: 600; color: #666;">✉️ Email</td>
-                      <td style="padding: 14px 0;">
-                        <a href="mailto:${email}" style="color: #0f4c81; text-decoration: none; font-weight: 500;">${email}</a>
-                      </td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #f0f0f0;">
-                      <td style="padding: 14px 0; font-weight: 600; color: #666;">🧹 Service</td>
-                      <td style="padding: 14px 0; color: #111; font-weight: 500; text-transform: capitalize;">${service.replace(/-/g, ' ')}</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #f0f0f0;">
-                      <td style="padding: 14px 0; font-weight: 600; color: #666;">📍 Location</td>
-                      <td style="padding: 14px 0; color: #111; font-weight: 500;">
-                        ${suburb}
-                        ${mapLat && mapLng ? `<br/><a href="https://www.google.com/maps?q=${mapLat},${mapLng}" target="_blank" style="color: #0f4c81; text-decoration: none; font-size: 13px; margin-top: 5px; display: inline-block;">🗺️ View on Google Maps</a>` : ''}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                
-                <div style="margin-top: 30px; background-color: #f7f9fa; padding: 20px; border-left: 4px solid #cfaa5e; border-radius: 0 6px 6px 0;">
-                  <h4 style="margin: 0 0 10px; color: #333; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">💬 Additional Message</h4>
-                  <p style="margin: 0; color: #444; font-size: 15px; line-height: 1.6; white-space: pre-wrap;">${message ? message : '<i>No additional message provided.</i>'}</p>
-                </div>
-              </div>
-              <div style="background-color: #f5f7f9; color: #999; padding: 20px; text-align: center; font-size: 13px; border-top: 1px solid #eee;">
-                This automated email was sent securely via <a href="https://prestiva-website.vercel.app/" style="color: #0f4c81; text-decoration: none;">Prestiva Service Website</a>.
-              </div>
-            </div>
-          `
-        })
-      });
+    // ── Server-side validation ──
+    const errors = [];
+    if (!fullName || String(fullName).trim().length < 2) errors.push('A valid full name is required.');
+    if (!phone || String(phone).trim().length < 6) errors.push('A valid phone number is required.');
+    if (!isEmail(email)) errors.push('A valid email address is required.');
+    if (!service) errors.push('Please select a service.');
+    if (!suburb || String(suburb).trim().length < 2) errors.push('Please provide a suburb/location.');
 
-      const data = await response.json();
+    if (errors.length) {
+      return res.status(400).json({ success: false, message: errors.join(' ') });
+    }
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Error from Resend API');
-      }
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@prestiva.com.au';
+    const payload = { fullName, phone, email, service, suburb, message, mapLat, mapLng };
 
-      console.log('Email notification sent successfully via Resend');
-      return res.status(201).json({ 
-        success: true, 
-        message: "Contact request submitted successfully" 
-      });
+    // ── Respond immediately — the user gets instant confirmation ──
+    res.status(201).json({ success: true, message: 'Contact request submitted successfully' });
 
-    } catch (emailError) {
-      console.error('Failed to send email notification:', emailError.message);
-      return res.status(500).json({ 
-        success: false, 
-        message: "Failed to send email API request." 
+    // ── Emails are sent in the background (notification + auto-reply) ──
+    dispatchEmails(payload, adminEmail).catch((e) => console.error('dispatchEmails error:', e.message));
+  } catch (error) {
+    console.error('Contact Submission Error:', error.message);
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        message: 'We could not send your request right now. Please call us on 0403 540 227.',
       });
     }
-  } catch (error) {
-    console.error("Contact Submission Error:", error.message);
-    res.status(500).json({ 
-      success: false, 
-      message: "Server Error. Please try again later." 
-    });
   }
 };
