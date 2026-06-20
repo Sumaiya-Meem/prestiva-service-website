@@ -81,7 +81,7 @@ const Header = () => {
         <div className={`nav-mega__menu${isOpen ? ' open' : ''}`}>
           {siteConfig.serviceCategories.map((cat) => (
             <div key={cat.slug} className="nav-mega__col">
-              <NavLink to={cat.path} className="nav-mega__title" onClick={closeMenu}>{cat.title}</NavLink>
+              <Link to={cat.path} className="nav-mega__title" onClick={closeMenu}>{cat.title}</Link>
               <ul className="nav-mega__list">
                 {cat.services.map((s) =>
                   s.comingSoon ? (
@@ -92,9 +92,9 @@ const Header = () => {
                     </li>
                   ) : (
                     <li key={s.name}>
-                      <NavLink to={s.to || cat.path} className="nav-mega__link" onClick={closeMenu}>
+                      <Link to={s.to || cat.path} className="nav-mega__link" onClick={closeMenu}>
                         {s.name}
-                      </NavLink>
+                      </Link>
                     </li>
                   )
                 )}

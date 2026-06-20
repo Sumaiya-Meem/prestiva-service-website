@@ -203,6 +203,13 @@ html[data-theme="dark"] .header {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
 }
 
+/* Logo is navy-on-transparent — give it a light backing so it stays readable in dark mode */
+html[data-theme="dark"] .header .logo img {
+  background: #fff;
+  padding: 5px 12px;
+  border-radius: 10px;
+}
+
 html[data-theme="dark"] .nav-link,
 html[data-theme="dark"] .logo,
 html[data-theme="dark"] .mobile-nav-toggle { color: var(--dark-text); }

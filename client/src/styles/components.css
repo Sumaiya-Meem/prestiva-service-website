@@ -271,12 +271,15 @@
     height: 100vh;
     background-color: var(--primary-navy);
     flex-direction: column;
-    padding: 100px 40px;
-    transition: var(--transition-smooth);
+    padding: 100px 40px 40px;
+    transition: right var(--transition-smooth);
     z-index: 1001;
     box-shadow: -10px 0 30px rgba(0,0,0,0.2);
     gap: 25px;
     display: flex; /* Ensure it's flex even on mobile */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
   
   .nav-links.active {
