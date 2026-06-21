@@ -43,13 +43,15 @@ const getTransporter = () => {
  * @param {string} [opts.replyTo] reply-to address
  * @param {Object} [opts.headers] extra mail headers (e.g. List-Unsubscribe)
  */
-const sendMail = async ({ to, subject, html, text, replyTo, headers }) => {
+const sendMail = async ({ to, subject, html, text, replyTo, headers, attachments }) => {
   const fromName = process.env.MAIL_FROM_NAME || 'Prestiva Property Services';
 
   // ── Direct SMTP ──
   if (smtpConfigured()) {
     const from = process.env.MAIL_FROM || `${fromName} <${process.env.SMTP_USER}>`;
-    await getTransporter().sendMail({ from, to, subject, html, text, replyTo, headers });
+    // Nodemailer expects { filename, content: Buffer }
+    const smtpAttachments = (attachments || []).map((a) => ({ filename: a.filename, content: a.content }));
+    await getTransporter().sendMail({ from, to, subject, html, text, replyTo, headers, attachments: smtpAttachments });
     return { ok: true, channel: 'smtp' };
   }
 
@@ -69,6 +71,11 @@ const sendMail = async ({ to, subject, html, text, replyTo, headers }) => {
         text,
         reply_to: replyTo,
         headers,
+        // Resend expects { filename, content: base64 }
+        attachments: (attachments || []).map((a) => ({
+          filename: a.filename,
+          content: Buffer.isBuffer(a.content) ? a.content.toString('base64') : a.content,
+        })),
       }),
     });
     const data = await response.json();

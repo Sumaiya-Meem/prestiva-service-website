@@ -85,7 +85,7 @@ const shell = (headerTitle, headerSubtitle, inner) => `
 </html>`;
 
 /* ───────────────────────── Admin notification ───────────────────────── */
-const adminTemplate = ({ fullName, phone, email, service, suburb, message, mapLat, mapLng }) => {
+const adminTemplate = ({ fullName, phone, email, service, propertyType, preferredDate, suburb, message, mapLat, mapLng, photoCount }) => {
   const row = (label, value) => `
     <tr>
       <td style="padding:13px 0; border-bottom:1px solid #f0f2f4; font-family:${FONT}; font-size:13px; color:#8a939e; width:34%; vertical-align:top;">${label}</td>
@@ -108,7 +108,10 @@ const adminTemplate = ({ fullName, phone, email, service, suburb, message, mapLa
       ${row('📞 Phone', `<a href="tel:${esc(phone)}" style="color:#0f4c81; text-decoration:none;">${esc(phone)}</a>`)}
       ${row('✉️ Email', `<a href="mailto:${esc(email)}" style="color:#0f4c81; text-decoration:none;">${esc(email)}</a>`)}
       ${row('🧹 Service', prettyService(service))}
+      ${propertyType ? row('🏠 Property type', esc(propertyType)) : ''}
+      ${preferredDate ? row('📅 Preferred date', esc(preferredDate)) : ''}
       ${row('📍 Location', `${esc(suburb)}${mapLink}`)}
+      ${photoCount ? row('📎 Photos', `${photoCount} attached`) : ''}
     </table>
 
     <div style="margin:24px 0 4px; background:#f8f9fb; border-left:4px solid ${GOLD}; border-radius:0 8px 8px 0; padding:18px 20px;">

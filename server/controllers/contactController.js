@@ -4,10 +4,10 @@ const { adminTemplate, customerTemplate, adminText, customerText } = require('..
 const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || ''));
 
 /**
- * Send the admin notification + customer auto-reply in parallel.
- * Runs AFTER the HTTP response so the user never waits on SMTP.
+ * Send the admin notification (with any photo attachments) + customer auto-reply
+ * in parallel. Runs AFTER the HTTP response so the user never waits on SMTP.
  */
-const dispatchEmails = async (payload, adminEmail) => {
+const dispatchEmails = async (payload, adminEmail, attachments) => {
   const results = await Promise.allSettled([
     sendMail({
       to: adminEmail,
@@ -15,6 +15,7 @@ const dispatchEmails = async (payload, adminEmail) => {
       subject: `New Request for Free Quote - ${payload.service}`,
       html: adminTemplate(payload),
       text: adminText(payload),
+      attachments,
     }),
     sendMail({
       to: payload.email,
@@ -31,43 +32,44 @@ const dispatchEmails = async (payload, adminEmail) => {
 
   results.forEach((r, i) => {
     const which = i === 0 ? 'admin notification' : 'customer auto-reply';
-    if (r.status === 'rejected') {
-      console.error(`[mail] ${which} FAILED:`, r.reason?.message || r.reason);
-    } else {
-      console.log(`[mail] ${which} sent via ${r.value.channel}`);
-    }
+    if (r.status === 'rejected') console.error(`[mail] ${which} FAILED:`, r.reason?.message || r.reason);
+    else console.log(`[mail] ${which} sent via ${r.value.channel}`);
   });
 };
 
 exports.submitContact = async (req, res) => {
   try {
-    const { fullName, phone, email, service, suburb, message, mapLat, mapLng, website } = req.body;
+    const {
+      fullName, phone, email, service, propertyType, preferredDate,
+      suburb, message, mapLat, mapLng, website,
+    } = req.body;
 
-    // ── Honeypot: real users never fill the hidden "website" field ──
+    // ── Honeypot ──
     if (website) {
       return res.status(201).json({ success: true, message: 'Contact request submitted successfully' });
     }
 
-    // ── Server-side validation ──
+    // ── Validation ──
     const errors = [];
     if (!fullName || String(fullName).trim().length < 2) errors.push('A valid full name is required.');
     if (!phone || String(phone).trim().length < 6) errors.push('A valid phone number is required.');
     if (!isEmail(email)) errors.push('A valid email address is required.');
     if (!service) errors.push('Please select a service.');
     if (!suburb || String(suburb).trim().length < 2) errors.push('Please provide a suburb/location.');
-
-    if (errors.length) {
-      return res.status(400).json({ success: false, message: errors.join(' ') });
-    }
+    if (errors.length) return res.status(400).json({ success: false, message: errors.join(' ') });
 
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@prestiva.com.au';
-    const payload = { fullName, phone, email, service, suburb, message, mapLat, mapLng };
+    const payload = { fullName, phone, email, service, propertyType, preferredDate, suburb, message, mapLat, mapLng };
 
-    // ── Respond immediately — the user gets instant confirmation ──
+    // Photos uploaded via multer (memory storage)
+    const attachments = (req.files || []).map((f) => ({ filename: f.originalname, content: f.buffer }));
+    payload.photoCount = attachments.length;
+
+    // Respond immediately
     res.status(201).json({ success: true, message: 'Contact request submitted successfully' });
 
-    // ── Emails are sent in the background (notification + auto-reply) ──
-    dispatchEmails(payload, adminEmail).catch((e) => console.error('dispatchEmails error:', e.message));
+    // Send emails in the background
+    dispatchEmails(payload, adminEmail, attachments).catch((e) => console.error('dispatchEmails error:', e.message));
   } catch (error) {
     console.error('Contact Submission Error:', error.message);
     if (!res.headersSent) {
