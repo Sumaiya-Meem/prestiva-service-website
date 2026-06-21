@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaFacebook, FaInstagram, FaLinkedin, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
+import { SiTiktok } from 'react-icons/si';
 import siteConfig from '../../config/siteConfig';
 import footerLogo from '../../assets/logos/prestiva-logo-stacked-navy-gold.svg';
 
@@ -25,7 +26,7 @@ const Footer = () => {
             <div className="social-links" style={{ display: 'flex', gap: '15px', marginTop: '24px' }}>
               <a href={siteConfig.social.facebook} className="social-link"><FaFacebook /></a>
               <a href={siteConfig.social.instagram} className="social-link"><FaInstagram /></a>
-              <a href={siteConfig.social.linkedin} className="social-link"><FaLinkedin /></a>
+              <a href={siteConfig.social.tiktok} className="social-link"><SiTiktok /></a>
             </div>
           </div>
 

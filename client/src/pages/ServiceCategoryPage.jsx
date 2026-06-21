@@ -39,6 +39,9 @@ const ServiceCategoryPage = ({ slug }) => {
           <div className="hero-content">
             <h1 className="hero-title">{cat.title} — {siteConfig.locationText}</h1>
             <p className="hero-subtitle">{cat.blurb}</p>
+            {cat.fromPrice && (
+              <p className="hero-price">Starting from <span>{cat.fromPrice}</span></p>
+            )}
             <div className="hero-btns cta-btns">
               <Link to="/contact" className="btn btn-primary">Get a Free Quote</Link>
               <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', borderColor: '#fff' }}>

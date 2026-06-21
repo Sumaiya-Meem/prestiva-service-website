@@ -798,6 +798,29 @@ html[data-theme="dark"] .upload-box:hover { color: var(--dark-text); }
 .legal-content ul li { margin-bottom: 8px; line-height: 1.7; }
 .legal-content a { color: var(--primary-gold); font-weight: 600; }
 
+/* Service hero "from" price badge */
+.hero-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 4px 0 24px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--primary-gold);
+  border-radius: 999px;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+.hero-price span {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary-gold);
+}
+
 /* Service category cards */
 .svc-grid {
   display: grid;

@@ -41,9 +41,9 @@ const siteConfig = {
 
   // ── Social Media Links ──
   social: {
-    facebook: "#",
-    instagram: "#",
-    linkedin: "#"
+    facebook: "https://facebook.com/Prestivapropertyservices",
+    instagram: "https://www.instagram.com/prestivapropertyservices",
+    tiktok: "https://www.tiktok.com/@prestivapropertyservices"
   },
 
   // ── API / Backend URL ──
