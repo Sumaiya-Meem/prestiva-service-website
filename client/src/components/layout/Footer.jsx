@@ -13,10 +13,16 @@ const Footer = () => {
             <Link to="/" className="footer-logo-badge" aria-label={`${siteConfig.businessName} home`}>
               <img src={footerLogo} alt={`${siteConfig.businessName} Logo`} loading="lazy" decoding="async" />
             </Link>
-            <p style={{ marginTop: '20px', color: '#6C757D' }}>
-              Your trusted partner for professional commercial cleaning, residential cleaning, and landscaping services. {siteConfig.tagline}
+            <p className="footer-motto">{siteConfig.motto}</p>
+            <p style={{ marginTop: '8px', color: '#9aa6b2', fontWeight: 600 }}>
+              {siteConfig.serviceCategories.map((cat, i) => (
+                <React.Fragment key={cat.slug}>
+                  {i > 0 && <>&nbsp;|&nbsp;</>}
+                  {cat.title.replace(' Services', '')}
+                </React.Fragment>
+              ))}
             </p>
-            <div className="social-links" style={{ display: 'flex', gap: '15px', marginTop: '25px' }}>
+            <div className="social-links" style={{ display: 'flex', gap: '15px', marginTop: '24px' }}>
               <a href={siteConfig.social.facebook} className="social-link"><FaFacebook /></a>
               <a href={siteConfig.social.instagram} className="social-link"><FaInstagram /></a>
               <a href={siteConfig.social.linkedin} className="social-link"><FaLinkedin /></a>
@@ -27,9 +33,11 @@ const Footer = () => {
             <h4 className="footer-title">Quick Links</h4>
             <ul className="footer-links">
               <li><Link to="/">Home</Link></li>
-              <li><Link to="/about">About Us</Link></li>
+              <li><Link to="/#services">Services</Link></li>
+              <li><Link to="/#pricing">Pricing</Link></li>
               <li><Link to="/gallery">Gallery</Link></li>
-              <li><Link to="/contact">Get a Quote</Link></li>
+              <li><Link to="/contact">Contact</Link></li>
+              <li><Link to="/contact">Get a Free Quote</Link></li>
             </ul>
           </div>
 
@@ -39,7 +47,6 @@ const Footer = () => {
               {siteConfig.serviceCategories.map((cat) => (
                 <li key={cat.slug}><Link to={cat.path}>{cat.title}</Link></li>
               ))}
-              <li><Link to="/contact">Get a Quote</Link></li>
             </ul>
           </div>
 
@@ -47,13 +54,13 @@ const Footer = () => {
             <h4 className="footer-title">Contact Us</h4>
             <ul className="footer-links">
               <li style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <FaMapMarkerAlt color="#D4A853" /> Adelaide, South Australia
+              </li>
+              <li style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                 <FaPhoneAlt color="#D4A853" /> <a href={`tel:${siteConfig.phoneRaw}`}>{siteConfig.phone}</a>
               </li>
               <li style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                 <FaEnvelope color="#D4A853" /> <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
-              </li>
-              <li style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <FaMapMarkerAlt color="#D4A853" /> {siteConfig.locationText}
               </li>
             </ul>
           </div>

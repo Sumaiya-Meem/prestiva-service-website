@@ -4,11 +4,11 @@ import HeroSection from '../components/sections/home/HeroSection';
 import TrustStats from '../components/sections/home/TrustStats';
 import ServicesOverview from '../components/sections/home/ServicesOverview';
 import CommercialSpotlight from '../components/sections/home/CommercialSpotlight';
+import WhoWeWorkWith from '../components/sections/home/WhoWeWorkWith';
 import WhyChoose from '../components/sections/home/WhyChoose';
 import Reviews from '../components/sections/home/Reviews';
 import BeforeAfterGallery from '../components/sections/home/BeforeAfterGallery';
 import PricingOverview from '../components/sections/home/PricingOverview';
-import CleaningChecklist from '../components/sections/home/CleaningChecklist';
 import AddOnServices from '../components/sections/home/AddOnServices';
 import FAQ from '../components/sections/home/FAQ';
 import ServiceAreas from '../components/sections/home/ServiceAreas';
@@ -19,19 +19,19 @@ const HomePage = () => {
   return (
     <div className="home-page">
       <Seo
-        title="Prestiva Property Services | Cleaning, Landscaping & Turf — Adelaide & Sydney"
-        description="Professional commercial & residential cleaning, after-construction cleaning, gutter cleaning, turf laying, irrigation and landscaping in Adelaide & Sydney. Fully insured. Get a free quote — call 0403 540 227."
+        title="Premium Property Maintenance, Landscaping & Cleaning in Adelaide | Prestiva"
+        description="Your Partner in Property Excellence. Property maintenance, landscaping and turf, plus commercial & builders cleaning across Adelaide. Fully insured, police checked. Get a free quote — call 0403 540 227."
         path="/"
       />
       <HeroSection />
       <TrustStats />
       <ServicesOverview />
       <CommercialSpotlight />
+      <WhoWeWorkWith />
       <WhyChoose />
       <Reviews />
       <BeforeAfterGallery />
       <PricingOverview />
-      <CleaningChecklist />
       <AddOnServices />
       <FAQ />
       <ServiceAreas />

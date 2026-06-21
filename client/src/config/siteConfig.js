@@ -12,6 +12,7 @@ const siteConfig = {
   businessName: "Prestiva Property Services",
   businessNameShort: "Prestiva",
   tagline: "Reliable results, every time.",
+  motto: "Your Partner in Property Excellence",
 
   // ── Contact Details ──
   phone: "0403 540 227",
@@ -26,7 +27,8 @@ const siteConfig = {
   serviceAreasDetailed: [
     {
       city: "Adelaide",
-      suburbs: "CBD, North, South, East & West Suburbs"
+      region: "Greater Adelaide Metropolitan Area",
+      suburbs: "CBD • Northern Suburbs • Southern Suburbs • Eastern Suburbs • Western Suburbs"
     },
     {
       city: "Sydney",
@@ -84,6 +86,7 @@ const siteConfig = {
       slug: "property-maintenance",
       title: "Property Maintenance",
       path: "/property-maintenance",
+      fromPrice: "$65",
       blurb: "Reliable upkeep to keep every property in top condition.",
       services: [
         { name: "General Property Maintenance" },
@@ -100,6 +103,7 @@ const siteConfig = {
       slug: "landscaping",
       title: "Landscaping",
       path: "/landscaping",
+      fromPrice: "$99",
       blurb: "Transforming outdoor spaces with turf, irrigation and design.",
       services: [
         { name: "Turf Laying" },
@@ -107,6 +111,7 @@ const siteConfig = {
         { name: "Soil Preparation" },
         { name: "Lawn Repair" },
         { name: "Garden Clean-Up" },
+        { name: "Mulching" },
         { name: "Outdoor Area Preparation" },
         { name: "Fencing", comingSoon: true },
         { name: "Retaining Walls", comingSoon: true }
@@ -116,17 +121,17 @@ const siteConfig = {
       slug: "cleaning",
       title: "Cleaning Services",
       path: "/cleaning",
+      fromPrice: "$120",
       blurb: "Spotless results for homes, offices and everything in between.",
       services: [
         { name: "Commercial Cleaning", to: "/commercial" },
-        { name: "Office Cleaning" },
-        { name: "Builders & After-Construction Cleaning" },
-        { name: "Real Estate Cleaning" },
-        { name: "Airbnb Cleaning" },
+        { name: "Builders Cleaning" },
+        { name: "After-Construction Cleaning" },
         { name: "End-of-Lease Cleaning", to: "/residential" },
         { name: "Carpet Cleaning" },
         { name: "Window Cleaning" },
-        { name: "Deep Cleaning" }
+        { name: "Deep Cleaning" },
+        { name: "Office Cleaning" }
       ]
     }
   ],
@@ -143,9 +148,9 @@ const siteConfig = {
 
   // ── Announcement Bar Messages ──
   announcements: [
-    "🏢 Commercial Cleaning Specialists",
-    "🏠 Residential Cleaning",
-    "🌿 Landscaping & Gardening",
+    "🛠️ Property Maintenance Specialists",
+    "🌿 Landscaping & Turf",
+    "🏢 Commercial & Builders Cleaning",
     "✅ Fully Insured & Police Checked",
     "⭐ 5-Star Google Rated",
     "⏰ 7 Days a Week",

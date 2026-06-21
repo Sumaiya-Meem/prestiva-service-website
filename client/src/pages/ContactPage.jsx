@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FaPhoneAlt, FaEnvelope, FaWhatsapp, FaMapMarkerAlt, FaClock, FaCheckCircle, FaCrosshairs } from 'react-icons/fa';
+import { useSearchParams } from 'react-router-dom';
+import { FaPhoneAlt, FaEnvelope, FaWhatsapp, FaMapMarkerAlt, FaClock, FaCheckCircle, FaCrosshairs, FaCloudUploadAlt } from 'react-icons/fa';
 import axios from 'axios';
 import siteConfig from '../config/siteConfig';
 import Seo from '../components/utils/Seo';
@@ -18,18 +19,49 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
+// Quote-form service options + their starting prices
+const QUOTE_SERVICES = [
+  // Property Maintenance
+  { name: 'Property Maintenance', price: 'From $65' },
+  { name: 'Lawn & Garden Care', price: 'From $65' },
+  { name: 'Gutter Cleaning', price: 'From $65' },
+  { name: 'Pressure Cleaning', price: 'From $65' },
+  // Landscaping
+  { name: 'Turf Laying', price: 'From $99' },
+  { name: 'Irrigation', price: 'From $99' },
+  // Cleaning Services
+  { name: 'Commercial Cleaning', price: 'From $35/hour' },
+  { name: 'Builders / After-Construction Cleaning', price: 'From $120' },
+  { name: 'End-of-Lease Cleaning', price: 'From $120' },
+  { name: 'Other' },
+];
+const SERVICE_PRICE_MAP = Object.fromEntries(QUOTE_SERVICES.filter((s) => s.price).map((s) => [s.name, s.price]));
+const PROPERTY_TYPES = ['Residential / Home', 'Commercial / Office', 'Retail', 'Real Estate', 'Construction Site', 'Strata', 'Other'];
+
 const ContactPage = () => {
+  const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
     email: '',
     service: '',
+    propertyType: '',
+    preferredDate: '',
     suburb: '',
     message: '',
     website: '', // honeypot — must stay empty
     mapLat: null,
     mapLng: null
   });
+  const [photos, setPhotos] = useState([]);
+
+  // Pre-select the service if arriving from a pricing button (/contact?service=...)
+  useEffect(() => {
+    const s = searchParams.get('service');
+    if (s && QUOTE_SERVICES.some((opt) => opt.name === s)) {
+      setFormData((prev) => ({ ...prev, service: s }));
+    }
+  }, [searchParams]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const defaultLocation = { lat: -34.9285, lng: 138.6007 }; // Default to Adelaide approx
@@ -110,26 +142,29 @@ const ContactPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handlePhotos = (e) => {
+    const files = Array.from(e.target.files || []).slice(0, 6);
+    setPhotos(files);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus(null);
 
     try {
-      const response = await axios.post(`${siteConfig.apiBaseUrl}/api/contact`, formData);
+      const data = new FormData();
+      Object.entries(formData).forEach(([k, v]) => data.append(k, v === null ? '' : v));
+      photos.forEach((file) => data.append('photos', file));
+
+      const response = await axios.post(`${siteConfig.apiBaseUrl}/api/contact`, data);
       if (response.data.success) {
         setSubmitStatus('success');
         setFormData({
-          fullName: '',
-          phone: '',
-          email: '',
-          service: '',
-          suburb: '',
-          message: '',
-          website: '',
-          mapLat: null,
-          mapLng: null
+          fullName: '', phone: '', email: '', service: '', propertyType: '',
+          preferredDate: '', suburb: '', message: '', website: '', mapLat: null, mapLng: null,
         });
+        setPhotos([]);
       }
     } catch (error) {
       console.error("Submission error:", error);
@@ -146,6 +181,8 @@ const ContactPage = () => {
     return () => clearTimeout(timer);
   }, [submitStatus]);
 
+  const servicePrice = SERVICE_PRICE_MAP[formData.service];
+
   return (
     <div className="contact-page">
       {/* Confirmation / error toast — appears after the BE responds, then auto-vanishes */}
@@ -154,7 +191,7 @@ const ContactPage = () => {
           {submitStatus === 'success' ? (
             <>
               <FaCheckCircle className="form-toast__icon" />
-              <div><strong>Thank you!</strong> We've received your request and will reach out to you soon.</div>
+              <div><strong>Thank you.</strong> Your quote request has been received. Our team will contact you shortly.</div>
             </>
           ) : (
             <>
@@ -273,15 +310,34 @@ const ContactPage = () => {
                     <select name="service" value={formData.service} onChange={handleChange} required
                       style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box', backgroundColor: 'var(--surface)', color: 'var(--dark-text)' }}>
                       <option value="">Select Service</option>
-                      {siteConfig.serviceCategories.map((cat) => (
-                        <optgroup key={cat.slug} label={cat.title}>
-                          {cat.services.filter((s) => !s.comingSoon).map((s) => (
-                            <option key={s.name} value={s.name}>{s.name}</option>
-                          ))}
-                        </optgroup>
+                      {QUOTE_SERVICES.map((s) => (
+                        <option key={s.name} value={s.name}>{s.name}</option>
                       ))}
-                      <option value="Other">Other / Not sure</option>
                     </select>
+                    {servicePrice && (
+                      <div className="service-price-note">
+                        <span>Starting price</span>
+                        <strong>{servicePrice}</strong>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="contact-form-grid" style={{ marginBottom: '20px' }}>
+                  <div className="form-group">
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Property Type</label>
+                    <select name="propertyType" value={formData.propertyType} onChange={handleChange}
+                      style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box', backgroundColor: 'var(--surface)', color: 'var(--dark-text)' }}>
+                      <option value="">Select Property Type</option>
+                      {PROPERTY_TYPES.map((p) => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Preferred Date</label>
+                    <input type="date" name="preferredDate" value={formData.preferredDate} onChange={handleChange}
+                      style={{ width: '100%', padding: '13px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box', backgroundColor: 'var(--surface)', color: 'var(--dark-text)' }} />
                   </div>
                 </div>
 
@@ -319,16 +375,25 @@ const ContactPage = () => {
                     placeholder="Select a point on the map, use your location, or type your full address here" />
                 </div>
 
-                <div style={{ marginBottom: '30px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Message (optional)</label>
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Job Details (optional)</label>
                   <textarea name="message" value={formData.message} onChange={handleChange} rows="4"
-                    style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box', resize: 'vertical' }} placeholder="Tell us about your cleaning needs..."></textarea>
+                    style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box', resize: 'vertical' }} placeholder="Tell us about the job — size, access, frequency, special requests…"></textarea>
+                </div>
+
+                <div style={{ marginBottom: '30px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Upload Photos (optional)</label>
+                  <label className="upload-box">
+                    <FaCloudUploadAlt />
+                    <span>{photos.length ? `${photos.length} photo${photos.length > 1 ? 's' : ''} selected` : 'Tap to add photos of the job (up to 6)'}</span>
+                    <input type="file" name="photos" accept="image/*" multiple onChange={handlePhotos} style={{ display: 'none' }} />
+                  </label>
                 </div>
 
                 <button type="submit" className="btn btn-primary" disabled={isSubmitting}
                   style={{ width: '100%', padding: '16px', fontSize: '1.05rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', opacity: isSubmitting ? 0.75 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}>
                   {isSubmitting && <span className="btn-spinner" aria-hidden="true" />}
-                  {isSubmitting ? 'Sending…' : 'Get a Free Quote'}
+                  {isSubmitting ? 'Sending…' : 'Submit Quote Request'}
                 </button>
               </form>
             </div>

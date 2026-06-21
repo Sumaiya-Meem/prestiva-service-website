@@ -133,10 +133,10 @@ const ResidentialPage = () => {
       {/* CTA */}
       <section className="section cta-banner bg-navy" style={{ textAlign: 'center' }}>
         <div className="container">
-          <h2 className="section-title" style={{ color: '#fff' }}>Book a Home Clean</h2>
+          <h2 className="section-title" style={{ color: '#fff' }}>Book a Cleaning Service</h2>
           <p style={{ color: '#fff', marginBottom: '30px' }}>Ready to enjoy a sparkling clean home?</p>
           <div className="cta-btns" style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-            <Link to="/contact" className="btn btn-primary">Book Now</Link>
+            <Link to="/contact" className="btn btn-primary">Get Cleaning Quote</Link>
             <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ color: '#fff', borderColor: '#fff' }}>Call Now</a>
           </div>
           <ContactLine />

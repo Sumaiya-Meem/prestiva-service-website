@@ -7,7 +7,7 @@ import useCarousel from '../../utils/useCarousel';
 // All photos per category, loaded from the gallery folders.
 const modules = import.meta.glob('../../../assets/gallery/**/*.webp', { eager: true, query: '?url', import: 'default' });
 
-const ORDER = ['office', 'builders', 'end-of-lease', 'real-estate', 'airbnb', 'pressure', 'property'];
+const ORDER = ['property', 'pressure', 'office', 'builders', 'end-of-lease', 'real-estate', 'airbnb'];
 const TAGS = {
   office: 'Office Cleaning',
   builders: 'Builders Cleaning',

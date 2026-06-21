@@ -72,6 +72,52 @@
   }
 }
 
+/* Hero motto + trust line */
+.hero-motto {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary-gold);
+  margin-bottom: 14px;
+  letter-spacing: 0.4px;
+}
+
+.hero-trust {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 34px 0 0;
+  padding: 0;
+}
+
+.hero-trust li {
+  position: relative;
+  color: rgba(255, 255, 255, 0.92);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 4px 18px;
+}
+
+.hero-trust li:first-child { padding-left: 0; }
+
+.hero-trust li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+@media (max-width: 768px) {
+  .hero-motto { font-size: 1.15rem; }
+  .hero-trust { justify-content: center; }
+  .hero-trust li { font-size: 0.78rem; padding: 4px 11px; }
+}
+
 /* Homepage hero — Ken Burns zoom */
 .hero-home {
   position: relative;
@@ -224,6 +270,81 @@
   list-style: none;
 }
 
+/* Commercial spotlight checklist */
+.spotlight-checklist {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 24px;
+  margin: 0;
+  padding: 0;
+}
+
+.spotlight-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-weight: 500;
+  font-size: 0.98rem;
+}
+
+.spotlight-check {
+  color: #27c281;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+@media (max-width: 560px) {
+  .spotlight-checklist { grid-template-columns: 1fr; }
+}
+
+/* Who We Work With */
+.who-we-work {
+  background-color: var(--off-white);
+}
+
+.who-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+}
+
+.who-card {
+  background: var(--surface);
+  border: 1px solid var(--light-gray);
+  border-radius: 14px;
+  padding: 28px 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  transition: var(--transition-smooth);
+}
+
+.who-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary-gold);
+  box-shadow: 0 14px 30px rgba(10, 22, 40, 0.1);
+}
+
+.who-icon { font-size: 2rem; color: var(--accent); }
+
+.who-label {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.92rem;
+  line-height: 1.3;
+}
+
+@media (max-width: 992px) {
+  .who-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .who-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
 /* Why Choose Prestiva */
 .why-choose {
   background: var(--navy-gradient);
@@ -330,8 +451,57 @@
 
 .service-card-title {
   font-size: 1.5rem;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
+
+.service-card-price {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: var(--primary-gold);
+  margin-bottom: 14px;
+}
+
+/* Quote-form price note (shown when a service is selected) */
+.service-price-note {
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 14px;
+  background: rgba(212, 168, 83, 0.12);
+  border: 1px solid rgba(212, 168, 83, 0.35);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--medium-gray);
+}
+
+.service-price-note strong {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  color: var(--primary-gold);
+}
+
+.service-price-note__cat { font-size: 0.82rem; }
+
+/* Photo upload box */
+.upload-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 2px dashed var(--light-gray);
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--medium-gray);
+  font-size: 0.92rem;
+  transition: var(--transition-smooth);
+}
+
+.upload-box:hover { border-color: var(--primary-gold); color: var(--primary-navy); }
+.upload-box svg { font-size: 1.5rem; color: var(--primary-gold); flex-shrink: 0; }
+html[data-theme="dark"] .upload-box:hover { color: var(--dark-text); }
 
 .service-card-text {
   color: var(--medium-gray);
@@ -1049,6 +1219,38 @@ html[data-theme="dark"] .carousel-arrow { color: var(--dark-text); }
   font-weight: 500;
 }
 
+/* 4-card homepage pricing grid */
+.price-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+.price-grid-4 .pricing-card {
+  padding: 40px 28px;
+}
+
+/* keep the highlighted card from scaling into its neighbours */
+.price-grid-4 .pricing-card.popular {
+  transform: none;
+}
+
+@media (max-width: 1200px) {
+  .price-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 780px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .price-grid-4 {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+  }
+}
+
 /* ── Gardening pricing enhancements ── */
 .gardening-pricing {
   background-color: var(--off-white);
@@ -1408,4 +1610,26 @@ html[data-theme="dark"] .carousel-arrow { color: var(--dark-text); }
     width: 100%;
     text-align: center;
   }
+}
+
+/* ════════════════ Mobile layout fixes ════════════════ */
+@media (max-width: 768px) {
+  /* The stats strip floats over the hero on desktop; avoid overlapping hero text on mobile */
+  .trust-stats-strip { margin-top: 16px; }
+
+  /* Decorative accent can overflow on small screens */
+  .image-accent { display: none; }
+}
+
+@media (max-width: 560px) {
+  .hero-title { font-size: 1.95rem; }
+  .hero-motto { font-size: 1.1rem; }
+  .section-title { font-size: 1.55rem; }
+
+  /* The contact form box uses big desktop padding — tighten on phones */
+  .contact-form-container { padding: 26px !important; }
+
+  /* Comfortable card padding on small screens */
+  .pricing-card { padding: 34px 22px; }
+  .service-card { padding: 30px 22px; }
 }

@@ -16,10 +16,11 @@ const ServicesOverview = () => {
     description: cat.blurb,
     icon: iconMap[cat.slug],
     link: cat.path,
+    price: cat.fromPrice,
   }));
 
   return (
-    <section className="section services-overview">
+    <section id="services" className="section services-overview">
       <div className="container">
         <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
           <h2 className="section-title">Our Service Specialisations</h2>
@@ -31,6 +32,7 @@ const ServicesOverview = () => {
             <div key={service.id} className="service-card">
               <div className="service-icon-box">{service.icon}</div>
               <h3 className="service-card-title">{service.title}</h3>
+              {service.price && <p className="service-card-price">From {service.price}</p>}
               <p className="service-card-text">{service.description}</p>
               <Link to={service.link} className="service-link">Learn More &rarr;</Link>
             </div>

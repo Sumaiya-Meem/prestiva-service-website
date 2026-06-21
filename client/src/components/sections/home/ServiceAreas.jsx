@@ -15,7 +15,10 @@ const ServiceAreas = () => {
           {siteConfig.serviceAreasDetailed.map((area, index) => (
             <div key={index} className="area-card" style={{ flex: '1', maxWidth: '400px', padding: '40px', backgroundColor: 'var(--surface)', borderRadius: '20px', boxShadow: '0 10px 40px rgba(0,0,0,0.05)', textAlign: 'center' }}>
               <div className="area-icon" style={{ fontSize: '2.5rem', color: 'var(--accent)', marginBottom: '20px' }}><FaMapMarkerAlt /></div>
-              <h3 style={{ fontSize: '1.5rem', marginBottom: '15px' }}>{area.city}</h3>
+              <h3 style={{ fontSize: '1.5rem', marginBottom: area.region ? '6px' : '15px' }}>{area.city}</h3>
+              {area.region && (
+                <p style={{ color: 'var(--primary-gold)', fontWeight: 700, fontFamily: 'var(--font-heading)', marginBottom: '12px' }}>{area.region}</p>
+              )}
               <p style={{ color: 'var(--medium-gray)' }}>{area.suburbs}</p>
             </div>
           ))}

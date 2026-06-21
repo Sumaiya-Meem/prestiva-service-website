@@ -750,6 +750,14 @@ html[data-theme="dark"] .search-result__title { color: var(--dark-text); }
   width: auto;
 }
 
+.footer-motto {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--primary-gold);
+  margin-top: 16px;
+}
+
 .footer-title {
   color: var(--primary-gold);
   font-size: 1.2rem;
@@ -821,10 +829,11 @@ html[data-theme="dark"] .search-result__title { color: var(--dark-text); }
 
 @media (max-width: 768px) {
   .scroll-to-top {
-    bottom: 90px; /* Sit above the sticky mobile contact bar */
-    right: 20px;
-    width: 50px;
-    height: 50px;
+    bottom: 84px; /* Sit above the sticky mobile contact bar */
+    right: 14px;
+    width: 42px;
+    height: 42px;
+    font-size: 1rem;
   }
 }
 
@@ -995,13 +1004,13 @@ html[data-theme="dark"] .search-result__title { color: var(--dark-text); }
 
 @media (max-width: 768px) {
   .fab {
-    bottom: 90px; /* above the sticky contact bar */
-    left: 16px;
-    gap: 12px;
+    bottom: 84px; /* above the sticky contact bar */
+    left: 14px;
+    gap: 11px;
   }
-  .fab__toggle { width: 54px; height: 54px; font-size: 1.35rem; }
-  .fab__menu { gap: 12px; }
-  .fab__action { width: 46px; height: 46px; font-size: 1.1rem; }
+  .fab__toggle { width: 48px; height: 48px; font-size: 1.2rem; }
+  .fab__menu { gap: 11px; }
+  .fab__action { width: 44px; height: 44px; font-size: 1.05rem; }
   .fab__tooltip { display: none; } /* icons are self-explanatory on touch */
 }
 

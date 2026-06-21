@@ -8,8 +8,8 @@ const FAQ = () => {
       answer: "We currently provide professional cleaning and landscaping services across Adelaide and Sydney and their surrounding suburbs."
     },
     {
-      question: "Are your cleaners insured and police-checked?",
-      answer: "Yes, absolutely. For your peace of mind, all our staff undergo rigorous background checks and we carry full public liability insurance."
+      question: "Are your team members insured and police-checked?",
+      answer: "Yes, our team members are professionally selected and committed to providing safe, reliable and high-quality service."
     },
     {
       question: "Do I need to be home for the service?",

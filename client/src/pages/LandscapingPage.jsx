@@ -24,7 +24,7 @@ const LandscapingPage = () => {
           <div className="hero-content">
             <h1 className="hero-title">Landscaping & Garden Services — {siteConfig.locationText}</h1>
             <div className="hero-btns cta-btns">
-              <Link to="/contact" className="btn btn-primary">Get a Garden Quote</Link>
+              <Link to="/contact" className="btn btn-primary">Get Landscaping Quote</Link>
               <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', borderColor: '#fff' }}>
                 <FaPhoneAlt /> Call Now
               </a>
@@ -140,7 +140,7 @@ const LandscapingPage = () => {
                 <li><FaCheckCircle className="plan-check" /> Exterior walls &amp; fencing</li>
                 <li><FaCheckCircle className="plan-check" /> Mould &amp; grime removed</li>
               </ul>
-              <Link to="/contact" className="btn btn-outline" style={{ marginTop: 'auto', width: '100%', textAlign: 'center' }}>Book Now</Link>
+              <Link to="/contact" className="btn btn-outline" style={{ marginTop: 'auto', width: '100%', textAlign: 'center' }}>Get a Quote</Link>
             </div>
           </div>
 
@@ -153,10 +153,10 @@ const LandscapingPage = () => {
       {/* CTA */}
       <section className="section cta-banner bg-navy" style={{ textAlign: 'center' }}>
         <div className="container">
-          <h2 className="section-title" style={{ color: '#fff' }}>Book a Garden Service</h2>
+          <h2 className="section-title" style={{ color: '#fff' }}>Book a Landscaping Service</h2>
           <p style={{ color: '#fff', marginBottom: '30px' }}>Ready to transform your outdoor space?</p>
           <div className="cta-btns" style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-            <Link to="/contact" className="btn btn-primary">Book Now</Link>
+            <Link to="/contact" className="btn btn-primary">Get Landscaping Quote</Link>
             <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ color: '#fff', borderColor: '#fff' }}>Call Now</a>
           </div>
           <ContactLine />
