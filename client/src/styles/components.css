@@ -16,10 +16,10 @@
 /* Contact form confirmation toast (auto-dismisses) */
 .form-toast {
   position: fixed;
-  top: 90px;
+  bottom: 32px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1500;
+  z-index: 3000;
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -54,12 +54,13 @@
 .form-toast__close:hover { opacity: 1; }
 
 @keyframes toastIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(-18px); }
+  from { opacity: 0; transform: translateX(-50%) translateY(24px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 @media (max-width: 768px) {
-  .form-toast { top: 70px; }
+  /* Sit above the fixed mobile contact bar */
+  .form-toast { bottom: 88px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -975,7 +976,7 @@ html[data-theme="dark"] .search-result__title { color: var(--dark-text); }
 .fab-wa   { background: #25D366; }
 .fab-fb   { background: #1877F2; }
 .fab-ig   { background: radial-gradient(circle at 30% 110%, #fdf497 0%, #fd5949 45%, #d6249f 70%, #285AEB 100%); }
-.fab-li   { background: #0A66C2; }
+.fab-tt   { background: #010101; }
 
 /* Hover label */
 .fab__tooltip {

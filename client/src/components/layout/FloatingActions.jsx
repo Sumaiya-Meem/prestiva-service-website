@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  FaPhoneAlt, FaWhatsapp, FaFacebookF, FaInstagram, FaLinkedinIn,
+  FaPhoneAlt, FaWhatsapp, FaFacebookF, FaInstagram,
   FaCommentDots, FaTimes, FaFileInvoiceDollar,
 } from 'react-icons/fa';
+import { SiTiktok } from 'react-icons/si';
 import siteConfig from '../../config/siteConfig';
 
 /**
  * A single floating action button that expands into a speed-dial menu:
- * Get a Free Quote, Call Now, WhatsApp, Facebook, Instagram, LinkedIn.
+ * Get a Free Quote, Call Now, WhatsApp, Facebook, Instagram, TikTok.
  * Fully responsive.
  */
 const FloatingActions = () => {
@@ -24,7 +25,7 @@ const FloatingActions = () => {
     { key: 'wa', label: 'WhatsApp', href: `https://wa.me/${siteConfig.whatsappRaw}?text=${waText}`, icon: <FaWhatsapp />, cls: 'fab-wa' },
     { key: 'fb', label: 'Facebook', href: siteConfig.social.facebook, icon: <FaFacebookF />, cls: 'fab-fb' },
     { key: 'ig', label: 'Instagram', href: siteConfig.social.instagram, icon: <FaInstagram />, cls: 'fab-ig' },
-    { key: 'li', label: 'LinkedIn', href: siteConfig.social.linkedin, icon: <FaLinkedinIn />, cls: 'fab-li' },
+    { key: 'tt', label: 'TikTok', href: siteConfig.social.tiktok, icon: <SiTiktok />, cls: 'fab-tt' },
   ];
 
   const close = () => setOpen(false);

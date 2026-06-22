@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 import { FaPhoneAlt, FaEnvelope, FaWhatsapp, FaMapMarkerAlt, FaClock, FaCheckCircle, FaCrosshairs, FaCloudUploadAlt } from 'react-icons/fa';
 import axios from 'axios';
@@ -185,8 +186,9 @@ const ContactPage = () => {
 
   return (
     <div className="contact-page">
-      {/* Confirmation / error toast — appears after the BE responds, then auto-vanishes */}
-      {submitStatus && (
+      {/* Confirmation / error snackbar — portalled to <body> so it's pinned to the
+          viewport (the page wrapper's lingering transform would otherwise trap it). */}
+      {submitStatus && createPortal(
         <div className={`form-toast form-toast--${submitStatus}`} role="status" aria-live="polite">
           {submitStatus === 'success' ? (
             <>
@@ -200,7 +202,8 @@ const ContactPage = () => {
             </>
           )}
           <button type="button" className="form-toast__close" onClick={() => setSubmitStatus(null)} aria-label="Dismiss">&times;</button>
-        </div>
+        </div>,
+        document.body
       )}
       <Seo
         title="Contact Us & Get a Free Quote | Prestiva Property Services"
