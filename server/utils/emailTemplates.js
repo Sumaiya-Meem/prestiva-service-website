@@ -70,7 +70,7 @@ const shell = (headerTitle, headerSubtitle, inner) => `
                 <a href="mailto:${EMAIL}" style="color:${NAVY}; text-decoration:none; font-weight:600;">${EMAIL}</a>
               </div>
               <div style="font-family:${FONT}; font-size:12px; color:#9aa3ad; margin-top:6px;">
-                Cleaning &middot; Landscaping &middot; Turf &amp; Irrigation &nbsp;|&nbsp; Adelaide &amp; Sydney
+                Property Maintenance &middot; Landscaping &middot; Cleaning &nbsp;|&nbsp; Adelaide &amp; Sydney
               </div>
               <div style="font-family:${FONT}; font-size:12px; margin-top:8px;">
                 <a href="${SITE}" style="color:${GOLD}; text-decoration:none;">www.prestiva.com.au</a>

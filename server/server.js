@@ -6,6 +6,8 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config();
 
+const { connectDB } = require('./config/db');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -13,7 +15,8 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// No database connection needed anymore, application handles emails via Nodemailer
+// Connect to MongoDB (optional — skips gracefully if MONGODB_URI is unset)
+connectDB();
 
 app.get('/', (req, res) => {
   res.send('Prestiva Backend Server Running');
@@ -24,6 +27,8 @@ app.use('/api/health', (req, res) => res.json({ status: 'OK' }));
 
 // Routes
 app.use('/api/contact', require('./routes/contactRoutes'));
+app.use('/api/settings', require('./routes/settingsRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
