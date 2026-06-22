@@ -15,6 +15,10 @@ app.use(express.json());
 
 // No database connection needed anymore, application handles emails via Nodemailer
 
+app.get('/', (req, res) => {
+  res.send('Prestiva Backend Server Running');
+});
+
 // Basic Route
 app.use('/api/health', (req, res) => res.json({ status: 'OK' }));
 
