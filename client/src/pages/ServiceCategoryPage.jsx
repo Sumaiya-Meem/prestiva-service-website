@@ -22,12 +22,36 @@ const ServiceCategoryPage = ({ slug }) => {
   const hero = heroBySlug[slug] || cleaningHero;
   const serviceNames = cat.services.map((s) => s.name).join(', ');
 
+  const serviceSchema = {
+    '@type': 'Service',
+    name: cat.title,
+    serviceType: cat.title,
+    description: cat.blurb,
+    provider: { '@id': 'https://www.prestiva.com.au/#business' },
+    areaServed: siteConfig.locations,
+    ...(cat.fromPrice && {
+      offers: {
+        '@type': 'Offer',
+        price: cat.fromPrice.replace(/[^0-9.]/g, ''),
+        priceCurrency: 'AUD',
+      },
+    }),
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: `${cat.title} services`,
+      itemListElement: cat.services
+        .filter((s) => !s.comingSoon)
+        .map((s) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: s.name } })),
+    },
+  };
+
   return (
     <div className="service-category-page">
       <Seo
         title={`${cat.title} — ${siteConfig.locationText} | ${siteConfig.businessNameShort}`}
         description={`${cat.blurb} ${cat.title} in ${siteConfig.locationText}: ${serviceNames}. Fully insured. Get a free quote — call ${siteConfig.phone}.`}
         path={cat.path}
+        schema={serviceSchema}
       />
 
       {/* Hero */}

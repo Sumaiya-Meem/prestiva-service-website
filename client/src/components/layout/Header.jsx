@@ -4,7 +4,7 @@ import { FaPhoneAlt, FaEnvelope, FaBars, FaTimes, FaBell, FaChevronDown, FaSearc
 import siteConfig from '../../config/siteConfig';
 import ThemeToggle from '../utils/ThemeToggle';
 import SearchModal from './SearchModal';
-import logo from '../../assets/logos/prestiva-logo-horizontal-navy-gold.svg';
+import logo from '../../assets/logos/prestiva-logo-horizontal-navy-gold.webp';
 
 const navItems = [
   { to: '/', label: 'Home', end: true },

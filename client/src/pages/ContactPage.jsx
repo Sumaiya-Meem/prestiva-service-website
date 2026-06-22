@@ -291,26 +291,26 @@ const ContactPage = () => {
                 />
                 <div className="contact-form-grid">
                   <div className="form-group">
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Full Name *</label>
-                    <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required
+                    <label htmlFor="cf-fullName" style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Full Name *</label>
+                    <input id="cf-fullName" type="text" name="fullName" value={formData.fullName} onChange={handleChange} required autoComplete="name"
                       style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box' }} placeholder="John Doe" />
                   </div>
                   <div className="form-group">
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Phone Number *</label>
-                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required
+                    <label htmlFor="cf-phone" style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Phone Number *</label>
+                    <input id="cf-phone" type="tel" name="phone" value={formData.phone} onChange={handleChange} required autoComplete="tel"
                       style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box' }} placeholder="0400 000 000" />
                   </div>
                 </div>
 
                 <div className="contact-form-grid" style={{ marginBottom: '20px' }}>
                   <div className="form-group">
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Email Address *</label>
-                    <input type="email" name="email" value={formData.email} onChange={handleChange} required
+                    <label htmlFor="cf-email" style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Email Address *</label>
+                    <input id="cf-email" type="email" name="email" value={formData.email} onChange={handleChange} required autoComplete="email"
                       style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box' }} placeholder="john@example.com" />
                   </div>
                   <div className="form-group">
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Service Required *</label>
-                    <select name="service" value={formData.service} onChange={handleChange} required
+                    <label htmlFor="cf-service" style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Service Required *</label>
+                    <select id="cf-service" name="service" value={formData.service} onChange={handleChange} required
                       style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box', backgroundColor: 'var(--surface)', color: 'var(--dark-text)' }}>
                       <option value="">Select Service</option>
                       {QUOTE_SERVICES.map((s) => (
@@ -328,8 +328,8 @@ const ContactPage = () => {
 
                 <div className="contact-form-grid" style={{ marginBottom: '20px' }}>
                   <div className="form-group">
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Property Type</label>
-                    <select name="propertyType" value={formData.propertyType} onChange={handleChange}
+                    <label htmlFor="cf-propertyType" style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Property Type</label>
+                    <select id="cf-propertyType" name="propertyType" value={formData.propertyType} onChange={handleChange}
                       style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box', backgroundColor: 'var(--surface)', color: 'var(--dark-text)' }}>
                       <option value="">Select Property Type</option>
                       {PROPERTY_TYPES.map((p) => (
@@ -338,14 +338,14 @@ const ContactPage = () => {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Preferred Date</label>
-                    <input type="date" name="preferredDate" value={formData.preferredDate} onChange={handleChange}
+                    <label htmlFor="cf-preferredDate" style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Preferred Date</label>
+                    <input id="cf-preferredDate" type="date" name="preferredDate" value={formData.preferredDate} onChange={handleChange}
                       style={{ width: '100%', padding: '13px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box', backgroundColor: 'var(--surface)', color: 'var(--dark-text)' }} />
                   </div>
                 </div>
 
                 <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', fontWeight: '600' }}>
+                  <label htmlFor="cf-suburb" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', fontWeight: '600' }}>
                     <span>Address / Location *</span>
                     <button type="button" onClick={handleLocateMe} disabled={isGeolocating} aria-label="Use Current Location"
                       style={{ padding: '6px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '5px', backgroundColor: 'var(--off-white)', border: '1px solid var(--light-gray)', borderRadius: '4px', cursor: 'pointer', transition: 'all 0.2s' }}>
@@ -373,14 +373,14 @@ const ContactPage = () => {
                     </p>
                   )}
 
-                  <textarea name="suburb" value={formData.suburb} onChange={handleChange} required rows="2"
+                  <textarea id="cf-suburb" name="suburb" value={formData.suburb} onChange={handleChange} required rows="2" autoComplete="street-address"
                     style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box', resize: 'vertical' }}
                     placeholder="Select a point on the map, use your location, or type your full address here" />
                 </div>
 
                 <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Job Details (optional)</label>
-                  <textarea name="message" value={formData.message} onChange={handleChange} rows="4"
+                  <label htmlFor="cf-message" style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Job Details (optional)</label>
+                  <textarea id="cf-message" name="message" value={formData.message} onChange={handleChange} rows="4"
                     style={{ width: '100%', padding: '14px', border: '1px solid var(--light-gray)', borderRadius: '8px', fontSize: '1rem', fontFamily: 'var(--font-body)', boxSizing: 'border-box', resize: 'vertical' }} placeholder="Tell us about the job — size, access, frequency, special requests…"></textarea>
                 </div>
 

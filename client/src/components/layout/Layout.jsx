@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Outlet } from 'react-router-dom';
 import AnnouncementBar from './AnnouncementBar';
 import Header from './Header';
 import Footer from './Footer';
@@ -18,7 +18,7 @@ const Layout = ({ children }) => {
       <Header />
       <main id="main" className="main-content">
         <div key={location.pathname} className="page-transition">
-          {children}
+          {children || <Outlet />}
         </div>
       </main>
       <Footer />
