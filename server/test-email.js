@@ -9,7 +9,7 @@
  * contact form will deliver mail too.
  */
 require('dotenv').config();
-const { sendMail, smtpConfigured } = require('./utils/mailer');
+const { sendMail, smtpConfigured, graphConfigured } = require('./utils/mailer');
 const { adminTemplate, customerTemplate, adminText, customerText } = require('./utils/emailTemplates');
 
 (async () => {
@@ -20,11 +20,13 @@ const { adminTemplate, customerTemplate, adminText, customerText } = require('./
     process.exit(1);
   }
 
-  const transport = smtpConfigured()
-    ? 'SMTP (direct from your mailbox)'
-    : process.env.RESEND_API_KEY
-      ? 'Resend API (fallback)'
-      : 'NONE — configure SMTP_* or RESEND_API_KEY in .env';
+  const transport = graphConfigured()
+    ? 'Microsoft Graph (OAuth2 from your Microsoft 365 mailbox)'
+    : smtpConfigured()
+      ? 'SMTP (direct from your mailbox)'
+      : process.env.RESEND_API_KEY
+        ? 'Resend API (fallback)'
+        : 'NONE — configure MS_*, SMTP_*, or RESEND_API_KEY in .env';
 
   console.log('────────────────────────────────────────');
   console.log(' Prestiva email test');
@@ -62,7 +64,20 @@ const { adminTemplate, customerTemplate, adminText, customerText } = require('./
     process.exit(0);
   } catch (err) {
     console.error('\n❌ Send failed:', err.message);
-    console.error('   Check your SMTP_* credentials (or RESEND_API_KEY) in server/.env');
+    const m = err.message || '';
+    if (/AADSTS7000215|invalid client secret|invalid_client/i.test(m)) {
+      console.error('   → Wrong client secret. Copy the secret VALUE (not the ID) from');
+      console.error('     Entra → your app → Certificates & secrets. See EMAIL_SETUP.md Step 2.');
+    } else if (/AADSTS900023|AADSTS90002|tenant/i.test(m)) {
+      console.error('   → Wrong MS_TENANT_ID. Copy the Directory (tenant) ID from the app Overview page.');
+    } else if (/AccessDenied|403|consent|Authorization_Request/i.test(m)) {
+      console.error('   → Missing permission. Add Microsoft Graph → Application → Mail.Send and click');
+      console.error('     "Grant admin consent". See EMAIL_SETUP.md Step 3.');
+    } else if (/MailboxNotEnabledForRESTAPI|not found|ErrorInvalidUser/i.test(m)) {
+      console.error('   → MS_SENDER is not a real, licensed Microsoft 365 mailbox. Check the address.');
+    } else {
+      console.error('   → Check your MS_* (Graph), SMTP_*, or RESEND_API_KEY values in server/.env');
+    }
     process.exit(1);
   }
 })();
