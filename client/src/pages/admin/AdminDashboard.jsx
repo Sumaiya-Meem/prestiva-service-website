@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { clearToken } from '../../services/adminApi';
 import QuotesPanel from '../../components/admin/QuotesPanel';
 import SettingsPanel from '../../components/admin/SettingsPanel';
+import GalleryPanel from '../../components/admin/GalleryPanel';
 import '../../styles/admin.css';
 
 const AdminDashboard = () => {
@@ -26,6 +27,12 @@ const AdminDashboard = () => {
             Quote Requests
           </button>
           <button
+            className={`admin-tab ${tab === 'gallery' ? 'admin-tab--active' : ''}`}
+            onClick={() => setTab('gallery')}
+          >
+            Gallery
+          </button>
+          <button
             className={`admin-tab ${tab === 'settings' ? 'admin-tab--active' : ''}`}
             onClick={() => setTab('settings')}
           >
@@ -36,7 +43,9 @@ const AdminDashboard = () => {
       </div>
 
       <div className="admin-main">
-        {tab === 'quotes' ? <QuotesPanel /> : <SettingsPanel />}
+        {tab === 'quotes' && <QuotesPanel />}
+        {tab === 'gallery' && <GalleryPanel />}
+        {tab === 'settings' && <SettingsPanel />}
       </div>
     </div>
   );

@@ -52,6 +52,52 @@ export const updateQuoteStatus = async (id, status) => {
   return handle(res);
 };
 
+/* ── Gallery ── */
+/** Build an absolute URL for a server-relative media path (/uploads/…). */
+export const mediaUrl = (u) => (!u || /^https?:\/\//.test(u) ? u : `${BASE}${u}`);
+
+export const fetchGallery = async () => {
+  const res = await fetch(`${BASE}/api/gallery`);
+  return handle(res); // { success, sections }
+};
+
+export const addGallerySection = async (name) => {
+  const res = await fetch(`${BASE}/api/gallery/sections`, {
+    method: 'POST',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
+  return handle(res);
+};
+
+export const deleteGallerySection = async (slug) => {
+  const res = await fetch(`${BASE}/api/gallery/sections/${encodeURIComponent(slug)}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  return handle(res);
+};
+
+export const uploadGalleryImage = async (slug, file) => {
+  const fd = new FormData();
+  fd.append('image', file);
+  // NB: don't set Content-Type — the browser adds the multipart boundary.
+  const res = await fetch(`${BASE}/api/gallery/sections/${encodeURIComponent(slug)}/images`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: fd,
+  });
+  return handle(res);
+};
+
+export const deleteGalleryImage = async (slug, id) => {
+  const res = await fetch(
+    `${BASE}/api/gallery/sections/${encodeURIComponent(slug)}/images/${encodeURIComponent(id)}`,
+    { method: 'DELETE', headers: authHeaders() }
+  );
+  return handle(res);
+};
+
 /* ── Settings ── */
 export const fetchSettings = async () => {
   const res = await fetch(`${BASE}/api/settings`);

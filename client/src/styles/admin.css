@@ -67,6 +67,8 @@
 .admin-btn--primary { background: var(--adm-gold); border-color: var(--adm-gold); color: var(--adm-navy); }
 .admin-btn--ghost { background: transparent; }
 .admin-btn--sm { padding: 6px 10px; font-size: .82rem; }
+.admin-btn--danger { color: #b42318; border-color: #f3c0bb; }
+.admin-btn--danger:hover { background: #fef2f1; border-color: #b42318; }
 
 /* Cards */
 .admin-card {
@@ -166,3 +168,43 @@
 .admin-login__sub { color: var(--adm-muted); font-size: .9rem; margin-bottom: 22px; }
 .admin-login .admin-input { width: 100%; margin-bottom: 4px; }
 .admin-login .admin-btn { width: 100%; margin-top: 14px; padding: 12px; }
+
+/* Gallery manager */
+.admin-gallery-addbar { display: flex; gap: 10px; margin-bottom: 18px; }
+.admin-gallery-addbar .admin-input { flex: 1; }
+
+.admin-gallery-section {
+  border: 1px solid var(--adm-border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.admin-gallery-section__head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.admin-gallery-section__name { font-weight: 800; font-size: 1.05rem; }
+.admin-gallery-section__count { color: var(--adm-muted); font-size: .85rem; margin-left: 10px; }
+.admin-gallery-section__actions { display: flex; gap: 8px; }
+
+.admin-gallery-empty { color: var(--adm-muted); font-size: .88rem; padding: 6px 2px; }
+
+.admin-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+.admin-gallery-thumb {
+  position: relative; margin: 0; border-radius: 10px; overflow: hidden;
+  aspect-ratio: 1 / 1; background: var(--adm-border);
+}
+.admin-gallery-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.admin-gallery-thumb__del {
+  position: absolute; top: 6px; right: 6px;
+  width: 26px; height: 26px; border-radius: 50%;
+  border: none; cursor: pointer;
+  background: rgba(180,35,24,.92); color: #fff;
+  font-size: 1.1rem; line-height: 1; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+.admin-gallery-thumb__del:hover { background: #b42318; }
