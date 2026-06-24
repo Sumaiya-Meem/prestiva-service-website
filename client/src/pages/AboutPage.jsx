@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import Seo from '../components/utils/Seo';
 import { FaPhoneAlt, FaShieldAlt, FaUserCheck, FaAward, FaStar, FaLeaf, FaTools, FaHandshake } from 'react-icons/fa';
 import siteConfig from '../config/siteConfig';
-import teamImg from '../assets/images/team.webp';
 
 const AboutPage = () => {
   const values = [
@@ -28,7 +27,7 @@ const AboutPage = () => {
         path="/about"
       />
       {/* Hero */}
-      <section className="hero-section subpage-hero" style={{ backgroundImage: `linear-gradient(rgba(10, 22, 40, 0.7), rgba(10, 22, 40, 0.7)), url(${teamImg})` }}>
+      <section className="hero-section subpage-hero bg-navy">
         <div className="container">
           <div className="hero-content">
             <h1 className="hero-title">Your Partner in Property Excellence</h1>

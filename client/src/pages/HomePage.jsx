@@ -8,6 +8,7 @@ import WhoWeWorkWith from '../components/sections/home/WhoWeWorkWith';
 import WhyChoose from '../components/sections/home/WhyChoose';
 import Reviews from '../components/sections/home/Reviews';
 import BeforeAfterGallery from '../components/sections/home/BeforeAfterGallery';
+import ResultsReel from '../components/sections/home/ResultsReel';
 import PricingOverview from '../components/sections/home/PricingOverview';
 import AddOnServices from '../components/sections/home/AddOnServices';
 import FAQ from '../components/sections/home/FAQ';
@@ -31,6 +32,7 @@ const HomePage = () => {
       <WhyChoose />
       <Reviews />
       <BeforeAfterGallery />
+      <ResultsReel />
       <PricingOverview />
       <AddOnServices />
       <FAQ />

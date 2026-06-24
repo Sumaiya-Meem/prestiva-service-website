@@ -1,31 +1,46 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useSearchParams } from 'react-router-dom';
-import { FaPhoneAlt, FaSearchPlus, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaPhoneAlt, FaSearchPlus, FaPlay, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import siteConfig from '../config/siteConfig';
 import Seo from '../components/utils/Seo';
 import ContactLine from '../components/sections/ContactLine';
 
-// Real job photos, optimized to WebP.
-const modules = import.meta.glob('../assets/gallery/**/*.webp', { eager: true, query: '?url', import: 'default' });
+// Real job media, optimized for web. Photos are WebP; clips are MP4 with a .jpg poster frame.
+const imageModules = import.meta.glob('../assets/gallery/**/*.webp', { eager: true, query: '?url', import: 'default' });
+const videoModules = import.meta.glob('../assets/gallery/**/*.mp4', { eager: true, query: '?url', import: 'default' });
+const posterModules = import.meta.glob('../assets/gallery/**/*.jpg', { eager: true, query: '?url', import: 'default' });
+
+// Map "<path-without-ext>" -> poster url, so each video can find its 1.mp4 -> 1.jpg poster.
+const POSTERS = {};
+for (const [p, url] of Object.entries(posterModules)) POSTERS[p.replace(/\.jpg$/, '')] = url;
 
 const FOLDER_META = {
   office: { tag: 'Office Cleaning' },
+  commercial: { tag: 'Commercial Cleaning' },
   builders: { tag: 'Builders Cleaning' },
   'end-of-lease': { tag: 'End of Lease' },
   airbnb: { tag: 'Airbnb Cleaning' },
   'real-estate': { tag: 'Real Estate Cleaning' },
   pressure: { tag: 'Pressure Washing' },
   property: { tag: 'Property Maintenance' },
+  landscaping: { tag: 'Landscaping' },
+  window: { tag: 'Window Cleaning' },
+  carpet: { tag: 'Carpet Cleaning' },
+  results: { tag: 'Cleaning Results' },
 };
 
-const ALL_ITEMS = Object.entries(modules)
-  .map(([p, url]) => {
+const toItems = (modules, type) =>
+  Object.entries(modules).map(([p, url]) => {
     const slug = p.split('/').slice(-2, -1)[0];
     const meta = FOLDER_META[slug] || { tag: 'Our Work' };
-    return { img: url, tag: meta.tag };
-  })
-  .sort((a, b) => a.tag.localeCompare(b.tag));
+    const poster = type === 'video' ? POSTERS[p.replace(/\.mp4$/, '')] : undefined;
+    return { src: url, tag: meta.tag, type, poster };
+  });
+
+const ALL_ITEMS = [...toItems(imageModules, 'image'), ...toItems(videoModules, 'video')]
+  // Videos first, then images grouped alphabetically by tag.
+  .sort((a, b) => (a.type !== b.type ? (a.type === 'video' ? -1 : 1) : a.tag.localeCompare(b.tag)));
 
 const FILTERS = ['All', ...Array.from(new Set(ALL_ITEMS.map((i) => i.tag)))];
 
@@ -37,6 +52,7 @@ const GalleryPage = () => {
   const catParam = searchParams.get('cat');
   const [filter, setFilter] = useState(() => (catParam && FILTERS.includes(catParam) ? catParam : 'All'));
   const [lightbox, setLightbox] = useState(null);
+  const [gridView, setGridView] = useState(false);
   const trackRef = useRef(null);
   const pausedRef = useRef(false);
 
@@ -87,6 +103,30 @@ const GalleryPage = () => {
 
   useEffect(() => setLightbox(null), [filter]);
 
+  // Shared tile — used by both the carousel and the "View All" grid.
+  const renderTile = (item, index, extraClass = '') => (
+    <figure
+      key={item.src}
+      className={`gallery-tile${extraClass ? ` ${extraClass}` : ''}`}
+      onClick={() => open(index)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && open(index)}
+      aria-label={`View ${item.tag} ${item.type === 'video' ? 'video' : 'photo'}`}
+    >
+      <img
+        src={item.type === 'video' ? item.poster : item.src}
+        alt={`${item.tag} — Prestiva`}
+        loading="lazy"
+        decoding="async"
+      />
+      <span className="gallery-tile__zoom">{item.type === 'video' ? <FaPlay /> : <FaSearchPlus />}</span>
+      <figcaption className="gallery-tile__caption">
+        <span className="gallery-tile__tag">{item.tag}</span>
+      </figcaption>
+    </figure>
+  );
+
   useEffect(() => {
     if (lightbox === null) return;
     document.body.style.overflow = 'hidden';
@@ -126,7 +166,7 @@ const GalleryPage = () => {
         <div className="container">
           <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '30px' }}>
             <h2 className="section-title">Recent Work</h2>
-            <p className="section-subtitle">Browse by category — slide to see more</p>
+            <p className="section-subtitle">{gridView ? 'Showing every photo' : 'Browse by category — slide to see more'}</p>
           </div>
 
           <div className="gallery-filters">
@@ -137,39 +177,37 @@ const GalleryPage = () => {
             ))}
           </div>
 
-          <div
-            className="gallery-carousel"
-            onMouseEnter={() => { pausedRef.current = true; }}
-            onMouseLeave={() => { pausedRef.current = false; }}
-          >
-            <button className="carousel-arrow carousel-arrow--prev" onClick={() => slide(-1)} aria-label="Previous">
-              <FaChevronLeft />
-            </button>
-
-            <div className="carousel-track" ref={trackRef}>
-              {items.map((item, index) => (
-                <figure
-                  key={item.img}
-                  className="carousel-slide gallery-tile"
-                  onClick={() => open(index)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && open(index)}
-                  aria-label={`View ${item.tag} photo`}
-                >
-                  <img src={item.img} alt={`${item.tag} — Prestiva`} loading="lazy" decoding="async" />
-                  <span className="gallery-tile__zoom"><FaSearchPlus /></span>
-                  <figcaption className="gallery-tile__caption">
-                    <span className="gallery-tile__tag">{item.tag}</span>
-                  </figcaption>
-                </figure>
-              ))}
+          {gridView ? (
+            <div className="gallery-grid">
+              {items.map((item, index) => renderTile(item, index))}
             </div>
+          ) : (
+            <div
+              className="gallery-carousel"
+              onMouseEnter={() => { pausedRef.current = true; }}
+              onMouseLeave={() => { pausedRef.current = false; }}
+            >
+              <button className="carousel-arrow carousel-arrow--prev" onClick={() => slide(-1)} aria-label="Previous">
+                <FaChevronLeft />
+              </button>
 
-            <button className="carousel-arrow carousel-arrow--next" onClick={() => slide(1)} aria-label="Next">
-              <FaChevronRight />
-            </button>
-          </div>
+              <div className="carousel-track" ref={trackRef}>
+                {items.map((item, index) => renderTile(item, index, 'carousel-slide'))}
+              </div>
+
+              <button className="carousel-arrow carousel-arrow--next" onClick={() => slide(1)} aria-label="Next">
+                <FaChevronRight />
+              </button>
+            </div>
+          )}
+
+          <button
+            className="gallery-viewall"
+            onClick={() => setGridView((v) => !v)}
+            aria-pressed={gridView}
+          >
+            {gridView ? '← Back to Slider' : `View All (${items.length})`}
+          </button>
         </div>
       </section>
 
@@ -194,7 +232,11 @@ const GalleryPage = () => {
           <button className="lightbox__btn lightbox__close" onClick={close} aria-label="Close"><FaTimes /></button>
           <button className="lightbox__btn lightbox__prev" onClick={(e) => { e.stopPropagation(); stepLb(-1); }} aria-label="Previous"><FaChevronLeft /></button>
           <figure className="lightbox__content" onClick={(e) => e.stopPropagation()}>
-            <img src={items[lightbox].img} alt={items[lightbox].tag} />
+            {items[lightbox].type === 'video' ? (
+              <video src={items[lightbox].src} controls autoPlay loop playsInline />
+            ) : (
+              <img src={items[lightbox].src} alt={items[lightbox].tag} />
+            )}
             <figcaption className="lightbox__caption">
               <span className="gallery-tile__tag">{items[lightbox].tag}</span>
             </figcaption>

@@ -109,6 +109,7 @@ const siteConfig = {
         { name: "Turf Laying" },
         { name: "Irrigation" },
         { name: "Soil Preparation" },
+        { name: "Planting" },
         { name: "Lawn Repair" },
         { name: "Garden Clean-Up" },
         { name: "Mulching" },

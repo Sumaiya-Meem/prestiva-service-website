@@ -1,16 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import siteConfig from '../../../config/siteConfig';
-import teamImg from '../../../assets/images/team.webp';
 
 const AboutMini = () => {
   return (
     <section className="section about-mini">
       <div className="container">
-        <div className="about-mini-grid responsive-grid-2" style={{ alignItems: 'center' }}>
-          <div className="about-mini-image">
-            <img src={teamImg} alt={`${siteConfig.businessNameShort} Team`} loading="lazy" decoding="async" style={{ width: '100%', borderRadius: '20px', boxShadow: '20px 20px 60px rgba(0,0,0,0.1)' }} />
-          </div>
+        <div className="about-mini-grid" style={{ maxWidth: '760px', margin: '0 auto' }}>
           <div className="about-mini-content">
             <h4 className="text-gold" style={{ marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: '700' }}>Local & Reliable</h4>
             <h2 className="section-title" style={{ marginBottom: '25px' }}>A Local Team You Can Trust</h2>
