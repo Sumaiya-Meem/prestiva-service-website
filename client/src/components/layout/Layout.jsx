@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
-import AnnouncementBar from './AnnouncementBar';
+// import AnnouncementBar from './AnnouncementBar';
 import Header from './Header';
 import Footer from './Footer';
 import MobileContactBar from './MobileContactBar';
@@ -14,7 +14,7 @@ const Layout = ({ children }) => {
     <div className="app-layout">
       <RevealManager />
       <a href="#main" className="skip-link">Skip to content</a>
-      <AnnouncementBar />
+      {/* <AnnouncementBar /> */}
       <Header />
       <main id="main" className="main-content">
         <div key={location.pathname} className="page-transition">
