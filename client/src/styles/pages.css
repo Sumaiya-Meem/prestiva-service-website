@@ -1542,6 +1542,10 @@ html[data-theme="dark"] .carousel-arrow { color: var(--dark-text); }
   color: var(--primary-gold);
 }
 
+html[data-theme="dark"] .addon-icon {
+  color: var(--primary-gold); /* #D4A853 — navy is invisible on dark backgrounds */
+}
+
 .addon-name {
   font-size: 0.95rem;
   font-weight: 700;
