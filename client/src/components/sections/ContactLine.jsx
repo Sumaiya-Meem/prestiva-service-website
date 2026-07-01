@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
+import { Phone, Mail } from 'lucide-react';
 import siteConfig from '../../config/siteConfig';
 
 /**
@@ -11,10 +11,10 @@ const ContactLine = ({ light = true }) => {
   return (
     <div className="contact-line" style={{ color }}>
       <a href={`tel:${siteConfig.phoneRaw}`} className="contact-line__item" style={{ color }}>
-        <FaPhoneAlt color="var(--primary-gold)" /> {siteConfig.phone}
+        <Phone color="var(--primary-gold)" /> {siteConfig.phone}
       </a>
       <a href={`mailto:${siteConfig.email}`} className="contact-line__item" style={{ color }}>
-        <FaEnvelope color="var(--primary-gold)" /> {siteConfig.email}
+        <Mail color="var(--primary-gold)" /> {siteConfig.email}
       </a>
     </div>
   );

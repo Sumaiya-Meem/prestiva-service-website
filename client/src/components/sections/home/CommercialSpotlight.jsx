@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaCheckCircle } from 'react-icons/fa';
+import { CheckCircle2 } from 'lucide-react';
 import spotlightImg from '../../../assets/gallery/office/5.webp';
 
 const points = [
@@ -27,7 +27,7 @@ const CommercialSpotlight = () => {
             </p>
             <ul className="spotlight-checklist">
               {points.map((p) => (
-                <li key={p}><FaCheckCircle className="spotlight-check" /> {p}</li>
+                <li key={p}><CheckCircle2 className="spotlight-check" /> {p}</li>
               ))}
             </ul>
             <Link to="/commercial" className="btn btn-primary" style={{ marginTop: '34px' }}>Commercial Services</Link>

@@ -1,22 +1,22 @@
 import React from 'react';
-import { 
-  FaUtensils, FaWindowMaximize, FaWind, FaSnowflake, 
-  FaDoorOpen, FaColumns, FaPaintRoller, FaWarehouse, 
-  FaBroom, FaSun 
-} from 'react-icons/fa';
+import {
+  CookingPot, AppWindow, Wind, Snowflake,
+  DoorOpen, Blinds, PaintRoller, Warehouse,
+  SprayCan, Sprout
+} from 'lucide-react';
 
 const AddOnServices = () => {
   const addons = [
-    { icon: <FaUtensils />, name: "Oven Clean" },
-    { icon: <FaWindowMaximize />, name: "Window Clean" },
-    { icon: <FaWind />, name: "Carpet Steam" },
-    { icon: <FaSnowflake />, name: "Fridge Clean" },
-    { icon: <FaDoorOpen />, name: "Balcony Clean" },
-    { icon: <FaColumns />, name: "Blind Clean" },
-    { icon: <FaPaintRoller />, name: "Wall Washing" },
-    { icon: <FaWarehouse />, name: "Garage Tidy" },
-    { icon: <FaBroom />, name: "Pressure Wash" },
-    { icon: <FaSun />, name: "Mulching" }
+    { icon: <CookingPot />, name: "Oven Clean" },
+    { icon: <AppWindow />, name: "Window Clean" },
+    { icon: <Wind />, name: "Carpet Steam" },
+    { icon: <Snowflake />, name: "Fridge Clean" },
+    { icon: <DoorOpen />, name: "Balcony Clean" },
+    { icon: <Blinds />, name: "Blind Clean" },
+    { icon: <PaintRoller />, name: "Wall Washing" },
+    { icon: <Warehouse />, name: "Garage Tidy" },
+    { icon: <SprayCan />, name: "Pressure Wash" },
+    { icon: <Sprout />, name: "Mulching" }
   ];
 
   return (

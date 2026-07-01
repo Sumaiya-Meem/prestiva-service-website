@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { fetchQuotes, updateQuoteStatus } from '../../services/adminApi';
+import { fetchQuotes, updateQuoteStatus, updateQuote } from '../../services/adminApi';
 
 const STATUSES = ['new', 'contacted', 'quoted', 'won', 'lost'];
 
@@ -17,6 +17,8 @@ const QuotesPanel = () => {
   const [error, setError] = useState('');
   const [openId, setOpenId] = useState(null);
   const [savingId, setSavingId] = useState(null);
+  const [noteDrafts, setNoteDrafts] = useState({}); // id -> draft text
+  const [savingNoteId, setSavingNoteId] = useState(null);
 
   const load = async (status = filter) => {
     setLoading(true);
@@ -48,6 +50,33 @@ const QuotesPanel = () => {
       setError(err.message);
     } finally {
       setSavingId(null);
+    }
+  };
+
+  const toggleOpen = (q) => {
+    const opening = openId !== q._id;
+    setOpenId(opening ? q._id : null);
+    if (opening) setNoteDrafts((d) => ({ ...d, [q._id]: q.internalNotes || '' }));
+  };
+
+  const onSaveNote = async (id) => {
+    setSavingNoteId(id);
+    try {
+      await updateQuote(id, { internalNotes: noteDrafts[id] ?? '' });
+      setQuotes((prev) => prev.map((q) => (q._id === id ? { ...q, internalNotes: noteDrafts[id] ?? '' } : q)));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSavingNoteId(null);
+    }
+  };
+
+  const onToggleArchive = async (q) => {
+    try {
+      await updateQuote(q._id, { archived: !q.archived });
+      setQuotes((prev) => prev.map((x) => (x._id === q._id ? { ...x, archived: !q.archived } : x)));
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -124,7 +153,7 @@ const QuotesPanel = () => {
                     <td>
                       <button
                         className="admin-btn admin-btn--sm admin-btn--ghost admin-table__expand"
-                        onClick={() => setOpenId(openId === q._id ? null : q._id)}
+                        onClick={() => toggleOpen(q)}
                       >
                         {openId === q._id ? 'Hide' : 'View'}
                       </button>
@@ -144,6 +173,29 @@ const QuotesPanel = () => {
                         <div style={{ marginTop: 8 }}>
                           <strong>Message:</strong>
                           <div style={{ whiteSpace: 'pre-wrap' }}>{q.message || '— none —'}</div>
+                        </div>
+
+                        <div style={{ marginTop: 12 }}>
+                          <strong>Internal notes</strong> <span style={{ color: 'var(--adm-muted)', fontWeight: 400 }}>(private)</span>
+                          <textarea
+                            className="admin-input"
+                            style={{ width: '100%', marginTop: 6, minHeight: 64, resize: 'vertical' }}
+                            placeholder="Add a private note about this lead…"
+                            value={noteDrafts[q._id] ?? ''}
+                            onChange={(e) => setNoteDrafts((d) => ({ ...d, [q._id]: e.target.value }))}
+                          />
+                          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                            <button
+                              className="admin-btn admin-btn--sm admin-btn--primary"
+                              onClick={() => onSaveNote(q._id)}
+                              disabled={savingNoteId === q._id || (noteDrafts[q._id] ?? '') === (q.internalNotes || '')}
+                            >
+                              {savingNoteId === q._id ? 'Saving…' : 'Save note'}
+                            </button>
+                            <button className="admin-btn admin-btn--sm" onClick={() => onToggleArchive(q)}>
+                              {q.archived ? 'Unarchive' : 'Archive'}
+                            </button>
+                          </div>
                         </div>
                       </td>
                     </tr>

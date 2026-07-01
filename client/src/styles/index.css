@@ -79,6 +79,19 @@ img {
   object-fit: cover;
 }
 
+/* ── Lucide line icons ──
+   Lucide renders fixed 24px SVGs. Make them scale with the surrounding
+   font-size (as the previous icon set did, so existing sizing CSS still
+   works) and use a slightly thinner stroke for a refined, crafted feel
+   rather than heavy "clip-art" glyphs. */
+svg.lucide {
+  width: 1em;
+  height: 1em;
+  stroke-width: 1.75;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
 .container {
   width: 90%;
   max-width: var(--container-max-width);

@@ -1,21 +1,22 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaPhoneAlt, FaBuilding, FaUtensils, FaHardHat, FaMedkit, FaShoppingBag, FaWarehouse, FaCity, FaFileAlt, FaCheckCircle } from 'react-icons/fa';
+import { Phone, Building2, Utensils, HardHat, BriefcaseMedical, ShoppingBag, Warehouse, Building, FileText } from 'lucide-react';
 import siteConfig from '../config/siteConfig';
 import Seo from '../components/utils/Seo';
 import ContactLine from '../components/sections/ContactLine';
-import heroImg from '../assets/gallery/office/3.webp';
+import { pageBgUrl } from '../config/pageBackgrounds';
 
 const CommercialPage = () => {
+  const heroImg = pageBgUrl('commercial');
   const industries = [
-    { icon: <FaBuilding />, name: "Offices" },
-    { icon: <FaUtensils />, name: "Restaurants" },
-    { icon: <FaHardHat />, name: "After Builders" },
-    { icon: <FaMedkit />, name: "Medical" },
-    { icon: <FaShoppingBag />, name: "Retail" },
-    { icon: <FaWarehouse />, name: "Warehouses" },
-    { icon: <FaCity />, name: "Strata" },
-    { icon: <FaFileAlt />, name: "Contract Cleaning" }
+    { icon: <Building2 />, name: "Offices" },
+    { icon: <Utensils />, name: "Restaurants" },
+    { icon: <HardHat />, name: "After Builders" },
+    { icon: <BriefcaseMedical />, name: "Medical" },
+    { icon: <ShoppingBag />, name: "Retail" },
+    { icon: <Warehouse />, name: "Warehouses" },
+    { icon: <Building />, name: "Strata" },
+    { icon: <FileText />, name: "Contract Cleaning" }
   ];
 
   return (
@@ -33,7 +34,7 @@ const CommercialPage = () => {
             <div className="hero-btns cta-btns">
               <Link to="/contact" className="btn btn-primary">Get a Commercial Quote</Link>
               <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', borderColor: '#fff' }}>
-                <FaPhoneAlt /> Call Now
+                <Phone /> Call Now
               </a>
             </div>
           </div>

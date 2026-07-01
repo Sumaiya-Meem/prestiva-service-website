@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  FaPhoneAlt, FaWhatsapp, FaFacebookF, FaInstagram,
-  FaCommentDots, FaTimes, FaFileInvoiceDollar,
-} from 'react-icons/fa';
+import { FaWhatsapp, FaFacebookF, FaInstagram, FaCommentDots } from 'react-icons/fa';
 import { SiTiktok } from 'react-icons/si';
+import { Phone, X, ReceiptText } from 'lucide-react';
 import siteConfig from '../../config/siteConfig';
 
 /**
@@ -20,8 +18,8 @@ const FloatingActions = () => {
   );
 
   const actions = [
-    { key: 'quote', label: 'Get a Free Quote', to: '/contact', internal: true, icon: <FaFileInvoiceDollar />, cls: 'fab-quote' },
-    { key: 'call', label: 'Call Now', href: `tel:${siteConfig.phoneRaw}`, icon: <FaPhoneAlt />, cls: 'fab-call' },
+    { key: 'quote', label: 'Get a Free Quote', to: '/contact', internal: true, icon: <ReceiptText />, cls: 'fab-quote' },
+    { key: 'call', label: 'Call Now', href: `tel:${siteConfig.phoneRaw}`, icon: <Phone />, cls: 'fab-call' },
     { key: 'wa', label: 'WhatsApp', href: `https://wa.me/${siteConfig.whatsappRaw}?text=${waText}`, icon: <FaWhatsapp />, cls: 'fab-wa' },
     { key: 'fb', label: 'Facebook', href: siteConfig.social.facebook, icon: <FaFacebookF />, cls: 'fab-fb' },
     { key: 'ig', label: 'Instagram', href: siteConfig.social.instagram, icon: <FaInstagram />, cls: 'fab-ig' },
@@ -75,7 +73,7 @@ const FloatingActions = () => {
           aria-expanded={open}
           aria-label={open ? 'Close contact menu' : 'Open contact menu'}
         >
-          <span className="fab__toggle-icon">{open ? <FaTimes /> : <FaCommentDots />}</span>
+          <span className="fab__toggle-icon">{open ? <X /> : <FaCommentDots />}</span>
         </button>
       </div>
     </>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaPhoneAlt } from 'react-icons/fa';
+import { Phone } from 'lucide-react';
 import siteConfig from '../../../config/siteConfig';
 
 const CTABanner = () => {
@@ -12,7 +12,7 @@ const CTABanner = () => {
         <div className="cta-btns" style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link to="/contact" className="btn btn-primary" style={{ padding: '15px 40px', fontSize: '1rem' }}>Get a Free Quote</Link>
           <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', borderColor: '#fff' }}>
-            <FaPhoneAlt /> Call Now
+            <Phone /> Call Now
           </a>
         </div>
       </div>

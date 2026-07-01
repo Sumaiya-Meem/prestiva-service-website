@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaSun, FaMoon } from 'react-icons/fa';
+import { Sun, Moon } from 'lucide-react';
 
 const getInitialTheme = () => {
   if (typeof document !== 'undefined') {
@@ -36,7 +36,7 @@ const ThemeToggle = ({ className = '' }) => {
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       data-tip={isDark ? 'Light mode' : 'Dark mode'}
     >
-      {isDark ? <FaSun /> : <FaMoon />}
+      {isDark ? <Sun /> : <Moon />}
     </button>
   );
 };

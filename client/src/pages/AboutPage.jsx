@@ -1,22 +1,23 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/utils/Seo';
-import { FaPhoneAlt, FaShieldAlt, FaUserCheck, FaAward, FaStar, FaLeaf, FaTools, FaHandshake } from 'react-icons/fa';
+import { Phone, ShieldCheck, UserCheck, Award, Star, Leaf, Wrench, Handshake } from 'lucide-react';
 import siteConfig from '../config/siteConfig';
+import { heroBgStyle } from '../config/pageBackgrounds';
 
 const AboutPage = () => {
   const values = [
-    { icon: <FaShieldAlt />, title: "Reliability", desc: "We show up on time and deliver consistent results you can depend on." },
-    { icon: <FaTools />, title: "Quality Workmanship", desc: "Every job is approached with care and finished to the highest standard." },
-    { icon: <FaLeaf />, title: "Eco-Conscious", desc: "We use sustainable products that are safe for you and the environment." },
-    { icon: <FaHandshake />, title: "Customer First", desc: "Our service is built around your specific needs and long-term satisfaction." }
+    { icon: <ShieldCheck />, title: "Reliability", desc: "We show up on time and deliver consistent results you can depend on." },
+    { icon: <Wrench />, title: "Quality Workmanship", desc: "Every job is approached with care and finished to the highest standard." },
+    { icon: <Leaf />, title: "Eco-Conscious", desc: "We use sustainable products that are safe for you and the environment." },
+    { icon: <Handshake />, title: "Customer First", desc: "Our service is built around your specific needs and long-term satisfaction." }
   ];
 
   const badges = [
-    { icon: <FaShieldAlt />, label: "Fully Insured" },
-    { icon: <FaUserCheck />, label: "Police Checked" },
-    { icon: <FaAward />, label: "Guarantee" },
-    { icon: <FaStar />, label: "5-Star Rated" }
+    { icon: <ShieldCheck />, label: "Fully Insured" },
+    { icon: <UserCheck />, label: "Police Checked" },
+    { icon: <Award />, label: "Guarantee" },
+    { icon: <Star fill="currentColor" />, label: "5-Star Rated" }
   ];
 
   return (
@@ -27,14 +28,14 @@ const AboutPage = () => {
         path="/about"
       />
       {/* Hero */}
-      <section className="hero-section subpage-hero bg-navy">
+      <section className="hero-section subpage-hero bg-navy" style={heroBgStyle('about')}>
         <div className="container">
           <div className="hero-content">
             <h1 className="hero-title">Your Partner in Property Excellence</h1>
             <p className="hero-subtitle">Serving {siteConfig.locationText} with pride and professional care.</p>
             <div className="hero-btns cta-btns">
               <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <FaPhoneAlt /> Call Us
+                <Phone /> Call Us
               </a>
             </div>
           </div>
@@ -81,11 +82,11 @@ const AboutPage = () => {
       {/* Trust Badges */}
       <section className="section trust-badges-section">
         <div className="container">
-          <div className="cta-btns" style={{ display: 'flex', justifyContent: 'center', gap: '30px', flexWrap: 'wrap' }}>
+          <div className="trust-badges">
             {badges.map((b, i) => (
-              <div key={i} style={{ textAlign: 'center', padding: '30px', backgroundColor: 'var(--off-white)', borderRadius: '15px', minWidth: '180px' }}>
-                <div style={{ fontSize: '2.5rem', color: 'var(--primary-navy)', marginBottom: '15px' }}>{b.icon}</div>
-                <h4 style={{ fontWeight: '700' }}>{b.label}</h4>
+              <div key={i} className="trust-badge">
+                <div className="trust-badge__icon">{b.icon}</div>
+                <h4 className="trust-badge__label">{b.label}</h4>
               </div>
             ))}
           </div>

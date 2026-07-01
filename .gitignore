@@ -2,3 +2,7 @@
 node_modules/
 client/node_modules/
 server/node_modules/
+
+# Admin-uploaded gallery media + its metadata (runtime content, not source)
+server/uploads/
+server/data/

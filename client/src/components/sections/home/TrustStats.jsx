@@ -1,14 +1,14 @@
 import React from 'react';
-import { FaBuilding, FaStar, FaShieldAlt, FaCalendarAlt } from 'react-icons/fa';
+import { Building2, Star, ShieldCheck, CalendarDays } from 'lucide-react';
 import siteConfig from '../../../config/siteConfig';
 import CountUpStat from '../../utils/CountUpStat';
 
 const TrustStats = () => {
   const stats = [
-    { icon: <FaBuilding />, number: siteConfig.trustStats.propertiesServiced, label: "Properties Serviced" },
-    { icon: <FaStar />, number: siteConfig.trustStats.googleRating, label: "Google Rated" },
-    { icon: <FaShieldAlt />, number: siteConfig.trustStats.insurance, label: "& Police Checked" },
-    { icon: <FaCalendarAlt />, number: siteConfig.trustStats.availability, label: "A Week" }
+    { icon: <Building2 />, number: siteConfig.trustStats.propertiesServiced, label: "Properties Serviced" },
+    { icon: <Star fill="currentColor" />, number: siteConfig.trustStats.googleRating, label: "Google Rated" },
+    { icon: <ShieldCheck />, number: siteConfig.trustStats.insurance, label: "& Police Checked" },
+    { icon: <CalendarDays />, number: siteConfig.trustStats.availability, label: "A Week" }
   ];
 
   return (

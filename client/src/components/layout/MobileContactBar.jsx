@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaPhoneAlt, FaFileAlt } from 'react-icons/fa';
+import { Phone, FileText } from 'lucide-react';
 import siteConfig from '../../config/siteConfig';
 
 /**
@@ -11,10 +11,10 @@ const MobileContactBar = () => {
   return (
     <div className="mobile-contact-bar">
       <a href={`tel:${siteConfig.phoneRaw}`} className="mobile-contact-bar__btn mobile-contact-bar__call">
-        <FaPhoneAlt /> Call Now
+        <Phone /> Call Now
       </a>
       <Link to="/contact" className="mobile-contact-bar__btn mobile-contact-bar__quote">
-        <FaFileAlt /> Get a Free Quote
+        <FileText /> Get a Free Quote
       </Link>
     </div>
   );

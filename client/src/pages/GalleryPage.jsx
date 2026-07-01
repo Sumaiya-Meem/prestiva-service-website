@@ -1,70 +1,116 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useSearchParams } from 'react-router-dom';
-import { FaPhoneAlt, FaSearchPlus, FaPlay, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { Phone, ZoomIn, Play, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import siteConfig from '../config/siteConfig';
 import Seo from '../components/utils/Seo';
 import ContactLine from '../components/sections/ContactLine';
-
-// Real job media, optimized for web. Photos are WebP; clips are MP4 with a .jpg poster frame.
-const imageModules = import.meta.glob('../assets/gallery/**/*.webp', { eager: true, query: '?url', import: 'default' });
-const videoModules = import.meta.glob('../assets/gallery/**/*.mp4', { eager: true, query: '?url', import: 'default' });
-const posterModules = import.meta.glob('../assets/gallery/**/*.jpg', { eager: true, query: '?url', import: 'default' });
-
-// Map "<path-without-ext>" -> poster url, so each video can find its 1.mp4 -> 1.jpg poster.
-const POSTERS = {};
-for (const [p, url] of Object.entries(posterModules)) POSTERS[p.replace(/\.jpg$/, '')] = url;
-
-const FOLDER_META = {
-  office: { tag: 'Office Cleaning' },
-  commercial: { tag: 'Commercial Cleaning' },
-  builders: { tag: 'Builders Cleaning' },
-  'end-of-lease': { tag: 'End of Lease' },
-  airbnb: { tag: 'Airbnb Cleaning' },
-  'real-estate': { tag: 'Real Estate Cleaning' },
-  pressure: { tag: 'Pressure Washing' },
-  property: { tag: 'Property Maintenance' },
-  landscaping: { tag: 'Landscaping' },
-  window: { tag: 'Window Cleaning' },
-  carpet: { tag: 'Carpet Cleaning' },
-  results: { tag: 'Cleaning Results' },
-};
-
-const toItems = (modules, type) =>
-  Object.entries(modules).map(([p, url]) => {
-    const slug = p.split('/').slice(-2, -1)[0];
-    const meta = FOLDER_META[slug] || { tag: 'Our Work' };
-    const poster = type === 'video' ? POSTERS[p.replace(/\.mp4$/, '')] : undefined;
-    return { src: url, tag: meta.tag, type, poster };
-  });
-
-const ALL_ITEMS = [...toItems(imageModules, 'image'), ...toItems(videoModules, 'video')]
-  // Videos first, then images grouped alphabetically by tag.
-  .sort((a, b) => (a.type !== b.type ? (a.type === 'video' ? -1 : 1) : a.tag.localeCompare(b.tag)));
-
-const FILTERS = ['All', ...Array.from(new Set(ALL_ITEMS.map((i) => i.tag)))];
+import { fetchGalleryCached, mediaUrl } from '../services/adminApi';
+import { heroBgStyle } from '../config/pageBackgrounds';
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Flatten the API's sections → a flat list of media items, videos first so the
+// most engaging content leads, then grouped by section tag.
+const toItems = (sections) => {
+  const items = [];
+  for (const s of sections || []) {
+    for (const m of s.media || []) {
+      items.push({
+        id: m.id,
+        src: mediaUrl(m.url),
+        thumb: m.thumbUrl ? mediaUrl(m.thumbUrl) : undefined, // small tile image
+        poster: m.posterUrl ? mediaUrl(m.posterUrl) : undefined,
+        tag: s.tag,
+        type: m.type,
+      });
+    }
+  }
+  return items.sort((a, b) =>
+    a.type !== b.type ? (a.type === 'video' ? -1 : 1) : a.tag.localeCompare(b.tag)
+  );
+};
+
+// ── Bundled built-in media (fallback) ──
+// Used when the API has no items yet (e.g. before the gallery has been seeded or
+// any media uploaded), so the Gallery page is never empty — mirroring the
+// homepage. Once media exists in the database, that takes over automatically.
+const imageModules = import.meta.glob('../assets/gallery/**/*.webp', { eager: true, query: '?url', import: 'default' });
+const videoModules = import.meta.glob('../assets/gallery/**/*.mp4', { eager: true, query: '?url', import: 'default' });
+const posterModules = import.meta.glob('../assets/gallery/**/*.jpg', { eager: true, query: '?url', import: 'default' });
+
+const FOLDER_META = {
+  office: 'Office Cleaning', commercial: 'Commercial Cleaning', builders: 'Builders Cleaning',
+  'end-of-lease': 'End of Lease', airbnb: 'Airbnb Cleaning', 'real-estate': 'Real Estate Cleaning',
+  pressure: 'Pressure Washing', property: 'Property Maintenance', landscaping: 'Landscaping',
+  window: 'Window Cleaning', carpet: 'Carpet Cleaning', results: 'Cleaning Results',
+};
+
+const POSTERS = {};
+for (const [p, url] of Object.entries(posterModules)) POSTERS[p.replace(/\.jpg$/, '')] = url;
+
+const slugOf = (p) => p.split('/').slice(-2, -1)[0];
+
+const bundledItems = () => {
+  const items = [];
+  for (const [p, url] of Object.entries(imageModules)) {
+    items.push({ id: p, src: url, tag: FOLDER_META[slugOf(p)] || 'Our Work', type: 'image' });
+  }
+  for (const [p, url] of Object.entries(videoModules)) {
+    items.push({ id: p, src: url, poster: POSTERS[p.replace(/\.mp4$/, '')], tag: FOLDER_META[slugOf(p)] || 'Our Work', type: 'video' });
+  }
+  return items.sort((a, b) =>
+    a.type !== b.type ? (a.type === 'video' ? -1 : 1) : a.tag.localeCompare(b.tag)
+  );
+};
+
 const GalleryPage = () => {
   const [searchParams] = useSearchParams();
   const catParam = searchParams.get('cat');
-  const [filter, setFilter] = useState(() => (catParam && FILTERS.includes(catParam) ? catParam : 'All'));
+
+  const [allItems, setAllItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('All');
   const [lightbox, setLightbox] = useState(null);
   const [gridView, setGridView] = useState(false);
   const trackRef = useRef(null);
   const pausedRef = useRef(false);
 
-  // Keep the filter in sync if the ?cat= param changes
+  // Load media from the admin-managed API. If the page was opened via a
+  // /gallery?cat=… link, pre-select that category once the data arrives.
   useEffect(() => {
-    if (catParam && FILTERS.includes(catParam)) setFilter(catParam);
-  }, [catParam]);
+    let alive = true;
+    fetchGalleryCached()
+      .then((data) => {
+        if (!alive) return;
+        const list = toItems(data.sections);
+        const finalList = list.length ? list : bundledItems(); // fall back if DB empty
+        setAllItems(finalList);
+        if (catParam && finalList.some((i) => i.tag === catParam)) setFilter(catParam);
+      })
+      .catch(() => { if (alive) setAllItems(bundledItems()); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+    // catParam is read once on mount; changing it via navigation remounts the route.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const filters = useMemo(
+    () => ['All', ...Array.from(new Set(allItems.map((i) => i.tag)))],
+    [allItems]
+  );
 
   const items = useMemo(
-    () => (filter === 'All' ? ALL_ITEMS : ALL_ITEMS.filter((i) => i.tag === filter)),
-    [filter]
+    () => (filter === 'All' ? allItems : allItems.filter((i) => i.tag === filter)),
+    [filter, allItems]
   );
+
+  // Changing category also closes any open lightbox (whose index no longer applies).
+  const changeFilter = (f) => {
+    setFilter(f);
+    setLightbox(null);
+  };
 
   // ── Carousel sliding ──
   const slide = useCallback((dir) => {
@@ -79,14 +125,12 @@ const GalleryPage = () => {
     else track.scrollBy({ left: dir * step, behavior: 'smooth' });
   }, []);
 
-  // Reset scroll when the category changes
   useEffect(() => {
     if (trackRef.current) trackRef.current.scrollTo({ left: 0 });
   }, [filter]);
 
-  // Autoplay (pauses on hover / when lightbox open / reduced-motion)
   useEffect(() => {
-    if (prefersReducedMotion()) return;
+    if (prefersReducedMotion() || items.length === 0) return;
     const id = setInterval(() => {
       if (!pausedRef.current && lightbox === null) slide(1);
     }, 1000);
@@ -101,12 +145,9 @@ const GalleryPage = () => {
     [items.length]
   );
 
-  useEffect(() => setLightbox(null), [filter]);
-
-  // Shared tile — used by both the carousel and the "View All" grid.
   const renderTile = (item, index, extraClass = '') => (
     <figure
-      key={item.src}
+      key={item.id || item.src}
       className={`gallery-tile${extraClass ? ` ${extraClass}` : ''}`}
       onClick={() => open(index)}
       role="button"
@@ -114,13 +155,19 @@ const GalleryPage = () => {
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && open(index)}
       aria-label={`View ${item.tag} ${item.type === 'video' ? 'video' : 'photo'}`}
     >
-      <img
-        src={item.type === 'video' ? item.poster : item.src}
-        alt={`${item.tag} — Prestiva`}
-        loading="lazy"
-        decoding="async"
-      />
-      <span className="gallery-tile__zoom">{item.type === 'video' ? <FaPlay /> : <FaSearchPlus />}</span>
+      {item.type === 'video' && !item.thumb && !item.poster ? (
+        <video src={item.src} preload="metadata" muted playsInline />
+      ) : (
+        <img
+          // Tile shows the lightweight thumbnail; the full image loads only in
+          // the lightbox. Falls back to poster (videos) or full image if absent.
+          src={item.thumb || (item.type === 'video' ? item.poster : item.src)}
+          alt={`${item.tag} — Prestiva`}
+          loading="lazy"
+          decoding="async"
+        />
+      )}
+      <span className="gallery-tile__zoom">{item.type === 'video' ? <Play fill="currentColor" /> : <ZoomIn />}</span>
       <figcaption className="gallery-tile__caption">
         <span className="gallery-tile__tag">{item.tag}</span>
       </figcaption>
@@ -151,7 +198,7 @@ const GalleryPage = () => {
       />
 
       {/* Hero */}
-      <section className="section subpage-hero bg-navy" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '40vh' }}>
+      <section className="section subpage-hero bg-navy" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '40vh', ...heroBgStyle('gallery') }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <h1 className="hero-title" style={{ color: '#fff' }}>Our Work Gallery</h1>
           <p className="contact-hero-subtitle">Real results from real jobs by {siteConfig.businessName}.</p>
@@ -166,48 +213,58 @@ const GalleryPage = () => {
         <div className="container">
           <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '30px' }}>
             <h2 className="section-title">Recent Work</h2>
-            <p className="section-subtitle">{gridView ? 'Showing every photo' : 'Browse by category — slide to see more'}</p>
+            <p className="section-subtitle">{gridView ? 'Showing every item' : 'Browse by category — slide to see more'}</p>
           </div>
 
-          <div className="gallery-filters">
-            {FILTERS.map((f) => (
-              <button key={f} className={`gallery-filter${filter === f ? ' active' : ''}`} onClick={() => setFilter(f)}>
-                {f}
-              </button>
-            ))}
-          </div>
-
-          {gridView ? (
-            <div className="gallery-grid">
-              {items.map((item, index) => renderTile(item, index))}
+          {loading ? (
+            <div className="section-subtitle" style={{ textAlign: 'center' }}>Loading gallery…</div>
+          ) : allItems.length === 0 ? (
+            <div className="section-subtitle" style={{ textAlign: 'center' }}>
+              Our gallery is being updated — please check back soon.
             </div>
           ) : (
-            <div
-              className="gallery-carousel"
-              onMouseEnter={() => { pausedRef.current = true; }}
-              onMouseLeave={() => { pausedRef.current = false; }}
-            >
-              <button className="carousel-arrow carousel-arrow--prev" onClick={() => slide(-1)} aria-label="Previous">
-                <FaChevronLeft />
-              </button>
-
-              <div className="carousel-track" ref={trackRef}>
-                {items.map((item, index) => renderTile(item, index, 'carousel-slide'))}
+            <>
+              <div className="gallery-filters">
+                {filters.map((f) => (
+                  <button key={f} className={`gallery-filter${filter === f ? ' active' : ''}`} onClick={() => changeFilter(f)}>
+                    {f}
+                  </button>
+                ))}
               </div>
 
-              <button className="carousel-arrow carousel-arrow--next" onClick={() => slide(1)} aria-label="Next">
-                <FaChevronRight />
-              </button>
-            </div>
-          )}
+              {gridView ? (
+                <div className="gallery-grid">
+                  {items.map((item, index) => renderTile(item, index))}
+                </div>
+              ) : (
+                <div
+                  className="gallery-carousel"
+                  onMouseEnter={() => { pausedRef.current = true; }}
+                  onMouseLeave={() => { pausedRef.current = false; }}
+                >
+                  <button className="carousel-arrow carousel-arrow--prev" onClick={() => slide(-1)} aria-label="Previous">
+                    <ChevronLeft />
+                  </button>
 
-          <button
-            className="gallery-viewall"
-            onClick={() => setGridView((v) => !v)}
-            aria-pressed={gridView}
-          >
-            {gridView ? '← Back to Slider' : `View All (${items.length})`}
-          </button>
+                  <div className="carousel-track" ref={trackRef}>
+                    {items.map((item, index) => renderTile(item, index, 'carousel-slide'))}
+                  </div>
+
+                  <button className="carousel-arrow carousel-arrow--next" onClick={() => slide(1)} aria-label="Next">
+                    <ChevronRight />
+                  </button>
+                </div>
+              )}
+
+              <button
+                className="gallery-viewall"
+                onClick={() => setGridView((v) => !v)}
+                aria-pressed={gridView}
+              >
+                {gridView ? '← Back to Slider' : `View All (${items.length})`}
+              </button>
+            </>
+          )}
         </div>
       </section>
 
@@ -219,7 +276,7 @@ const GalleryPage = () => {
           <div className="cta-btns" style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link to="/contact" className="btn btn-primary">Get a Free Quote</Link>
             <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', borderColor: '#fff' }}>
-              <FaPhoneAlt /> Call Now
+              <Phone /> Call Now
             </a>
           </div>
           <ContactLine />
@@ -229,11 +286,11 @@ const GalleryPage = () => {
       {/* Lightbox — portalled to body */}
       {lightbox !== null && items[lightbox] && createPortal(
         <div className="lightbox" onClick={close} role="dialog" aria-modal="true">
-          <button className="lightbox__btn lightbox__close" onClick={close} aria-label="Close"><FaTimes /></button>
-          <button className="lightbox__btn lightbox__prev" onClick={(e) => { e.stopPropagation(); stepLb(-1); }} aria-label="Previous"><FaChevronLeft /></button>
+          <button className="lightbox__btn lightbox__close" onClick={close} aria-label="Close"><X /></button>
+          <button className="lightbox__btn lightbox__prev" onClick={(e) => { e.stopPropagation(); stepLb(-1); }} aria-label="Previous"><ChevronLeft /></button>
           <figure className="lightbox__content" onClick={(e) => e.stopPropagation()}>
             {items[lightbox].type === 'video' ? (
-              <video src={items[lightbox].src} controls autoPlay loop playsInline />
+              <video src={items[lightbox].src} poster={items[lightbox].poster} controls autoPlay loop playsInline />
             ) : (
               <img src={items[lightbox].src} alt={items[lightbox].tag} />
             )}
@@ -241,7 +298,7 @@ const GalleryPage = () => {
               <span className="gallery-tile__tag">{items[lightbox].tag}</span>
             </figcaption>
           </figure>
-          <button className="lightbox__btn lightbox__next" onClick={(e) => { e.stopPropagation(); stepLb(1); }} aria-label="Next"><FaChevronRight /></button>
+          <button className="lightbox__btn lightbox__next" onClick={(e) => { e.stopPropagation(); stepLb(1); }} aria-label="Next"><ChevronRight /></button>
         </div>,
         document.body
       )}

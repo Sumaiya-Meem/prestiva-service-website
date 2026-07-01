@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaCheck } from 'react-icons/fa';
+import { Check } from 'lucide-react';
 
 const plans = [
   {
@@ -58,7 +58,7 @@ const PricingOverview = () => {
               </div>
               <ul className="plan-features">
                 {plan.features.map((feature, i) => (
-                  <li key={i}><FaCheck color="#27c281" /> {feature}</li>
+                  <li key={i}><Check color="#27c281" /> {feature}</li>
                 ))}
               </ul>
               <Link

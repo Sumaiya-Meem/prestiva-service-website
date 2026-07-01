@@ -1,25 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaPhoneAlt, FaCheckCircle, FaArrowRight, FaClock } from 'react-icons/fa';
+import { Phone, CheckCircle2, ArrowRight, Clock } from 'lucide-react';
 import siteConfig from '../config/siteConfig';
 import Seo from '../components/utils/Seo';
 import ContactLine from '../components/sections/ContactLine';
-
-import cleaningHero from '../assets/gallery/office/2.webp';
-import maintenanceHero from '../assets/gallery/property/1.webp';
-import landscapingHero from '../assets/images/landscaping_hero.webp';
-
-const heroBySlug = {
-  cleaning: cleaningHero,
-  'property-maintenance': maintenanceHero,
-  landscaping: landscapingHero,
-};
+import { pageBgUrl } from '../config/pageBackgrounds';
 
 const ServiceCategoryPage = ({ slug }) => {
   const cat = siteConfig.serviceCategories.find((c) => c.slug === slug);
   if (!cat) return null;
 
-  const hero = heroBySlug[slug] || cleaningHero;
+  const hero = pageBgUrl(slug) || pageBgUrl('cleaning');
   const serviceNames = cat.services.map((s) => s.name).join(', ');
 
   const serviceSchema = {
@@ -69,7 +60,7 @@ const ServiceCategoryPage = ({ slug }) => {
             <div className="hero-btns cta-btns">
               <Link to="/contact" className="btn btn-primary">Get a Free Quote</Link>
               <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', borderColor: '#fff' }}>
-                <FaPhoneAlt /> Call Now
+                <Phone /> Call Now
               </a>
             </div>
           </div>
@@ -89,12 +80,12 @@ const ServiceCategoryPage = ({ slug }) => {
               const inner = (
                 <>
                   <span className="svc-card__icon">
-                    {s.comingSoon ? <FaClock /> : <FaCheckCircle />}
+                    {s.comingSoon ? <Clock /> : <CheckCircle2 />}
                   </span>
                   <h3 className="svc-card__name">{s.name}</h3>
                   {s.comingSoon && <span className="svc-badge">Coming Soon</span>}
-                  {s.to && <span className="svc-card__more">Learn more <FaArrowRight /></span>}
-                  {!s.to && !s.comingSoon && <span className="svc-card__more">Get a quote <FaArrowRight /></span>}
+                  {s.to && <span className="svc-card__more">Learn more <ArrowRight /></span>}
+                  {!s.to && !s.comingSoon && <span className="svc-card__more">Get a quote <ArrowRight /></span>}
                 </>
               );
 

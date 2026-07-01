@@ -1,20 +1,52 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   fetchGallery,
   addGallerySection,
   deleteGallerySection,
-  uploadGalleryImage,
-  deleteGalleryImage,
+  uploadGalleryMedia,
+  deleteGalleryMedia,
+  clearGalleryCache,
   mediaUrl,
 } from '../../services/adminApi';
+
+const isImageFile = (f) => f && /^image\//.test(f.type);
+const isVideoFile = (f) => f && /^video\//.test(f.type);
+
+/** One media thumbnail (image or video) with a delete button. */
+const Thumb = ({ slug, item, onDelete }) => (
+  <figure className={`admin-media-thumb admin-media-thumb--${item.type}`}>
+    {item.type === 'video' ? (
+      item.thumbUrl || item.posterUrl ? (
+        <img src={mediaUrl(item.thumbUrl || item.posterUrl)} alt="" loading="lazy" />
+      ) : (
+        <video src={mediaUrl(item.url)} preload="metadata" muted playsInline />
+      )
+    ) : (
+      <img src={mediaUrl(item.thumbUrl || item.url)} alt="" loading="lazy" />
+    )}
+
+    {item.type === 'video' && <span className="admin-media-thumb__play" aria-hidden="true">▶</span>}
+    <span className="admin-media-thumb__type">{item.type === 'video' ? 'Video' : 'Photo'}</span>
+
+    <button
+      className="admin-media-thumb__del"
+      onClick={() => onDelete(slug, item)}
+      aria-label={`Delete ${item.type}`}
+      title="Delete"
+    >
+      ×
+    </button>
+  </figure>
+);
 
 const GalleryPanel = () => {
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState(null); // { type, text }
   const [newName, setNewName] = useState('');
-  const [busy, setBusy] = useState(false); // section-level action in flight
-  const [uploading, setUploading] = useState(''); // slug currently uploading
+  const [busy, setBusy] = useState(false);
+  const [upload, setUpload] = useState(null); // { slug, progress, name }
+  const [dragSlug, setDragSlug] = useState('');
   const fileInputs = useRef({}); // slug -> <input> ref
 
   const load = async () => {
@@ -29,18 +61,21 @@ const GalleryPanel = () => {
     }
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   const flash = (type, text) => setMsg({ type, text });
+
+  const totals = useMemo(() => {
+    let images = 0; let videos = 0;
+    for (const s of sections) for (const m of s.media || []) (m.type === 'video' ? videos++ : images++);
+    return { images, videos, sections: sections.length };
+  }, [sections]);
 
   const onAddSection = async (e) => {
     e.preventDefault();
     const name = newName.trim();
     if (!name) return;
-    setBusy(true);
-    setMsg(null);
+    setBusy(true); setMsg(null);
     try {
       await addGallerySection(name);
       setNewName('');
@@ -54,13 +89,12 @@ const GalleryPanel = () => {
   };
 
   const onDeleteSection = async (section) => {
-    const count = section.images.length;
+    const count = (section.media || []).length;
     const warn = count
-      ? `Delete “${section.tag}” and its ${count} image${count > 1 ? 's' : ''}? This cannot be undone.`
+      ? `Delete “${section.tag}” and its ${count} item${count > 1 ? 's' : ''}? This cannot be undone.`
       : `Delete the empty section “${section.tag}”?`;
     if (!window.confirm(warn)) return;
-    setBusy(true);
-    setMsg(null);
+    setBusy(true); setMsg(null);
     try {
       await deleteGallerySection(section.slug);
       await load();
@@ -72,42 +106,73 @@ const GalleryPanel = () => {
     }
   };
 
-  const onPickFile = (slug) => fileInputs.current[slug]?.click();
-
-  const onUpload = async (slug, e) => {
-    const file = e.target.files && e.target.files[0];
-    e.target.value = ''; // allow re-selecting the same file later
-    if (!file) return;
-    setUploading(slug);
+  // Upload one or more files (from picker or drag-drop) sequentially.
+  const uploadFiles = async (slug, fileList) => {
+    const files = Array.from(fileList || []).filter((f) => isImageFile(f) || isVideoFile(f));
+    if (!files.length) return;
     setMsg(null);
     try {
-      await uploadGalleryImage(slug, file);
+      for (const file of files) {
+        setUpload({ slug, progress: 0, name: file.name });
+        await uploadGalleryMedia(slug, file, (p) =>
+          setUpload({ slug, progress: p, name: file.name })
+        );
+      }
+      clearGalleryCache(); // public site refetches next time it loads
       await load();
-      flash('success', 'Image added.');
+      flash('success', `${files.length} item${files.length > 1 ? 's' : ''} added.`);
     } catch (err) {
       flash('error', err.message);
     } finally {
-      setUploading('');
+      setUpload(null);
     }
   };
 
-  const onDeleteImage = async (slug, id) => {
-    if (!window.confirm('Delete this image?')) return;
+  const onPickFile = (slug) => fileInputs.current[slug]?.click();
+
+  const onInputChange = (slug, e) => {
+    // Snapshot to an array BEFORE clearing the input — e.target.files is a live
+    // list that resetting value='' would empty, dropping the selection.
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    uploadFiles(slug, files);
+  };
+
+  const onDeleteMedia = async (slug, item) => {
+    if (!window.confirm(`Delete this ${item.type}?`)) return;
     setMsg(null);
     try {
-      await deleteGalleryImage(slug, id);
-      await load();
+      await deleteGalleryMedia(slug, item.id);
+      setSections((prev) =>
+        prev.map((s) =>
+          s.slug === slug ? { ...s, media: s.media.filter((m) => m.id !== item.id) } : s
+        )
+      );
     } catch (err) {
       flash('error', err.message);
     }
+  };
+
+  const onDrop = (slug, e) => {
+    e.preventDefault();
+    setDragSlug('');
+    uploadFiles(slug, e.dataTransfer.files);
   };
 
   return (
     <div className="admin-card">
       <div className="admin-card__title">Gallery</div>
       <div className="admin-card__sub">
-        Add or remove gallery sections, and upload or delete photos within each. Uploaded
-        images are auto-compressed to WebP. Changes are stored on the server.
+        Manage the photos &amp; videos shown on the public website. Drag files onto a
+        section or use “Add media”. Images are auto-compressed to WebP; videos get a
+        poster frame. Changes are live on the site immediately.
+      </div>
+
+      {/* Totals */}
+      <div className="admin-stats">
+        <div className="admin-stat"><div className="admin-stat__num">{totals.sections}</div><div className="admin-stat__label">Sections</div></div>
+        <div className="admin-stat"><div className="admin-stat__num">{totals.images}</div><div className="admin-stat__label">Photos</div></div>
+        <div className="admin-stat"><div className="admin-stat__num">{totals.videos}</div><div className="admin-stat__label">Videos</div></div>
       </div>
 
       {/* Add section */}
@@ -131,59 +196,74 @@ const GalleryPanel = () => {
       ) : sections.length === 0 ? (
         <div className="admin-empty">No sections yet. Add one above to get started.</div>
       ) : (
-        sections.map((section) => (
-          <div className="admin-gallery-section" key={section.slug}>
-            <div className="admin-gallery-section__head">
-              <div>
-                <span className="admin-gallery-section__name">{section.tag}</span>
-                <span className="admin-gallery-section__count">{section.images.length} photo{section.images.length === 1 ? '' : 's'}</span>
+        sections.map((section) => {
+          const media = section.media || [];
+          const uploadingHere = upload && upload.slug === section.slug;
+          return (
+            <div
+              className={`admin-gallery-section${dragSlug === section.slug ? ' is-dragover' : ''}`}
+              key={section.slug}
+              onDragOver={(e) => { e.preventDefault(); setDragSlug(section.slug); }}
+              onDragLeave={() => setDragSlug('')}
+              onDrop={(e) => onDrop(section.slug, e)}
+            >
+              <div className="admin-gallery-section__head">
+                <div>
+                  <span className="admin-gallery-section__name">{section.tag}</span>
+                  <span className="admin-gallery-section__count">
+                    {media.length} item{media.length === 1 ? '' : 's'}
+                  </span>
+                </div>
+                <div className="admin-gallery-section__actions">
+                  <button
+                    className="admin-btn admin-btn--sm"
+                    onClick={() => onPickFile(section.slug)}
+                    disabled={!!upload}
+                  >
+                    {uploadingHere ? 'Uploading…' : '+ Add media'}
+                  </button>
+                  <button
+                    className="admin-btn admin-btn--sm admin-btn--danger"
+                    onClick={() => onDeleteSection(section)}
+                    disabled={busy || !!upload}
+                  >
+                    Delete section
+                  </button>
+                  <input
+                    type="file"
+                    accept="image/*,video/*"
+                    multiple
+                    hidden
+                    ref={(el) => { fileInputs.current[section.slug] = el; }}
+                    onChange={(e) => onInputChange(section.slug, e)}
+                  />
+                </div>
               </div>
-              <div className="admin-gallery-section__actions">
-                <button
-                  className="admin-btn admin-btn--sm"
-                  onClick={() => onPickFile(section.slug)}
-                  disabled={uploading === section.slug}
-                >
-                  {uploading === section.slug ? 'Uploading…' : '+ Add image'}
-                </button>
-                <button
-                  className="admin-btn admin-btn--sm admin-btn--danger"
-                  onClick={() => onDeleteSection(section)}
-                  disabled={busy}
-                >
-                  Delete section
-                </button>
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  ref={(el) => { fileInputs.current[section.slug] = el; }}
-                  onChange={(e) => onUpload(section.slug, e)}
-                />
-              </div>
-            </div>
 
-            {section.images.length === 0 ? (
-              <div className="admin-gallery-empty">No images yet — use “Add image”.</div>
-            ) : (
-              <div className="admin-gallery-grid">
-                {section.images.map((img) => (
-                  <figure className="admin-gallery-thumb" key={img.id}>
-                    <img src={mediaUrl(img.url)} alt="" loading="lazy" />
-                    <button
-                      className="admin-gallery-thumb__del"
-                      onClick={() => onDeleteImage(section.slug, img.id)}
-                      aria-label="Delete image"
-                      title="Delete image"
-                    >
-                      ×
-                    </button>
-                  </figure>
-                ))}
-              </div>
-            )}
-          </div>
-        ))
+              {/* Upload progress for this section */}
+              {uploadingHere && (
+                <div className="admin-upload-progress">
+                  <div className="admin-upload-progress__bar" style={{ width: `${Math.round(upload.progress * 100)}%` }} />
+                  <span className="admin-upload-progress__label">
+                    {upload.name} — {Math.round(upload.progress * 100)}%
+                  </span>
+                </div>
+              )}
+
+              {media.length === 0 ? (
+                <div className="admin-gallery-empty">
+                  Drop photos or videos here, or use “Add media”.
+                </div>
+              ) : (
+                <div className="admin-gallery-grid">
+                  {media.map((item) => (
+                    <Thumb key={item.id} slug={section.slug} item={item} onDelete={onDeleteMedia} />
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })
       )}
     </div>
   );

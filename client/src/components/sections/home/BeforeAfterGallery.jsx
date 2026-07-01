@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight, FaArrowRight } from 'react-icons/fa';
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import siteConfig from '../../../config/siteConfig';
 import useCarousel from '../../utils/useCarousel';
 
@@ -61,7 +61,7 @@ const CategoryCard = ({ tag, images, to, index }) => {
       </div>
       <span className="cat-card__overlay">
         <span className="cat-card__tag">{tag}</span>
-        <span className="cat-card__view">View gallery <FaArrowRight /></span>
+        <span className="cat-card__view">View gallery <ArrowRight /></span>
       </span>
     </Link>
   );
@@ -80,7 +80,7 @@ const BeforeAfterGallery = () => {
 
         <div className="cat-carousel" onMouseEnter={pause} onMouseLeave={resume}>
           <button className="carousel-arrow carousel-arrow--prev" onClick={() => slide(-1)} aria-label="Previous">
-            <FaChevronLeft />
+            <ChevronLeft />
           </button>
 
           <div className="cat-track" ref={trackRef}>
@@ -96,7 +96,7 @@ const BeforeAfterGallery = () => {
           </div>
 
           <button className="carousel-arrow carousel-arrow--next" onClick={() => slide(1)} aria-label="Next">
-            <FaChevronRight />
+            <ChevronRight />
           </button>
         </div>
 

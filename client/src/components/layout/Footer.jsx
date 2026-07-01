@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaFacebook, FaInstagram, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
+import { FaFacebook, FaInstagram } from 'react-icons/fa';
 import { SiTiktok } from 'react-icons/si';
+import { MapPin, Phone, Mail } from 'lucide-react';
 import siteConfig from '../../config/siteConfig';
 import footerLogo from '../../assets/logos/prestiva-logo-stacked-navy-gold.webp';
 
@@ -55,13 +56,13 @@ const Footer = () => {
             <h4 className="footer-title">Contact Us</h4>
             <ul className="footer-links">
               <li style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <FaMapMarkerAlt color="#D4A853" /> Adelaide, South Australia
+                <MapPin color="#D4A853" /> Adelaide, South Australia
               </li>
               <li style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <FaPhoneAlt color="#D4A853" /> <a href={`tel:${siteConfig.phoneRaw}`}>{siteConfig.phone}</a>
+                <Phone color="#D4A853" /> <a href={`tel:${siteConfig.phoneRaw}`}>{siteConfig.phone}</a>
               </li>
               <li style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <FaEnvelope color="#D4A853" /> <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+                <Mail color="#D4A853" /> <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
               </li>
             </ul>
           </div>

@@ -431,22 +431,60 @@
 }
 
 .service-icon-box {
-  width: 80px;
-  height: 80px;
-  background-color: var(--primary-navy);
-  color: var(--primary-gold);
-  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 18px;              /* soft squircle, not a hard circle */
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
-  margin-bottom: 25px;
+  font-size: 1.9rem;
+  margin-bottom: 24px;
   transition: var(--transition-smooth);
 }
 
 .service-card:hover .service-icon-box {
-  background-color: var(--primary-gold);
+  background-color: var(--accent);
   color: var(--white);
+  transform: translateY(-2px);
+}
+
+/* About page — trust badges (responsive, dark-mode safe) */
+.trust-badges {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  max-width: 920px;
+  margin: 0 auto;
+}
+.trust-badge {
+  text-align: center;
+  padding: 30px 20px;
+  background-color: var(--off-white);
+  border: 1px solid var(--light-gray);
+  border-radius: 15px;
+}
+.trust-badge__icon {
+  font-size: 2.5rem;
+  /* Gold — the same accent used by the icons above; stays visible on both the
+     light card (light mode) and the dark card (dark mode). */
+  color: var(--primary-gold);
+  margin-bottom: 15px;
+  line-height: 1;
+}
+.trust-badge__label {
+  font-weight: 700;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .trust-badges { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .trust-badge { padding: 24px 14px; }
+  .trust-badge__icon { font-size: 2.1rem; }
+}
+@media (max-width: 360px) {
+  .trust-badges { grid-template-columns: 1fr; }
 }
 
 .service-card-title {

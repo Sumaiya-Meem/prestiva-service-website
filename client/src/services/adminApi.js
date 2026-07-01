@@ -43,11 +43,14 @@ export const fetchQuotes = async (status = '') => {
   return handle(res); // { success, count, quotes }
 };
 
-export const updateQuoteStatus = async (id, status) => {
+export const updateQuoteStatus = async (id, status) => updateQuote(id, { status });
+
+/** Patch any subset of { status, internalNotes, archived } on a quote. */
+export const updateQuote = async (id, patch) => {
   const res = await fetch(`${BASE}/api/contact/${id}`, {
     method: 'PATCH',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
+    body: JSON.stringify(patch),
   });
   return handle(res);
 };
@@ -61,13 +64,40 @@ export const fetchGallery = async () => {
   return handle(res); // { success, sections }
 };
 
+/**
+ * Cached gallery fetch for the PUBLIC site. The result is kept in memory for the
+ * lifetime of the page, so navigating between pages (Home ↔ Gallery) reuses the
+ * same data instead of hitting the database every time. A full page reload
+ * clears the module state and fetches once more. In-flight requests are deduped.
+ *
+ * (The admin panel intentionally uses the uncached `fetchGallery` so it always
+ * shows the latest state after edits.)
+ */
+let _galleryData = null;
+let _galleryPromise = null;
+
+export const fetchGalleryCached = () => {
+  if (_galleryData) return Promise.resolve(_galleryData);
+  if (!_galleryPromise) {
+    _galleryPromise = fetchGallery()
+      .then((d) => { _galleryData = d; return d; })
+      .catch((e) => { _galleryPromise = null; throw e; }); // don't cache failures
+  }
+  return _galleryPromise;
+};
+
+/** Drop the cache (e.g. after admin edits) so the next read refetches. */
+export const clearGalleryCache = () => { _galleryData = null; _galleryPromise = null; };
+
 export const addGallerySection = async (name) => {
   const res = await fetch(`${BASE}/api/gallery/sections`, {
     method: 'POST',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify({ name }),
   });
-  return handle(res);
+  const data = await handle(res);
+  clearGalleryCache();
+  return data;
 };
 
 export const deleteGallerySection = async (slug) => {
@@ -75,26 +105,78 @@ export const deleteGallerySection = async (slug) => {
     method: 'DELETE',
     headers: authHeaders(),
   });
-  return handle(res);
+  const data = await handle(res);
+  clearGalleryCache();
+  return data;
 };
 
-export const uploadGalleryImage = async (slug, file) => {
-  const fd = new FormData();
-  fd.append('image', file);
-  // NB: don't set Content-Type — the browser adds the multipart boundary.
-  const res = await fetch(`${BASE}/api/gallery/sections/${encodeURIComponent(slug)}/images`, {
-    method: 'POST',
-    headers: authHeaders(),
-    body: fd,
+/**
+ * Upload an image OR video to a section. Reports progress via onProgress(0..1)
+ * (uses XHR because fetch can't stream upload progress). Videos can be large,
+ * so a progress bar matters for UX.
+ */
+export const uploadGalleryMedia = (slug, file, onProgress) =>
+  new Promise((resolve, reject) => {
+    const fd = new FormData();
+    fd.append('file', file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${BASE}/api/gallery/sections/${encodeURIComponent(slug)}/media`);
+    xhr.setRequestHeader('Authorization', `Bearer ${getToken()}`);
+
+    xhr.upload.onprogress = (e) => {
+      if (onProgress && e.lengthComputable) onProgress(e.loaded / e.total);
+    };
+    xhr.onload = () => {
+      let data = {};
+      try { data = JSON.parse(xhr.responseText); } catch { /* no body */ }
+      if (xhr.status === 401) { clearToken(); return reject(new Error('Session expired — please log in again.')); }
+      if (xhr.status >= 200 && xhr.status < 300 && data.success !== false) return resolve(data);
+      reject(new Error(data.message || `Upload failed (${xhr.status})`));
+    };
+    xhr.onerror = () => reject(new Error('Network error during upload.'));
+    xhr.send(fd);
   });
-  return handle(res);
-};
 
-export const deleteGalleryImage = async (slug, id) => {
+export const deleteGalleryMedia = async (slug, id) => {
   const res = await fetch(
-    `${BASE}/api/gallery/sections/${encodeURIComponent(slug)}/images/${encodeURIComponent(id)}`,
+    `${BASE}/api/gallery/sections/${encodeURIComponent(slug)}/media/${encodeURIComponent(id)}`,
     { method: 'DELETE', headers: authHeaders() }
   );
+  const data = await handle(res);
+  clearGalleryCache();
+  return data;
+};
+
+/* ── Page background images ── */
+export const uploadPageBackground = (page, file, onProgress) =>
+  new Promise((resolve, reject) => {
+    const fd = new FormData();
+    fd.append('file', file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${BASE}/api/backgrounds/${encodeURIComponent(page)}`);
+    xhr.setRequestHeader('Authorization', `Bearer ${getToken()}`);
+
+    xhr.upload.onprogress = (e) => {
+      if (onProgress && e.lengthComputable) onProgress(e.loaded / e.total);
+    };
+    xhr.onload = () => {
+      let data = {};
+      try { data = JSON.parse(xhr.responseText); } catch { /* no body */ }
+      if (xhr.status === 401) { clearToken(); return reject(new Error('Session expired — please log in again.')); }
+      if (xhr.status >= 200 && xhr.status < 300 && data.success !== false) return resolve(data);
+      reject(new Error(data.message || `Upload failed (${xhr.status})`));
+    };
+    xhr.onerror = () => reject(new Error('Network error during upload.'));
+    xhr.send(fd);
+  });
+
+export const deletePageBackground = async (page) => {
+  const res = await fetch(`${BASE}/api/backgrounds/${encodeURIComponent(page)}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
   return handle(res);
 };
 

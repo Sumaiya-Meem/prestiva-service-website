@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaCheckCircle } from 'react-icons/fa';
+import { CheckCircle2 } from 'lucide-react';
 
 const CleaningChecklist = () => {
   const [activeTab, setActiveTab] = useState('kitchen');
@@ -63,7 +63,7 @@ const CleaningChecklist = () => {
           <div className="checklist-grid">
             {checklistData[activeTab].map((item, index) => (
               <div key={index} className="checklist-item">
-                <FaCheckCircle className="check-icon" />
+                <CheckCircle2 className="check-icon" />
                 <span>{item}</span>
               </div>
             ))}

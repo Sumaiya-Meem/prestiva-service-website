@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaPlay } from 'react-icons/fa';
+import { Play } from 'lucide-react';
+import { fetchGalleryCached, mediaUrl } from '../../../services/adminApi';
 
-// Compressed result clips (with poster frames) — see /gallery for the full set.
+// Bundled fallback clips (with poster frames) — used if the API has no videos
+// yet (e.g. before the gallery is seeded), so the homepage is never empty.
 import v1 from '../../../assets/gallery/results/1.mp4';
 import v2 from '../../../assets/gallery/results/2.mp4';
 import v3 from '../../../assets/gallery/results/3.mp4';
@@ -12,22 +14,40 @@ import p2 from '../../../assets/gallery/results/2.jpg';
 import p3 from '../../../assets/gallery/results/3.jpg';
 import p4 from '../../../assets/gallery/results/4.jpg';
 
-const CLIPS = [
+const FALLBACK_CLIPS = [
   { src: v1, poster: p1 },
   { src: v2, poster: p2 },
   { src: v3, poster: p3 },
   { src: v4, poster: p4 },
 ];
 
-// Each card stays a lightweight poster until the user opts in to play —
-// no video bytes are downloaded on page load.
+// Pull videos from the admin-managed gallery, preferring the "results" section.
+const videosFromSections = (sections) => {
+  const all = [];
+  let preferred = [];
+  for (const s of sections || []) {
+    const vids = (s.media || [])
+      .filter((m) => m.type === 'video')
+      .map((m) => ({
+        src: mediaUrl(m.url),
+        poster: m.posterUrl ? mediaUrl(m.posterUrl) : '',
+        thumb: m.thumbUrl ? mediaUrl(m.thumbUrl) : '',
+      }));
+    if (s.slug === 'results') preferred = vids;
+    all.push(...vids);
+  }
+  const chosen = preferred.length ? preferred : all;
+  return chosen.slice(0, 6);
+};
+
+// Each card stays a lightweight poster until the user opts in to play.
 const ResultClip = ({ clip }) => {
   const [playing, setPlaying] = useState(false);
 
   if (playing) {
     return (
       <figure className="result-clip">
-        <video src={clip.src} poster={clip.poster} controls autoPlay playsInline />
+        <video src={clip.src} poster={clip.poster || undefined} controls autoPlay playsInline />
       </figure>
     );
   }
@@ -35,14 +55,32 @@ const ResultClip = ({ clip }) => {
   return (
     <figure className="result-clip">
       <button type="button" className="result-clip__play" onClick={() => setPlaying(true)} aria-label="Play cleaning result video">
-        <img src={clip.poster} alt="Prestiva cleaning result" loading="lazy" decoding="async" />
-        <span className="result-clip__icon"><FaPlay /></span>
+        {clip.thumb || clip.poster ? (
+          <img src={clip.thumb || clip.poster} alt="Prestiva cleaning result" loading="lazy" decoding="async" />
+        ) : (
+          <video src={clip.src} preload="metadata" muted playsInline />
+        )}
+        <span className="result-clip__icon"><Play fill="currentColor" /></span>
       </button>
     </figure>
   );
 };
 
 const ResultsReel = () => {
+  const [clips, setClips] = useState(FALLBACK_CLIPS);
+
+  useEffect(() => {
+    let alive = true;
+    fetchGalleryCached()
+      .then((data) => {
+        if (!alive) return;
+        const vids = videosFromSections(data.sections);
+        if (vids.length) setClips(vids); // otherwise keep the bundled fallback
+      })
+      .catch(() => { /* keep fallback */ });
+    return () => { alive = false; };
+  }, []);
+
   return (
     <section className="section results-reel">
       <div className="container">
@@ -52,8 +90,8 @@ const ResultsReel = () => {
         </div>
 
         <div className="results-grid">
-          {CLIPS.map((clip, i) => (
-            <ResultClip key={i} clip={clip} />
+          {clips.map((clip, i) => (
+            <ResultClip key={clip.src || i} clip={clip} />
           ))}
         </div>
 

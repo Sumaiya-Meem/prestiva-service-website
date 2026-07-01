@@ -1,15 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaPhoneAlt, FaLeaf, FaClock, FaCheckCircle } from 'react-icons/fa';
+import { Phone, Leaf, Clock, CheckCircle2 } from 'lucide-react';
 import siteConfig from '../config/siteConfig';
 import Seo from '../components/utils/Seo';
 import ContactLine from '../components/sections/ContactLine';
-import heroImg from '../assets/images/landscaping_hero.webp';
+import { pageBgUrl } from '../config/pageBackgrounds';
 import BeforeAfterGallery from '../components/sections/home/BeforeAfterGallery';
 
 const LandscapingPage = () => {
   const landscapingCat = siteConfig.serviceCategories.find((c) => c.slug === 'landscaping');
   const services = landscapingCat ? landscapingCat.services : [];
+  const heroImg = pageBgUrl('landscaping');
 
   return (
     <div className="landscaping-page">
@@ -26,7 +27,7 @@ const LandscapingPage = () => {
             <div className="hero-btns cta-btns">
               <Link to="/contact" className="btn btn-primary">Get Landscaping Quote</Link>
               <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', borderColor: '#fff' }}>
-                <FaPhoneAlt /> Call Now
+                <Phone /> Call Now
               </a>
             </div>
           </div>
@@ -40,7 +41,7 @@ const LandscapingPage = () => {
           <div className="services-grid responsive-grid-5">
             {services.map((s, i) => (
               <div key={i} className="service-card" style={{ padding: '25px', textAlign: 'center', backgroundColor: 'var(--off-white)', borderRadius: '12px', opacity: s.comingSoon ? 0.7 : 1 }}>
-                <FaLeaf color={s.comingSoon ? '#9aa4b0' : '#27c281'} style={{ marginBottom: '10px' }} />
+                <Leaf color={s.comingSoon ? '#9aa4b0' : '#27c281'} style={{ marginBottom: '10px' }} />
                 <h4 style={{ fontSize: '0.9rem', fontWeight: '700' }}>{s.name}</h4>
                 {s.comingSoon && <span className="svc-badge" style={{ marginTop: '8px', display: 'inline-block' }}>Coming Soon</span>}
               </div>
@@ -58,17 +59,17 @@ const LandscapingPage = () => {
           </div>
           <div className="responsive-grid-3">
             <div className="why-card">
-              <div className="why-icon"><FaClock /></div>
+              <div className="why-icon"><Clock /></div>
               <h3>Same Crew</h3>
               <p>We send the same team to your property for consistent results every time.</p>
             </div>
             <div className="why-card">
-              <div className="why-icon"><FaLeaf /></div>
+              <div className="why-icon"><Leaf /></div>
               <h3>Green Removal</h3>
               <p>We include full green waste removal in every booking, leaving your site pristine.</p>
             </div>
             <div className="why-card">
-              <div className="why-icon"><FaCheckCircle /></div>
+              <div className="why-icon"><CheckCircle2 /></div>
               <h3>One-off or Regular</h3>
               <p>Whether you need a quick clean-up or monthly maintenance, we've got you covered.</p>
             </div>
@@ -100,9 +101,9 @@ const LandscapingPage = () => {
                 <span className="unit">/visit</span>
               </div>
               <ul className="plan-features">
-                <li><FaCheckCircle className="plan-check" /> Mowing, edging &amp; line trimming</li>
-                <li><FaCheckCircle className="plan-check" /> Clippings cleared &amp; removed</li>
-                <li><FaCheckCircle className="plan-check" /> Paths &amp; driveway blown down</li>
+                <li><CheckCircle2 className="plan-check" /> Mowing, edging &amp; line trimming</li>
+                <li><CheckCircle2 className="plan-check" /> Clippings cleared &amp; removed</li>
+                <li><CheckCircle2 className="plan-check" /> Paths &amp; driveway blown down</li>
               </ul>
               <Link to="/contact" className="btn btn-outline" style={{ marginTop: 'auto', width: '100%', textAlign: 'center' }}>Book a Mow</Link>
             </div>
@@ -118,10 +119,10 @@ const LandscapingPage = () => {
                 <span className="unit">/visit</span>
               </div>
               <ul className="plan-features">
-                <li><FaCheckCircle className="plan-check" /> Everything in Essentials</li>
-                <li><FaCheckCircle className="plan-check" /> Weeding, hedging &amp; pruning</li>
-                <li><FaCheckCircle className="plan-check" /> Mulching &amp; garden bed tidy-up</li>
-                <li><FaCheckCircle className="plan-check" /> All green waste removed</li>
+                <li><CheckCircle2 className="plan-check" /> Everything in Essentials</li>
+                <li><CheckCircle2 className="plan-check" /> Weeding, hedging &amp; pruning</li>
+                <li><CheckCircle2 className="plan-check" /> Mulching &amp; garden bed tidy-up</li>
+                <li><CheckCircle2 className="plan-check" /> All green waste removed</li>
               </ul>
               <Link to="/contact" className="btn btn-primary" style={{ marginTop: 'auto', width: '100%', textAlign: 'center' }}>Book Maintenance</Link>
             </div>
@@ -136,9 +137,9 @@ const LandscapingPage = () => {
                 <span className="unit">/job</span>
               </div>
               <ul className="plan-features">
-                <li><FaCheckCircle className="plan-check" /> Driveways, patios &amp; pavers</li>
-                <li><FaCheckCircle className="plan-check" /> Exterior walls &amp; fencing</li>
-                <li><FaCheckCircle className="plan-check" /> Mould &amp; grime removed</li>
+                <li><CheckCircle2 className="plan-check" /> Driveways, patios &amp; pavers</li>
+                <li><CheckCircle2 className="plan-check" /> Exterior walls &amp; fencing</li>
+                <li><CheckCircle2 className="plan-check" /> Mould &amp; grime removed</li>
               </ul>
               <Link to="/contact" className="btn btn-outline" style={{ marginTop: 'auto', width: '100%', textAlign: 'center' }}>Get a Quote</Link>
             </div>

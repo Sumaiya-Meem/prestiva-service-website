@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const FAQ = () => {
   const faqs = [
@@ -44,7 +44,7 @@ const FAQ = () => {
             <div key={index} className={`faq-item ${activeIndex === index ? 'active' : ''}`}>
               <div className="faq-question" onClick={() => toggleFAQ(index)}>
                 <h3>{faq.question}</h3>
-                {activeIndex === index ? <FaChevronUp /> : <FaChevronDown />}
+                {activeIndex === index ? <ChevronUp /> : <ChevronDown />}
               </div>
               <div className="faq-answer">
                 <p>{faq.answer}</p>

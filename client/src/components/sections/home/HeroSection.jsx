@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaPhoneAlt } from 'react-icons/fa';
+import { Phone } from 'lucide-react';
 import siteConfig from '../../../config/siteConfig';
-import heroImg from '../../../assets/images/home_hero.webp';
+import { pageBgUrl } from '../../../config/pageBackgrounds';
 
 const trustItems = ['Fully Insured', 'Police Checked', 'Adelaide Based', 'Commercial & Residential'];
 
 const HeroSection = () => {
+  const heroImg = pageBgUrl('home');
   return (
     <section className="hero-section hero-home">
       <div className="hero-bg" style={{ backgroundImage: `url(${heroImg})` }} />
@@ -22,7 +23,7 @@ const HeroSection = () => {
           <div className="hero-btns">
             <Link to="/contact" className="btn btn-primary">Get a Free Quote</Link>
             <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', borderColor: '#fff' }}>
-              <FaPhoneAlt /> Call {siteConfig.phone}
+              <Phone /> Call {siteConfig.phone}
             </a>
           </div>
 

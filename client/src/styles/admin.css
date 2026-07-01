@@ -51,6 +51,24 @@
 
 .admin-main { padding: 24px; max-width: 1100px; margin: 0 auto; }
 
+/* Mobile: keep the top bar usable — brand + logout on top, tabs on a full-width
+   horizontally-scrollable row so all four stay reachable on a phone. */
+@media (max-width: 720px) {
+  .admin-topbar { flex-wrap: wrap; padding: 12px 14px; gap: 10px; }
+  .admin-tabs {
+    order: 3;
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+  .admin-tabs::-webkit-scrollbar { height: 0; }
+  .admin-tab { white-space: nowrap; flex: 0 0 auto; }
+  .admin-main { padding: 16px 12px; }
+  .admin-card { padding: 16px; }
+}
+
 /* Buttons */
 .admin-btn {
   border: 1px solid var(--adm-border);
@@ -208,3 +226,96 @@
   box-shadow: 0 2px 8px rgba(0,0,0,.3);
 }
 .admin-gallery-thumb__del:hover { background: #b42318; }
+
+/* Media thumbnails (images + videos) */
+.admin-gallery-section.is-dragover {
+  border-color: var(--adm-gold);
+  background: #fdf8ee;
+  box-shadow: inset 0 0 0 2px rgba(212,168,83,.5);
+}
+
+.admin-media-thumb {
+  position: relative; margin: 0; border-radius: 10px; overflow: hidden;
+  aspect-ratio: 1 / 1; background: var(--adm-navy);
+}
+.admin-media-thumb img,
+.admin-media-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.admin-media-thumb__del {
+  position: absolute; top: 6px; right: 6px;
+  width: 26px; height: 26px; border-radius: 50%;
+  border: none; cursor: pointer;
+  background: rgba(180,35,24,.92); color: #fff;
+  font-size: 1.1rem; line-height: 1; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3); z-index: 2;
+}
+.admin-media-thumb__del:hover { background: #b42318; }
+
+.admin-media-thumb__type {
+  position: absolute; bottom: 6px; left: 6px;
+  padding: 2px 8px; border-radius: 999px;
+  font-size: .68rem; font-weight: 700; letter-spacing: .3px;
+  background: rgba(10,22,40,.78); color: #fff;
+}
+.admin-media-thumb--video .admin-media-thumb__type { background: rgba(212,168,83,.95); color: var(--adm-navy); }
+
+.admin-media-thumb__play {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 1.6rem; pointer-events: none;
+  text-shadow: 0 2px 10px rgba(0,0,0,.6);
+}
+
+/* Page Backgrounds manager */
+.admin-bg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.admin-bg-card {
+  border: 1px solid var(--adm-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+.admin-bg-card__preview {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--adm-navy);
+}
+.admin-bg-card__preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.admin-bg-card__navy {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,.6); font-size: .82rem;
+  background: linear-gradient(135deg, var(--adm-navy), var(--adm-navy-2));
+}
+.admin-bg-card__tag {
+  position: absolute; top: 8px; left: 8px;
+  padding: 2px 9px; border-radius: 999px;
+  font-size: .68rem; font-weight: 800; letter-spacing: .3px; text-transform: uppercase;
+  background: rgba(10,22,40,.78); color: #fff;
+}
+.admin-bg-card__tag--custom { background: var(--adm-gold); color: var(--adm-navy); }
+.admin-bg-card__uploading {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(10,22,40,.6); color: #fff; font-weight: 700; font-size: .9rem;
+}
+.admin-bg-card__body { padding: 12px 14px; }
+.admin-bg-card__name { font-weight: 800; margin-bottom: 10px; }
+.admin-bg-card__actions { display: flex; gap: 8px; }
+
+/* Upload progress bar */
+.admin-upload-progress {
+  position: relative; height: 26px; border-radius: 8px; overflow: hidden;
+  background: var(--adm-border); margin-bottom: 14px;
+}
+.admin-upload-progress__bar {
+  position: absolute; inset: 0 auto 0 0; background: var(--adm-gold);
+  transition: width .15s ease;
+}
+.admin-upload-progress__label {
+  position: relative; z-index: 1; display: block; line-height: 26px; padding: 0 10px;
+  font-size: .78rem; font-weight: 600; color: var(--adm-navy);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}

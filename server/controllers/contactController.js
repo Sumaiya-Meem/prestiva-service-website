@@ -63,27 +63,37 @@ exports.listQuotes = async (req, res) => {
 };
 
 /**
- * Admin: update a quote's pipeline status. Token-protected.
- * PATCH /api/contact/:id  { status: 'contacted' }
+ * Admin: update a quote. Token-protected. Accepts any of:
+ *   { status, internalNotes, archived }
+ * PATCH /api/contact/:id
  */
 exports.updateQuoteStatus = async (req, res) => {
   if (!dbReady()) {
     return res.status(503).json({ success: false, message: 'Database not configured.' });
   }
+
+  const update = {};
   const allowed = ['new', 'contacted', 'quoted', 'won', 'lost'];
-  if (!allowed.includes(req.body.status)) {
-    return res.status(400).json({ success: false, message: `status must be one of: ${allowed.join(', ')}` });
+
+  if (req.body.status !== undefined) {
+    if (!allowed.includes(req.body.status)) {
+      return res.status(400).json({ success: false, message: `status must be one of: ${allowed.join(', ')}` });
+    }
+    update.status = req.body.status;
   }
+  if (req.body.internalNotes !== undefined) update.internalNotes = String(req.body.internalNotes).slice(0, 5000);
+  if (req.body.archived !== undefined) update.archived = Boolean(req.body.archived);
+
+  if (Object.keys(update).length === 0) {
+    return res.status(400).json({ success: false, message: 'Nothing to update.' });
+  }
+
   try {
-    const quote = await Quote.findByIdAndUpdate(
-      req.params.id,
-      { status: req.body.status },
-      { new: true }
-    ).lean();
+    const quote = await Quote.findByIdAndUpdate(req.params.id, update, { new: true }).lean();
     if (!quote) return res.status(404).json({ success: false, message: 'Quote not found.' });
     return res.json({ success: true, quote });
   } catch (err) {
-    console.error('[db] updateQuoteStatus error:', err.message);
+    console.error('[db] updateQuote error:', err.message);
     return res.status(500).json({ success: false, message: 'Could not update quote.' });
   }
 };

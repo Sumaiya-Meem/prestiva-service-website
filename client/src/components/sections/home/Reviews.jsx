@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaStar, FaQuoteLeft, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
 import useCarousel from '../../utils/useCarousel';
 
 const testimonials = [
@@ -54,16 +54,16 @@ const Reviews = () => {
 
         <div className="reviews-carousel" onMouseEnter={pause} onMouseLeave={resume}>
           <button className="carousel-arrow carousel-arrow--prev" onClick={() => slide(-1)} aria-label="Previous reviews">
-            <FaChevronLeft />
+            <ChevronLeft />
           </button>
 
           <div className="reviews-track" ref={trackRef}>
             {testimonials.map((review, index) => (
               <div key={index} className="review-slide review-card">
-                <div className="quote-icon"><FaQuoteLeft /></div>
+                <div className="quote-icon"><Quote /></div>
                 <div className="rating">
                   {[...Array(review.rating)].map((_, i) => (
-                    <FaStar key={i} color="var(--primary-gold)" />
+                    <Star key={i} color="var(--primary-gold)" fill="var(--primary-gold)" />
                   ))}
                 </div>
                 <p className="review-text">{review.text}</p>
@@ -78,7 +78,7 @@ const Reviews = () => {
           </div>
 
           <button className="carousel-arrow carousel-arrow--next" onClick={() => slide(1)} aria-label="More reviews">
-            <FaChevronRight />
+            <ChevronRight />
           </button>
         </div>
       </div>

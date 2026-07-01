@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaBroom, FaLeaf, FaTools } from 'react-icons/fa';
+import { SprayCan, Leaf, Wrench } from 'lucide-react';
 import siteConfig from '../../../config/siteConfig';
 
 const iconMap = {
-  cleaning: <FaBroom />,
-  landscaping: <FaLeaf />,
-  'property-maintenance': <FaTools />,
+  cleaning: <SprayCan />,
+  landscaping: <Leaf />,
+  'property-maintenance': <Wrench />,
 };
 
 const ServicesOverview = () => {

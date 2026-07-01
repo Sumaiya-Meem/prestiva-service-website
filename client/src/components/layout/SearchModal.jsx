@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaSearch, FaTimes, FaArrowRight } from 'react-icons/fa';
+import { Search, X, ArrowRight } from 'lucide-react';
 
 // Searchable pages / services
 const PAGES = [
@@ -58,7 +58,7 @@ const SearchModal = ({ open, onClose }) => {
     <div className="search-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label="Site search">
       <div className="search-panel" onClick={(e) => e.stopPropagation()}>
         <div className="search-input-row">
-          <FaSearch className="search-input-icon" />
+          <Search className="search-input-icon" />
           <input
             ref={inputRef}
             value={q}
@@ -67,7 +67,7 @@ const SearchModal = ({ open, onClose }) => {
             className="search-input"
             aria-label="Search"
           />
-          <button className="search-close" onClick={onClose} aria-label="Close search"><FaTimes /></button>
+          <button className="search-close" onClick={onClose} aria-label="Close search"><X /></button>
         </div>
 
         <ul className="search-results">
@@ -81,7 +81,7 @@ const SearchModal = ({ open, onClose }) => {
                   <span className="search-result__title">{r.title}</span>
                   <span className="search-result__desc">{r.desc}</span>
                 </span>
-                <FaArrowRight className="search-result__arrow" />
+                <ArrowRight className="search-result__arrow" />
               </button>
             </li>
           ))}

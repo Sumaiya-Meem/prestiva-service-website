@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { FaPhoneAlt, FaEnvelope, FaBars, FaTimes, FaBell, FaChevronDown, FaSearch } from 'react-icons/fa';
+import { Phone, Mail, Menu, X, Bell, ChevronDown, Search } from 'lucide-react';
 import siteConfig from '../../config/siteConfig';
 import ThemeToggle from '../utils/ThemeToggle';
 import SearchModal from './SearchModal';
@@ -76,7 +76,7 @@ const Header = () => {
           onClick={() => setOpenDropdown(isOpen ? null : 'Services')}
           aria-expanded={isOpen}
         >
-          {item.label} <FaChevronDown className="nav-dropdown__chevron" />
+          {item.label} <ChevronDown className="nav-dropdown__chevron" />
         </button>
         <div className={`nav-mega__menu${isOpen ? ' open' : ''}`}>
           {siteConfig.serviceCategories.map((cat) => (
@@ -125,10 +125,10 @@ const Header = () => {
           {/* Contact details + CTA inside the mobile slide-out menu */}
           <div className="mobile-menu-contact">
             <a href={`tel:${siteConfig.phoneRaw}`} className="mobile-menu-contact-link">
-              <FaPhoneAlt /> {siteConfig.phone}
+              <Phone /> {siteConfig.phone}
             </a>
             <a href={`mailto:${siteConfig.email}`} className="mobile-menu-contact-link">
-              <FaEnvelope /> {siteConfig.email}
+              <Mail /> {siteConfig.email}
             </a>
             <Link to="/contact" className="btn btn-primary" style={{ width: '100%', textAlign: 'center' }} onClick={closeMenu}>Get a Free Quote</Link>
           </div>
@@ -136,10 +136,10 @@ const Header = () => {
 
         <div className="header-actions">
           <button type="button" className="icon-btn" onClick={() => setSearchOpen(true)} aria-label="Search">
-            <FaSearch />
+            <Search />
           </button>
           <Link to="/contact" className="btn btn-primary">
-            <FaBell className="cta-bell" /> Get a Free Quote
+            <Bell className="cta-bell" /> Get a Free Quote
           </Link>
           <ThemeToggle />
           <button
@@ -149,7 +149,7 @@ const Header = () => {
             aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={isMobileMenuOpen}
           >
-            {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+            {isMobileMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
       </div>

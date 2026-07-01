@@ -36,11 +36,20 @@ const quoteSchema = new mongoose.Schema(
       index: true,
     },
 
+    // Private admin notes (never shown to the customer).
+    internalNotes: { type: String, trim: true, default: '' },
+
+    // Soft-hide from the default list without deleting the record.
+    archived: { type: Boolean, default: false, index: true },
+
     // Light audit context
     source: { type: String, default: 'website' },
     userAgent: { type: String, default: '' },
   },
   { timestamps: true }
 );
+
+// Common dashboard query: newest-first, filtered by pipeline status.
+quoteSchema.index({ archived: 1, status: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Quote', quoteSchema);

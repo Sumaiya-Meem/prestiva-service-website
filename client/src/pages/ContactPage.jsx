@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
-import { FaPhoneAlt, FaEnvelope, FaWhatsapp, FaMapMarkerAlt, FaClock, FaCheckCircle, FaCrosshairs, FaCloudUploadAlt } from 'react-icons/fa';
+import { FaWhatsapp } from 'react-icons/fa';
+import { Phone, Mail, MapPin, Clock, CheckCircle2, Crosshair, CloudUpload } from 'lucide-react';
+import { heroBgStyle } from '../config/pageBackgrounds';
 import axios from 'axios';
 import siteConfig from '../config/siteConfig';
 import Seo from '../components/utils/Seo';
@@ -192,7 +194,7 @@ const ContactPage = () => {
         <div className={`form-toast form-toast--${submitStatus}`} role="status" aria-live="polite">
           {submitStatus === 'success' ? (
             <>
-              <FaCheckCircle className="form-toast__icon" />
+              <CheckCircle2 className="form-toast__icon" />
               <div><strong>Thank you.</strong> Your quote request has been received. Our team will contact you shortly.</div>
             </>
           ) : (
@@ -211,7 +213,7 @@ const ContactPage = () => {
         path="/contact"
       />
       {/* Hero / Header */}
-      <section className="section subpage-hero bg-navy" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '30vh' }}>
+      <section className="section subpage-hero bg-navy" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '30vh', ...heroBgStyle('contact') }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <h1 className="hero-title" style={{ color: '#fff' }}>Get in Touch with Prestiva</h1>
           <p className="contact-hero-subtitle">
@@ -229,7 +231,7 @@ const ContactPage = () => {
 
               <div style={{ marginBottom: '50px' }}>
                 <div style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '30px' }}>
-                  <div style={{ padding: '15px', backgroundColor: 'var(--off-white)', borderRadius: '50%', color: 'var(--primary-gold)' }}><FaPhoneAlt fontSize="1.5rem" /></div>
+                  <div style={{ padding: '15px', backgroundColor: 'var(--off-white)', borderRadius: '50%', color: 'var(--primary-gold)' }}><Phone fontSize="1.5rem" /></div>
                   <div>
                     <h4 style={{ marginBottom: '5px' }}>Call Us</h4>
                     <a href={`tel:${siteConfig.phoneRaw}`} style={{ fontWeight: '700', fontSize: '1.2rem' }}>{siteConfig.phone}</a>
@@ -237,7 +239,7 @@ const ContactPage = () => {
                 </div>
 
                 <div style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '30px' }}>
-                  <div style={{ padding: '15px', backgroundColor: 'var(--off-white)', borderRadius: '50%', color: 'var(--primary-gold)' }}><FaEnvelope fontSize="1.5rem" /></div>
+                  <div style={{ padding: '15px', backgroundColor: 'var(--off-white)', borderRadius: '50%', color: 'var(--primary-gold)' }}><Mail fontSize="1.5rem" /></div>
                   <div>
                     <h4 style={{ marginBottom: '5px' }}>Email Us</h4>
                     <a href={`mailto:${siteConfig.email}`} style={{ fontWeight: '700', fontSize: '1.2rem' }}>{siteConfig.email}</a>
@@ -257,16 +259,16 @@ const ContactPage = () => {
                 <h3 style={{ marginBottom: '25px' }}>Business Details</h3>
                 <ul style={{ listStyle: 'none', color: 'var(--medium-gray)' }}>
                   <li style={{ display: 'flex', gap: '15px', marginBottom: '15px', alignItems: 'center' }}>
-                    <FaMapMarkerAlt color="var(--primary-gold)" /> <span><strong>Service Areas:</strong> {siteConfig.locationText}</span>
+                    <MapPin color="var(--primary-gold)" /> <span><strong>Service Areas:</strong> {siteConfig.locationText}</span>
                   </li>
                   <li style={{ display: 'flex', gap: '15px', marginBottom: '15px', alignItems: 'center' }}>
-                    <FaClock color="var(--primary-gold)" /> <span><strong>Operating Hours:</strong> {siteConfig.operatingHours}</span>
+                    <Clock color="var(--primary-gold)" /> <span><strong>Operating Hours:</strong> {siteConfig.operatingHours}</span>
                   </li>
                   <li style={{ display: 'flex', gap: '15px', marginBottom: '15px', alignItems: 'center' }}>
-                    <FaPhoneAlt color="var(--primary-gold)" /> <span><strong>Phone:</strong> {siteConfig.phone}</span>
+                    <Phone color="var(--primary-gold)" /> <span><strong>Phone:</strong> {siteConfig.phone}</span>
                   </li>
                   <li style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                    <FaEnvelope color="var(--primary-gold)" /> <span><strong>Email:</strong> {siteConfig.email}</span>
+                    <Mail color="var(--primary-gold)" /> <span><strong>Email:</strong> {siteConfig.email}</span>
                   </li>
                 </ul>
               </div>
@@ -349,7 +351,7 @@ const ContactPage = () => {
                     <span>Address / Location *</span>
                     <button type="button" onClick={handleLocateMe} disabled={isGeolocating} aria-label="Use Current Location"
                       style={{ padding: '6px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '5px', backgroundColor: 'var(--off-white)', border: '1px solid var(--light-gray)', borderRadius: '4px', cursor: 'pointer', transition: 'all 0.2s' }}>
-                      <FaCrosshairs /> {isGeolocating ? 'Locating...' : 'Use Current Location'}
+                      <Crosshair /> {isGeolocating ? 'Locating...' : 'Use Current Location'}
                     </button>
                   </label>
 
@@ -387,7 +389,7 @@ const ContactPage = () => {
                 <div style={{ marginBottom: '30px' }}>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Upload Photos (optional)</label>
                   <label className="upload-box">
-                    <FaCloudUploadAlt />
+                    <CloudUpload />
                     <span>{photos.length ? `${photos.length} photo${photos.length > 1 ? 's' : ''} selected` : 'Tap to add photos of the job (up to 6)'}</span>
                     <input type="file" name="photos" accept="image/*" multiple onChange={handlePhotos} style={{ display: 'none' }} />
                   </label>
@@ -409,7 +411,7 @@ const ContactPage = () => {
         <div className="container">
           <h2 className="section-title" style={{ color: '#fff' }}>Speak with Our Team Today</h2>
           <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontSize: '1.2rem', padding: '15px 40px' }}>
-            <FaPhoneAlt /> Call {siteConfig.businessNameShort} Now
+            <Phone /> Call {siteConfig.businessNameShort} Now
           </a>
         </div>
       </section>

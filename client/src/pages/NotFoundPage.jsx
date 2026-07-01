@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaPhoneAlt, FaHome } from 'react-icons/fa';
+import { Phone, Home } from 'lucide-react';
 import siteConfig from '../config/siteConfig';
 
 const NotFoundPage = () => {
@@ -17,10 +17,10 @@ const NotFoundPage = () => {
         </p>
         <div className="cta-btns" style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link to="/" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
-            <FaHome /> Back to Home
+            <Home /> Back to Home
           </Link>
           <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', color: '#fff', borderColor: '#fff' }}>
-            <FaPhoneAlt /> Call {siteConfig.phone}
+            <Phone /> Call {siteConfig.phone}
           </a>
         </div>
       </div>

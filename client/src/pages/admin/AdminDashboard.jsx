@@ -4,6 +4,7 @@ import { clearToken } from '../../services/adminApi';
 import QuotesPanel from '../../components/admin/QuotesPanel';
 import SettingsPanel from '../../components/admin/SettingsPanel';
 import GalleryPanel from '../../components/admin/GalleryPanel';
+import BackgroundsPanel from '../../components/admin/BackgroundsPanel';
 import '../../styles/admin.css';
 
 const AdminDashboard = () => {
@@ -33,6 +34,12 @@ const AdminDashboard = () => {
             Gallery
           </button>
           <button
+            className={`admin-tab ${tab === 'backgrounds' ? 'admin-tab--active' : ''}`}
+            onClick={() => setTab('backgrounds')}
+          >
+            Page Backgrounds
+          </button>
+          <button
             className={`admin-tab ${tab === 'settings' ? 'admin-tab--active' : ''}`}
             onClick={() => setTab('settings')}
           >
@@ -45,6 +52,7 @@ const AdminDashboard = () => {
       <div className="admin-main">
         {tab === 'quotes' && <QuotesPanel />}
         {tab === 'gallery' && <GalleryPanel />}
+        {tab === 'backgrounds' && <BackgroundsPanel />}
         {tab === 'settings' && <SettingsPanel />}
       </div>
     </div>

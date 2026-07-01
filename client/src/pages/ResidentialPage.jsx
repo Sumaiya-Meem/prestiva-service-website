@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaPhoneAlt, FaCheckCircle, FaStar, FaShieldAlt } from 'react-icons/fa';
+import { Phone, CheckCircle2, ShieldCheck } from 'lucide-react';
 import siteConfig from '../config/siteConfig';
 import Seo from '../components/utils/Seo';
 import ContactLine from '../components/sections/ContactLine';
-import heroImg from '../assets/gallery/end-of-lease/2.webp';
+import { pageBgUrl } from '../config/pageBackgrounds';
 
 const ResidentialPage = () => {
   const [activeTab, setActiveTab] = useState('kitchen');
+  const heroImg = pageBgUrl('residential');
 
   const services = [
     { title: "House Cleaning", desc: "Regular maintenance for a spotless home." },
@@ -40,7 +41,7 @@ const ResidentialPage = () => {
             <div className="hero-btns cta-btns">
               <Link to="/contact" className="btn btn-primary">Get a Home Clean Quote</Link>
               <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', borderColor: '#fff' }}>
-                <FaPhoneAlt /> Call Now
+                <Phone /> Call Now
               </a>
             </div>
           </div>
@@ -76,7 +77,7 @@ const ResidentialPage = () => {
               </ul>
             </div>
             <div style={{ textAlign: 'center', padding: '40px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '20px', border: '2px solid var(--primary-gold)' }}>
-              <FaShieldAlt style={{ fontSize: '4rem', color: 'var(--primary-gold)', marginBottom: '20px' }} />
+              <ShieldCheck style={{ fontSize: '4rem', color: 'var(--primary-gold)', marginBottom: '20px' }} />
               <h3>Fully Guaranteed</h3>
             </div>
           </div>
@@ -97,7 +98,7 @@ const ResidentialPage = () => {
           <div style={{ maxWidth: '600px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr', gap: '15px' }}>
             {checklistData[activeTab].map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: '15px', alignItems: 'center', padding: '15px', backgroundColor: 'var(--surface)', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-                <FaCheckCircle color="var(--primary-gold)" />
+                <CheckCircle2 color="var(--primary-gold)" />
                 <span>{item}</span>
               </div>
             ))}

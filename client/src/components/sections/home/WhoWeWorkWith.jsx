@@ -1,14 +1,14 @@
 import React from 'react';
-import { FaHardHat, FaHandshake, FaStore, FaUserTie, FaHome, FaCity } from 'react-icons/fa';
+import { HardHat, Handshake, Store, UserRound, Home, Building2 } from 'lucide-react';
 import siteConfig from '../../../config/siteConfig';
 
 const clients = [
-  { icon: <FaHardHat />, label: 'Builders & Contractors' },
-  { icon: <FaHandshake />, label: 'Real Estate Agents' },
-  { icon: <FaStore />, label: 'Offices & Retail Stores' },
-  { icon: <FaUserTie />, label: 'Property Managers' },
-  { icon: <FaHome />, label: 'Homeowners' },
-  { icon: <FaCity />, label: 'Commercial Sites' },
+  { icon: <HardHat />, label: 'Builders & Contractors' },
+  { icon: <Handshake />, label: 'Real Estate Agents' },
+  { icon: <Store />, label: 'Offices & Retail Stores' },
+  { icon: <UserRound />, label: 'Property Managers' },
+  { icon: <Home />, label: 'Homeowners' },
+  { icon: <Building2 />, label: 'Commercial Sites' },
 ];
 
 const WhoWeWorkWith = () => (

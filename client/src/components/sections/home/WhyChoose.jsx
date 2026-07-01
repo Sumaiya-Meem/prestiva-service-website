@@ -1,30 +1,30 @@
 import React from 'react';
-import { FaUserCheck, FaLeaf, FaTag, FaClock, FaCheckCircle } from 'react-icons/fa';
+import { UserCheck, Leaf, Tag, Clock, CheckCircle2 } from 'lucide-react';
 
 const WhyChoose = () => {
   const reasons = [
     {
-      icon: <FaUserCheck />,
+      icon: <UserCheck />,
       title: "Police-checked & Fully Insured",
       text: "Every team member is vetted and covered, giving you total peace of mind."
     },
     {
-      icon: <FaLeaf />,
+      icon: <Leaf />,
       title: "Eco-friendly Products",
       text: "We use sustainable, non-toxic products that are safe for your family, staff, and pets."
     },
     {
-      icon: <FaTag />,
+      icon: <Tag />,
       title: "Upfront Pricing",
       text: "No hidden costs. We provide clear, transparent quotes before any work begins."
     },
     {
-      icon: <FaClock />,
+      icon: <Clock />,
       title: "Same-day Bookings",
       text: "Need it done fast? We offer flexible scheduling and urgent cleaning services."
     },
     {
-      icon: <FaCheckCircle />,
+      icon: <CheckCircle2 />,
       title: "Satisfaction Guarantee",
       text: "If you're not 100% happy with the results, we'll make it right — guaranteed."
     }
