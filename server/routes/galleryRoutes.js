@@ -30,6 +30,7 @@ const uploadMedia = (req, res, next) =>
 router.get('/', galleryController.list);
 
 // Admin (token-protected): manage sections & media.
+router.post('/import-defaults', adminAuth, galleryController.importDefaults);
 router.post('/sections', adminAuth, galleryController.addSection);
 router.delete('/sections/:slug', adminAuth, galleryController.deleteSection);
 router.post('/sections/:slug/media', adminAuth, uploadMedia, galleryController.addMedia);

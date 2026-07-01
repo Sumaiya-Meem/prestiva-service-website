@@ -188,6 +188,12 @@
 .admin-login .admin-btn { width: 100%; margin-top: 14px; padding: 12px; }
 
 /* Gallery manager */
+.admin-gallery-import {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px 16px; margin-bottom: 16px;
+  background: #fbf7ec; border: 1px solid #e8dcc0; border-radius: 12px;
+}
 .admin-gallery-addbar { display: flex; gap: 10px; margin-bottom: 18px; }
 .admin-gallery-addbar .admin-input { flex: 1; }
 

@@ -69,6 +69,23 @@ exports.addMedia = async (req, res) => {
 };
 
 /**
+ * Admin: import the built-in gallery (images/videos committed in the repo) onto
+ * this server's storage. Fixes the case where media records exist in the DB but
+ * their files were only ever created on a developer's machine.
+ * POST /api/gallery/import-defaults
+ */
+exports.importDefaults = async (req, res) => {
+  if (!requireDb(res)) return;
+  try {
+    const result = await store.importDefaults();
+    return res.json({ success: true, ...result });
+  } catch (err) {
+    console.error('[gallery] importDefaults error:', err.message);
+    return res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+/**
  * Admin: delete a single media item from a section.
  * DELETE /api/gallery/sections/:slug/media/:id
  */

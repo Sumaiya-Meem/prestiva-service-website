@@ -5,6 +5,7 @@ import {
   deleteGallerySection,
   uploadGalleryMedia,
   deleteGalleryMedia,
+  importDefaultGallery,
   clearGalleryCache,
   mediaUrl,
 } from '../../services/adminApi';
@@ -47,6 +48,7 @@ const GalleryPanel = () => {
   const [busy, setBusy] = useState(false);
   const [upload, setUpload] = useState(null); // { slug, progress, name }
   const [dragSlug, setDragSlug] = useState('');
+  const [importing, setImporting] = useState(false);
   const fileInputs = useRef({}); // slug -> <input> ref
 
   const load = async () => {
@@ -64,6 +66,21 @@ const GalleryPanel = () => {
   useEffect(() => { load(); }, []);
 
   const flash = (type, text) => setMsg({ type, text });
+
+  const onImport = async () => {
+    if (!window.confirm('Import the built-in photos & videos onto the server? This is safe to run anytime and fixes images that don’t load.')) return;
+    setImporting(true);
+    setMsg(null);
+    try {
+      const r = await importDefaultGallery();
+      await load();
+      flash('success', `Import complete — ${r.added} added, ${r.restored} restored, ${r.skipped} already present${r.failed ? `, ${r.failed} failed` : ''}.`);
+    } catch (err) {
+      flash('error', err.message);
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const totals = useMemo(() => {
     let images = 0; let videos = 0;
@@ -173,6 +190,19 @@ const GalleryPanel = () => {
         <div className="admin-stat"><div className="admin-stat__num">{totals.sections}</div><div className="admin-stat__label">Sections</div></div>
         <div className="admin-stat"><div className="admin-stat__num">{totals.images}</div><div className="admin-stat__label">Photos</div></div>
         <div className="admin-stat"><div className="admin-stat__num">{totals.videos}</div><div className="admin-stat__label">Videos</div></div>
+      </div>
+
+      {/* Repair / import built-in media */}
+      <div className="admin-gallery-import">
+        <div>
+          <strong>Images not showing on the live site?</strong>
+          <div className="admin-hint" style={{ marginTop: 4 }}>
+            Imports the built-in photos &amp; videos onto this server. Safe to run anytime.
+          </div>
+        </div>
+        <button className="admin-btn" onClick={onImport} disabled={importing || busy}>
+          {importing ? 'Importing… (may take a minute)' : 'Import built-in gallery'}
+        </button>
       </div>
 
       {/* Add section */}

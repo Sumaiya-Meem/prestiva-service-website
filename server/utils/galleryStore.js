@@ -327,12 +327,128 @@ const deleteMedia = async (slug, id) => {
   await media.deleteOne();
 };
 
+// ── Import the built-in gallery (server-side) ──
+// Reads the images/videos committed in the repo (client/src/assets/gallery) and
+// writes them to the SAME storage path admin uploads use, so it works on the
+// server even when the files were only ever seeded on a developer's laptop.
+// File-aware & idempotent: it (re)writes any file that's missing on disk, even
+// when a DB record already exists, and can be safely re-run.
+const DEFAULT_SRC = path.join(__dirname, '..', '..', 'client', 'src', 'assets', 'gallery');
+
+const IMPORT_TAGS = {
+  office: 'Office Cleaning', commercial: 'Commercial Cleaning', builders: 'Builders Cleaning',
+  'end-of-lease': 'End of Lease', airbnb: 'Airbnb Cleaning', 'real-estate': 'Real Estate Cleaning',
+  pressure: 'Pressure Washing', property: 'Property Maintenance', landscaping: 'Landscaping',
+  window: 'Window Cleaning', carpet: 'Carpet Cleaning', results: 'Cleaning Results',
+};
+const idFor = (rel) => crypto.createHash('md5').update(rel).digest('hex').slice(0, 16);
+const titleCase = (slug) =>
+  slug.replace(/(^|-)([a-z])/g, (_, sep, c) => (sep ? ' ' : '') + c.toUpperCase()).trim();
+
+const importDefaults = async (srcDir = DEFAULT_SRC) => {
+  if (!fs.existsSync(srcDir)) {
+    throw new Error(`Built-in gallery source not found on the server (${srcDir}).`);
+  }
+  await ensureSeeded();
+
+  const folders = fs.readdirSync(srcDir, { withFileTypes: true })
+    .filter((d) => d.isDirectory()).map((d) => d.name).sort();
+
+  let added = 0, restored = 0, skipped = 0, failed = 0;
+
+  for (const slug of folders) {
+    const dir = path.join(srcDir, slug);
+    const files = fs.readdirSync(dir).sort();
+
+    let section = await GallerySection.findOne({ slug });
+    if (!section) {
+      const order = await GallerySection.estimatedDocumentCount();
+      section = await GallerySection.create({ slug, tag: IMPORT_TAGS[slug] || titleCase(slug), order });
+    }
+    const destDir = sectionDir(slug);
+    ensureDir(destDir);
+    let order = await Media.countDocuments({ section: section._id });
+
+    const videoBaseNames = new Set(
+      files.filter((f) => /\.(mp4|webm|mov)$/i.test(f)).map((f) => f.replace(/\.[^.]+$/, ''))
+    );
+
+    for (const f of files) {
+      try {
+        const abs = path.join(dir, f);
+        const ext = path.extname(f).toLowerCase();
+        const base = f.replace(/\.[^.]+$/, '');
+        const id = idFor(`${slug}/${f}`);
+
+        if (/\.(mp4|webm|mov)$/i.test(f)) {
+          const url = `${URL_PREFIX}/${slug}/${id}${ext}`;
+          const videoDest = path.join(destDir, `${id}${ext}`);
+          const existing = await Media.findOne({ url });
+          if (existing && fs.existsSync(videoDest)) { skipped++; continue; }
+
+          fs.copyFileSync(abs, videoDest);
+          let posterUrl = '', thumbUrl = '';
+          const poster = files.find((p) => p.replace(/\.[^.]+$/, '') === base && /\.(jpg|jpeg|png)$/i.test(p));
+          if (poster) {
+            const pExt = path.extname(poster).toLowerCase();
+            const ps = path.join(dir, poster);
+            fs.copyFileSync(ps, path.join(destDir, `${id}${pExt}`));
+            posterUrl = `${URL_PREFIX}/${slug}/${id}${pExt}`;
+            await makeThumb(ps, path.join(destDir, `${id}-t.webp`));
+            thumbUrl = `${URL_PREFIX}/${slug}/${id}-t.webp`;
+          }
+          if (existing) {
+            const patch = {};
+            if (!existing.posterUrl && posterUrl) patch.posterUrl = posterUrl;
+            if (!existing.thumbUrl && thumbUrl) patch.thumbUrl = thumbUrl;
+            if (Object.keys(patch).length) { Object.assign(existing, patch); await existing.save(); }
+            restored++;
+          } else {
+            await Media.create({ section: section._id, type: 'video', url, posterUrl, thumbUrl, bytes: fs.statSync(abs).size, order: order++ });
+            added++;
+          }
+        } else if (/\.(webp|jpg|jpeg|png)$/i.test(f)) {
+          if (videoBaseNames.has(base)) continue; // poster handled with its video
+          const url = `${URL_PREFIX}/${slug}/${id}.webp`;
+          const imgDest = path.join(destDir, `${id}.webp`);
+          const thumbDest = path.join(destDir, `${id}-t.webp`);
+          const existing = await Media.findOne({ url });
+          if (existing && fs.existsSync(imgDest) && fs.existsSync(thumbDest)) { skipped++; continue; }
+
+          const pipeline = sharp(abs).rotate();
+          const meta = await pipeline.metadata();
+          const out = await pipeline
+            .resize({ width: IMAGE_WIDTH, withoutEnlargement: true })
+            .webp({ quality: WEBP_QUALITY, effort: 6 })
+            .toBuffer();
+          fs.writeFileSync(imgDest, out);
+          await makeThumb(abs, thumbDest);
+          const thumbUrl = `${URL_PREFIX}/${slug}/${id}-t.webp`;
+
+          if (existing) {
+            if (!existing.thumbUrl) { existing.thumbUrl = thumbUrl; await existing.save(); }
+            restored++;
+          } else {
+            await Media.create({ section: section._id, type: 'image', url, thumbUrl, width: meta.width || null, height: meta.height || null, bytes: out.length, order: order++ });
+            added++;
+          }
+        }
+      } catch {
+        failed++;
+      }
+    }
+  }
+
+  return { added, restored, skipped, failed };
+};
+
 module.exports = {
   list,
   addSection,
   deleteSection,
   addMedia,
   deleteMedia,
+  importDefaults,
   slugify,
   ensureSeeded,
   makeThumb,

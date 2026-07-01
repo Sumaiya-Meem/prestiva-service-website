@@ -138,6 +138,17 @@ export const uploadGalleryMedia = (slug, file, onProgress) =>
     xhr.send(fd);
   });
 
+/** Import the built-in gallery onto the server (fixes missing files in prod). */
+export const importDefaultGallery = async () => {
+  const res = await fetch(`${BASE}/api/gallery/import-defaults`, {
+    method: 'POST',
+    headers: authHeaders(),
+  });
+  const data = await handle(res);
+  clearGalleryCache();
+  return data;
+};
+
 export const deleteGalleryMedia = async (slug, id) => {
   const res = await fetch(
     `${BASE}/api/gallery/sections/${encodeURIComponent(slug)}/media/${encodeURIComponent(id)}`,
