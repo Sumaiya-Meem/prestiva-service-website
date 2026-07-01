@@ -200,6 +200,9 @@
   letter-spacing: 1px;
 }
 
+/* Dark mode: navy numbers are invisible on the dark strip — use light text. */
+html[data-theme="dark"] .stat-number { color: var(--dark-text); }
+
 @media (max-width: 992px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -752,7 +755,7 @@ html[data-theme="dark"] .upload-box:hover { color: var(--dark-text); }
   position: absolute;
   top: 20px;
   padding: 8px 15px;
-  background-color: var(--primary-navy);
+  background-color: var(--brand-navy);
   color: var(--white);
   font-family: var(--font-heading);
   font-weight: 700;
@@ -1045,7 +1048,7 @@ html[data-theme="dark"] .gallery-viewall { color: var(--dark-text); }
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.92);
-  color: var(--primary-navy);
+  color: var(--brand-navy); /* fixed white circle → keep the triangle navy in both themes */
   font-size: 1.4rem;
   padding-left: 4px; /* optically centre the triangle */
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -1317,7 +1320,7 @@ html[data-theme="dark"] .carousel-arrow { color: var(--dark-text); }
 
 .pricing-card.popular {
   border-color: var(--primary-gold);
-  background-color: var(--primary-navy);
+  background-color: var(--brand-navy);
   color: var(--white);
   transform: scale(1.05);
   box-shadow: 0 20px 50px rgba(10, 22, 40, 0.2);
@@ -1618,7 +1621,7 @@ html[data-theme="dark"] .addon-icon {
 }
 
 .faq-item.active .faq-question {
-  background-color: var(--primary-navy);
+  background-color: var(--brand-navy);
   color: var(--white);
 }
 

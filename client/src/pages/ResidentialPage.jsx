@@ -113,7 +113,7 @@ const ResidentialPage = () => {
           <div style={{ maxWidth: '800px', margin: '0 auto', backgroundColor: 'var(--surface)', borderRadius: '20px', overflowX: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '400px' }}>
               <thead>
-                <tr style={{ backgroundColor: 'var(--primary-navy)', color: '#fff', textAlign: 'left' }}>
+                <tr style={{ backgroundColor: 'var(--brand-navy)', color: '#fff', textAlign: 'left' }}>
                   <th style={{ padding: '20px' }}>Home Size</th>
                   <th style={{ padding: '20px' }}>Standard Clean</th>
                 </tr>

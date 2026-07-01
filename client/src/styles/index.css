@@ -4,7 +4,8 @@
 
 :root {
   /* Colors */
-  --primary-navy: #0A1628;
+  --primary-navy: #0A1628;   /* also used as strong text colour — flips light in dark mode */
+  --brand-navy: #0A1628;     /* fixed navy for backgrounds/badges — never flips */
   --primary-gold: #D4A853;
   --gold-hover: #C49A47;
   --white: #FFFFFF;
@@ -199,6 +200,10 @@ html[data-theme="dark"] {
   --dark-text: #e8edf4;
   --accent: #2cc6d6;
   --accent-soft: rgba(44, 198, 214, 0.15);
+  /* Navy is our "strong text" colour on light surfaces; on dark surfaces it
+     would be invisible, so flip it to light text. Navy BACKGROUNDS use the
+     fixed --brand-navy instead, so they stay navy. */
+  --primary-navy: #e8edf4;
   color-scheme: dark;
 }
 
@@ -281,7 +286,7 @@ html[data-theme="dark"] .theme-toggle { color: var(--primary-gold); }
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  background: var(--primary-navy);
+  background: var(--brand-navy);
   color: #fff;
   font-family: var(--font-heading);
   font-size: 0.72rem;
