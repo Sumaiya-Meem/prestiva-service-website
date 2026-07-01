@@ -16,11 +16,14 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Serve admin-uploaded gallery media (created at runtime under /server/uploads).
+// Serve admin-uploaded media. In production point UPLOAD_DIR at a persistent
+// disk (e.g. /data/uploads on Render) so files survive deploys; locally it
+// defaults to server/uploads.
 // Filenames are content-unique (random ids) and never change once written, so
 // they can be cached aggressively by browsers/CDNs — repeat visits load the
 // images/videos instantly instead of re-downloading them.
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
+app.use('/uploads', express.static(UPLOAD_DIR, {
   maxAge: '30d',
   immutable: true,
 }));

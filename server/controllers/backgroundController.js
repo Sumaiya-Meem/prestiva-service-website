@@ -15,7 +15,8 @@ const Settings = require('../models/Settings');
  * no separate endpoint or reload wiring needed.
  */
 const FIXED_KEY = 'site';
-const UPLOAD_DIR = path.join(__dirname, '..', 'uploads', 'backgrounds');
+const UPLOAD_BASE = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'uploads');
+const UPLOAD_DIR = path.join(UPLOAD_BASE, 'backgrounds');
 const URL_PREFIX = '/uploads/backgrounds';
 
 // Pages whose hero background can be managed. Keep in sync with the client's

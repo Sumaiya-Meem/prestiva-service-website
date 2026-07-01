@@ -78,6 +78,7 @@ async function run() {
 
   let addedImages = 0;
   let addedVideos = 0;
+  let restored = 0; // record already existed but files were missing on disk → re-written
   let skipped = 0;
   let failed = 0;
 
@@ -119,7 +120,7 @@ async function run() {
       files.filter((f) => /\.(mp4|webm|mov)$/i.test(f)).map((f) => f.replace(/\.[^.]+$/, ''))
     );
 
-    let secAdded = 0, secSkipped = 0, secFailed = 0;
+    let secAdded = 0, secRestored = 0, secSkipped = 0, secFailed = 0;
 
     for (const f of files) {
       const abs = path.join(dir, f);
@@ -130,13 +131,18 @@ async function run() {
 
       // Each file is isolated: a single failure is logged and skipped so the
       // rest of the import still completes (re-run later to fill any gaps).
+      // Skip only when BOTH the record AND its file already exist — so running
+      // on a fresh server (records in the shared DB, files missing on disk)
+      // still writes the files.
       try {
         // ── Video ──
         if (/\.(mp4|webm|mov)$/i.test(f)) {
           const url = `${URL_PREFIX}/${slug}/${id}${ext}`;
-          if (await Media.findOne({ url })) { skipped++; secSkipped++; continue; }
+          const videoDest = path.join(destDir, `${id}${ext}`);
+          const existing = await Media.findOne({ url });
+          if (existing && fs.existsSync(videoDest)) { skipped++; secSkipped++; continue; }
 
-          fs.copyFileSync(abs, path.join(destDir, `${id}${ext}`));
+          fs.copyFileSync(abs, videoDest);
 
           let posterUrl = '';
           let thumbUrl = '';
@@ -152,11 +158,20 @@ async function run() {
             thumbUrl = `${URL_PREFIX}/${slug}/${id}-t.webp`;
           }
 
-          await createWithRetry(
-            { section: section._id, type: 'video', url, posterUrl, thumbUrl, bytes: fs.statSync(abs).size, order: order++ },
-            rel
-          );
-          addedVideos++; secAdded++;
+          if (existing) {
+            // Files were missing → now restored. Backfill any empty fields.
+            const patch = {};
+            if (!existing.posterUrl && posterUrl) patch.posterUrl = posterUrl;
+            if (!existing.thumbUrl && thumbUrl) patch.thumbUrl = thumbUrl;
+            if (Object.keys(patch).length) { Object.assign(existing, patch); await existing.save(); }
+            restored++; secRestored++;
+          } else {
+            await createWithRetry(
+              { section: section._id, type: 'video', url, posterUrl, thumbUrl, bytes: fs.statSync(abs).size, order: order++ },
+              rel
+            );
+            addedVideos++; secAdded++;
+          }
           continue;
         }
 
@@ -164,7 +179,10 @@ async function run() {
         if (/\.(webp|jpg|jpeg|png)$/i.test(f)) {
           if (videoBaseNames.has(base)) continue; // it's a poster, handled above
           const url = `${URL_PREFIX}/${slug}/${id}.webp`;
-          if (await Media.findOne({ url })) { skipped++; secSkipped++; continue; }
+          const imgDest = path.join(destDir, `${id}.webp`);
+          const thumbDest = path.join(destDir, `${id}-t.webp`);
+          const existing = await Media.findOne({ url });
+          if (existing && fs.existsSync(imgDest) && fs.existsSync(thumbDest)) { skipped++; secSkipped++; continue; }
 
           const pipeline = sharp(abs).rotate();
           const meta = await pipeline.metadata();
@@ -172,19 +190,24 @@ async function run() {
             .resize({ width: store.IMAGE_WIDTH, withoutEnlargement: true })
             .webp({ quality: store.WEBP_QUALITY, effort: 6 })
             .toBuffer();
-          fs.writeFileSync(path.join(destDir, `${id}.webp`), out);
-          await store.makeThumb(abs, path.join(destDir, `${id}-t.webp`));
+          fs.writeFileSync(imgDest, out);
+          await store.makeThumb(abs, thumbDest);
 
-          await createWithRetry(
-            {
-              section: section._id, type: 'image', url,
-              thumbUrl: `${URL_PREFIX}/${slug}/${id}-t.webp`,
-              width: meta.width || null, height: meta.height || null,
-              bytes: out.length, order: order++,
-            },
-            rel
-          );
-          addedImages++; secAdded++;
+          const thumbUrl = `${URL_PREFIX}/${slug}/${id}-t.webp`;
+          if (existing) {
+            if (!existing.thumbUrl) { existing.thumbUrl = thumbUrl; await existing.save(); }
+            restored++; secRestored++;
+          } else {
+            await createWithRetry(
+              {
+                section: section._id, type: 'image', url, thumbUrl,
+                width: meta.width || null, height: meta.height || null,
+                bytes: out.length, order: order++,
+              },
+              rel
+            );
+            addedImages++; secAdded++;
+          }
         }
       } catch (e) {
         failed++; secFailed++;
@@ -193,14 +216,17 @@ async function run() {
     }
 
     console.log(
-      `  ${section.tag.padEnd(22)} +${secAdded} added, ${secSkipped} skipped` +
+      `  ${section.tag.padEnd(22)} +${secAdded} added` +
+      (secRestored ? `, ${secRestored} files restored` : '') +
+      `, ${secSkipped} skipped` +
       (secFailed ? `, ${secFailed} FAILED` : '')
     );
   }
 
   console.log(
-    `\n✓ Done. Imported ${addedImages} image(s), ${addedVideos} video(s). ` +
-    `Skipped ${skipped} already-present.` +
+    `\n✓ Done. Imported ${addedImages} image(s), ${addedVideos} video(s).` +
+    (restored ? ` Restored ${restored} missing file(s) for existing records.` : '') +
+    ` Skipped ${skipped} already-present.` +
     (failed ? ` ${failed} FAILED — re-run to retry them.` : '')
   );
   await mongoose.disconnect();

@@ -22,7 +22,11 @@ const sharp = require('sharp');
 const GallerySection = require('../models/GallerySection');
 const Media = require('../models/Media');
 
-const UPLOAD_ROOT = path.join(__dirname, '..', 'uploads', 'gallery');
+// Where uploaded files are stored on disk. In production set UPLOAD_DIR to a
+// path on a PERSISTENT disk (e.g. /data/uploads on Render) so media survives
+// deploys; locally it defaults to server/uploads.
+const UPLOAD_BASE = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'uploads');
+const UPLOAD_ROOT = path.join(UPLOAD_BASE, 'gallery');
 const URL_PREFIX = '/uploads/gallery'; // public path prefix (static in server.js)
 
 const IMAGE_WIDTH = 1600;  // px — gallery images (large enough for the full-screen lightbox)
