@@ -86,6 +86,22 @@ exports.importDefaults = async (req, res) => {
 };
 
 /**
+ * Admin: rebuild the gallery into the current storage backend (fixes a switch to
+ * R2, or a wiped ephemeral disk). Clears media records, then re-imports built-ins.
+ * POST /api/gallery/rebuild
+ */
+exports.rebuild = async (req, res) => {
+  if (!requireDb(res)) return;
+  try {
+    const result = await store.rebuild();
+    return res.json({ success: true, ...result });
+  } catch (err) {
+    console.error('[gallery] rebuild error:', err.message);
+    return res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+/**
  * Admin: delete a single media item from a section.
  * DELETE /api/gallery/sections/:slug/media/:id
  */

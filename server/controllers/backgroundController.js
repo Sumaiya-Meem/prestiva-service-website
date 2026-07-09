@@ -1,7 +1,6 @@
-const fs = require('fs');
-const path = require('path');
 const crypto = require('crypto');
 const sharp = require('sharp');
+const storage = require('../utils/storage');
 const { dbReady } = require('../config/db');
 const Settings = require('../models/Settings');
 
@@ -15,9 +14,6 @@ const Settings = require('../models/Settings');
  * no separate endpoint or reload wiring needed.
  */
 const FIXED_KEY = 'site';
-const UPLOAD_BASE = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'uploads');
-const UPLOAD_DIR = path.join(UPLOAD_BASE, 'backgrounds');
-const URL_PREFIX = '/uploads/backgrounds';
 
 // Pages whose hero background can be managed. Keep in sync with the client's
 // config/pageBackgrounds.js list.
@@ -25,13 +21,6 @@ const PAGES = [
   'home', 'about', 'commercial', 'residential', 'landscaping',
   'cleaning', 'property-maintenance', 'gallery', 'contact',
 ];
-
-const ensureDir = () => fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-
-const removeByUrl = (url) => {
-  if (!url || !url.startsWith(`${URL_PREFIX}/`)) return;
-  fs.rmSync(path.join(UPLOAD_DIR, url.split('/').pop()), { force: true });
-};
 
 const currentBg = async (page) => {
   const doc = await Settings.findOne({ key: FIXED_KEY }).lean();
@@ -52,27 +41,25 @@ exports.upload = async (req, res) => {
   }
 
   try {
-    ensureDir();
     const prev = await currentBg(page);
 
     // Compress to a wide hero-friendly WebP.
     const id = crypto.randomBytes(6).toString('hex');
-    const filename = `${page}-${id}.webp`;
+    const key = `backgrounds/${page}-${id}.webp`;
     const optimized = await sharp(req.file.buffer)
       .rotate()
       .resize({ width: 1920, withoutEnlargement: true })
       .webp({ quality: 78, effort: 5 })
       .toBuffer();
-    fs.writeFileSync(path.join(UPLOAD_DIR, filename), optimized);
+    const url = await storage.put(key, optimized, 'image/webp');
 
-    const url = `${URL_PREFIX}/${filename}`;
     await Settings.findOneAndUpdate(
       { key: FIXED_KEY },
       { $set: { [`overrides.pageBackgrounds.${page}`]: url } },
       { upsert: true, setDefaultsOnInsert: true }
     );
 
-    if (prev && prev !== url) removeByUrl(prev); // delete the old file after a successful save
+    if (prev && prev !== url) await storage.del(storage.keyFromUrl(prev)); // delete the old file after a successful save
     return res.status(201).json({ success: true, page, url });
   } catch (err) {
     console.error('[backgrounds] upload error:', err.message);
@@ -95,7 +82,7 @@ exports.remove = async (req, res) => {
       { key: FIXED_KEY },
       { $unset: { [`overrides.pageBackgrounds.${page}`]: '' } }
     );
-    removeByUrl(prev);
+    await storage.del(storage.keyFromUrl(prev));
     return res.json({ success: true, page });
   } catch (err) {
     console.error('[backgrounds] remove error:', err.message);

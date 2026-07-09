@@ -21,6 +21,18 @@ const sharp = require('sharp');
 
 const GallerySection = require('../models/GallerySection');
 const Media = require('../models/Media');
+const os = require('os');
+const storage = require('./storage');
+
+const mimeForFile = (name) => {
+  const ext = path.extname(name).toLowerCase();
+  if (ext === '.mp4') return 'video/mp4';
+  if (ext === '.webm') return 'video/webm';
+  if (ext === '.mov') return 'video/quicktime';
+  if (ext === '.jpg' || ext === '.jpeg') return 'image/jpeg';
+  if (ext === '.png') return 'image/png';
+  return 'image/webp';
+};
 
 // Where uploaded files are stored on disk. In production set UPLOAD_DIR to a
 // path on a PERSISTENT disk (e.g. /data/uploads on Render) so media survives
@@ -38,15 +50,23 @@ const THUMB_WIDTH = 480;   // px — small tile thumbnail for grids/carousels
 const THUMB_QUALITY = 72;
 
 /**
- * Write a small WebP thumbnail from a source (Buffer or file path) to destPath.
- * Used for grid/carousel tiles so pages don't download full-size images.
+ * WebP thumbnail as a Buffer (from a Buffer or a file path). Used for
+ * grid/carousel tiles so pages don't download full-size images.
  */
-const makeThumb = async (source, destPath) => {
-  const buf = await sharp(source)
+const makeThumbBuffer = async (source) =>
+  sharp(source)
     .rotate()
     .resize({ width: THUMB_WIDTH, withoutEnlargement: true })
     .webp({ quality: THUMB_QUALITY, effort: 5 })
     .toBuffer();
+
+/**
+ * Legacy disk-writing thumbnail — kept for the one-off CLI scripts
+ * (scripts/seedGallery.js, scripts/backfillThumbs.js) which write straight to
+ * UPLOAD_ROOT. The live upload/import paths use makeThumbBuffer + storage.put.
+ */
+const makeThumb = async (source, destPath) => {
+  const buf = await makeThumbBuffer(source);
   fs.writeFileSync(destPath, buf);
   return buf.length;
 };
@@ -74,9 +94,6 @@ const slugify = (s) =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
-
-const sectionDir = (slug) => path.join(UPLOAD_ROOT, slug);
-const ensureDir = (dir) => fs.mkdirSync(dir, { recursive: true });
 
 /** Shape a Media doc for the API (stable public contract). */
 const toMediaDTO = (m) => ({
@@ -135,7 +152,6 @@ const addSection = async (name) => {
 
   const order = await GallerySection.estimatedDocumentCount();
   const section = await GallerySection.create({ slug, tag, order });
-  ensureDir(sectionDir(slug));
   return { slug: section.slug, tag: section.tag, order: section.order, media: [] };
 };
 
@@ -146,14 +162,7 @@ const deleteSection = async (slug) => {
 
   await Media.deleteMany({ section: section._id });
   await section.deleteOne();
-  fs.rmSync(sectionDir(slug), { recursive: true, force: true });
-};
-
-/** Remove a file at a server-relative /uploads path (safe if already gone). */
-const removeFileByUrl = (url) => {
-  if (!url) return;
-  const rel = url.replace(new RegExp(`^${URL_PREFIX}/`), '');
-  fs.rmSync(path.join(UPLOAD_ROOT, rel), { force: true });
+  await storage.delPrefix(`gallery/${slug}/`);
 };
 
 // Resolve the bundled ffmpeg binary once (null if the dependency is missing).
@@ -179,21 +188,6 @@ const runFfmpeg = (args) =>
       (err) => resolve(!err)
     );
   });
-
-/**
- * Extract a poster frame from a saved video (best-effort). Returns the poster's
- * server-relative URL, or '' if ffmpeg isn't available / extraction fails — the
- * <video> element still works without a poster.
- */
-const makeVideoPoster = async (videoPath, slug, id) => {
-  const posterFile = `${id}.jpg`;
-  const posterPath = path.join(sectionDir(slug), posterFile);
-  const ok = await runFfmpeg([
-    '-ss', '00:00:01', '-i', videoPath, '-frames:v', '1',
-    '-vf', `scale='min(${POSTER_WIDTH},iw)':-2`, posterPath,
-  ]);
-  return ok && fs.existsSync(posterPath) ? `${URL_PREFIX}/${slug}/${posterFile}` : '';
-};
 
 /**
  * Transcode to a web-optimised H.264 MP4: capped at VIDEO_WIDTH, CRF 26,
@@ -229,85 +223,81 @@ const addMedia = async (slug, file) => {
   if (!isImage && !isVideo) throw new Error('Only image or video files are allowed.');
 
   const id = crypto.randomBytes(8).toString('hex');
-  const dir = sectionDir(slug);
-  ensureDir(dir);
   const order = await Media.countDocuments({ section: section._id });
 
   let doc;
   if (isImage) {
-    const filename = `${id}.webp`;
-    const thumbName = `${id}-t.webp`;
+    const key = `gallery/${slug}/${id}.webp`;
+    const thumbKey = `gallery/${slug}/${id}-t.webp`;
     const pipeline = sharp(file.buffer).rotate();
     const meta = await pipeline.metadata();
     const optimized = await pipeline
       .resize({ width: IMAGE_WIDTH, withoutEnlargement: true })
       .webp({ quality: WEBP_QUALITY, effort: 6 })
       .toBuffer();
-    fs.writeFileSync(path.join(dir, filename), optimized);
-    await makeThumb(file.buffer, path.join(dir, thumbName));
+    const url = await storage.put(key, optimized, 'image/webp');
+    const thumbUrl = await storage.put(thumbKey, await makeThumbBuffer(file.buffer), 'image/webp');
 
     doc = await Media.create({
       section: section._id,
       type: 'image',
-      url: `${URL_PREFIX}/${slug}/${filename}`,
-      thumbUrl: `${URL_PREFIX}/${slug}/${thumbName}`,
+      url,
+      thumbUrl,
       width: meta.width || null,
       height: meta.height || null,
       bytes: optimized.length,
       order,
     });
   } else {
-    const origExt = (path.extname(file.originalname || '') || '.mp4').toLowerCase();
-    const tmpPath = path.join(dir, `${id}.upload${origExt}`);
-    fs.writeFileSync(tmpPath, file.buffer);
+    // ffmpeg needs real files, so process in a local temp dir regardless of the
+    // storage backend; only the finished artifacts are uploaded.
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'prestiva-vid-'));
+    try {
+      const origExt = (path.extname(file.originalname || '') || '.mp4').toLowerCase();
+      const tmpUpload = path.join(tmpDir, `src${origExt}`);
+      fs.writeFileSync(tmpUpload, file.buffer);
 
-    const mp4Path = path.join(dir, `${id}.mp4`);
-    const transcoded = await transcodeVideo(tmpPath, mp4Path);
+      const tmpMp4 = path.join(tmpDir, 'out.mp4');
+      const transcoded = await transcodeVideo(tmpUpload, tmpMp4);
 
-    let finalName;
-    if (transcoded) {
-      const origSize = file.buffer.length;
-      const outSize = fs.statSync(mp4Path).size;
-      // Keep the original only if it's already an MP4 AND smaller than the
-      // re-encode (don't bloat already-optimised clips). Otherwise use the
-      // web-optimised MP4 — which also converts .mov/.webm for compatibility.
-      if (origExt === '.mp4' && origSize <= outSize) {
-        fs.rmSync(mp4Path, { force: true });
-        finalName = `${id}.mp4`;
-        fs.renameSync(tmpPath, path.join(dir, finalName));
+      let finalLocal, finalName;
+      if (transcoded) {
+        const origSize = file.buffer.length;
+        const outSize = fs.statSync(tmpMp4).size;
+        // Keep the original only if it's already an MP4 AND no larger than the
+        // re-encode; otherwise use the web-optimised MP4 (also converts .mov/.webm).
+        if (origExt === '.mp4' && origSize <= outSize) {
+          finalLocal = tmpUpload; finalName = `${id}.mp4`;
+        } else {
+          finalLocal = tmpMp4; finalName = `${id}.mp4`;
+        }
       } else {
-        fs.rmSync(tmpPath, { force: true });
-        finalName = `${id}.mp4`;
+        finalLocal = tmpUpload; finalName = `${id}${origExt}`;
       }
-    } else {
-      // Transcode unavailable/failed → store the original as-is.
-      fs.rmSync(mp4Path, { force: true }); // remove any partial output
-      finalName = `${id}${origExt}`;
-      fs.renameSync(tmpPath, path.join(dir, finalName));
+
+      const videoBuf = fs.readFileSync(finalLocal);
+      const url = await storage.put(`gallery/${slug}/${finalName}`, videoBuf, mimeForFile(finalName));
+
+      // Poster frame (best-effort) + small thumbnail derived from it.
+      let posterUrl = '', thumbUrl = '';
+      const tmpPoster = path.join(tmpDir, 'poster.jpg');
+      const posterOk = await runFfmpeg([
+        '-ss', '00:00:01', '-i', finalLocal, '-frames:v', '1',
+        '-vf', `scale='min(${POSTER_WIDTH},iw)':-2`, tmpPoster,
+      ]);
+      if (posterOk && fs.existsSync(tmpPoster)) {
+        posterUrl = await storage.put(`gallery/${slug}/${id}.jpg`, fs.readFileSync(tmpPoster), 'image/jpeg');
+        try {
+          thumbUrl = await storage.put(`gallery/${slug}/${id}-t.webp`, await makeThumbBuffer(tmpPoster), 'image/webp');
+        } catch { /* thumb is best-effort */ }
+      }
+
+      doc = await Media.create({
+        section: section._id, type: 'video', url, thumbUrl, posterUrl, bytes: videoBuf.length, order,
+      });
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
     }
-
-    const finalPath = path.join(dir, finalName);
-    const posterUrl = await makeVideoPoster(finalPath, slug, id);
-
-    // Small tile thumbnail derived from the poster frame.
-    let thumbUrl = '';
-    if (posterUrl) {
-      try {
-        const thumbName = `${id}-t.webp`;
-        await makeThumb(path.join(dir, `${id}.jpg`), path.join(dir, thumbName));
-        thumbUrl = `${URL_PREFIX}/${slug}/${thumbName}`;
-      } catch { /* poster thumb is best-effort */ }
-    }
-
-    doc = await Media.create({
-      section: section._id,
-      type: 'video',
-      url: `${URL_PREFIX}/${slug}/${finalName}`,
-      thumbUrl,
-      posterUrl,
-      bytes: fs.statSync(finalPath).size,
-      order,
-    });
   }
 
   return toMediaDTO(doc);
@@ -321,9 +311,9 @@ const deleteMedia = async (slug, id) => {
   const media = await Media.findOne({ _id: id, section: section._id });
   if (!media) throw new Error('Media not found.');
 
-  removeFileByUrl(media.url);
-  removeFileByUrl(media.thumbUrl);
-  removeFileByUrl(media.posterUrl);
+  await storage.del(storage.keyFromUrl(media.url));
+  await storage.del(storage.keyFromUrl(media.thumbUrl));
+  await storage.del(storage.keyFromUrl(media.posterUrl));
   await media.deleteOne();
 };
 
@@ -365,8 +355,6 @@ const importDefaults = async (srcDir = DEFAULT_SRC) => {
       const order = await GallerySection.estimatedDocumentCount();
       section = await GallerySection.create({ slug, tag: IMPORT_TAGS[slug] || titleCase(slug), order });
     }
-    const destDir = sectionDir(slug);
-    ensureDir(destDir);
     let order = await Media.countDocuments({ section: section._id });
 
     const videoBaseNames = new Set(
@@ -381,21 +369,19 @@ const importDefaults = async (srcDir = DEFAULT_SRC) => {
         const id = idFor(`${slug}/${f}`);
 
         if (/\.(mp4|webm|mov)$/i.test(f)) {
-          const url = `${URL_PREFIX}/${slug}/${id}${ext}`;
-          const videoDest = path.join(destDir, `${id}${ext}`);
+          const key = `gallery/${slug}/${id}${ext}`;
+          const url = storage.publicUrl(key);
           const existing = await Media.findOne({ url });
-          if (existing && fs.existsSync(videoDest)) { skipped++; continue; }
+          if (existing && await storage.exists(key)) { skipped++; continue; }
 
-          fs.copyFileSync(abs, videoDest);
+          await storage.put(key, fs.readFileSync(abs), mimeForFile(f));
           let posterUrl = '', thumbUrl = '';
           const poster = files.find((p) => p.replace(/\.[^.]+$/, '') === base && /\.(jpg|jpeg|png)$/i.test(p));
           if (poster) {
             const pExt = path.extname(poster).toLowerCase();
             const ps = path.join(dir, poster);
-            fs.copyFileSync(ps, path.join(destDir, `${id}${pExt}`));
-            posterUrl = `${URL_PREFIX}/${slug}/${id}${pExt}`;
-            await makeThumb(ps, path.join(destDir, `${id}-t.webp`));
-            thumbUrl = `${URL_PREFIX}/${slug}/${id}-t.webp`;
+            posterUrl = await storage.put(`gallery/${slug}/${id}${pExt}`, fs.readFileSync(ps), mimeForFile(poster));
+            thumbUrl = await storage.put(`gallery/${slug}/${id}-t.webp`, await makeThumbBuffer(ps), 'image/webp');
           }
           if (existing) {
             const patch = {};
@@ -409,11 +395,11 @@ const importDefaults = async (srcDir = DEFAULT_SRC) => {
           }
         } else if (/\.(webp|jpg|jpeg|png)$/i.test(f)) {
           if (videoBaseNames.has(base)) continue; // poster handled with its video
-          const url = `${URL_PREFIX}/${slug}/${id}.webp`;
-          const imgDest = path.join(destDir, `${id}.webp`);
-          const thumbDest = path.join(destDir, `${id}-t.webp`);
+          const key = `gallery/${slug}/${id}.webp`;
+          const thumbKey = `gallery/${slug}/${id}-t.webp`;
+          const url = storage.publicUrl(key);
           const existing = await Media.findOne({ url });
-          if (existing && fs.existsSync(imgDest) && fs.existsSync(thumbDest)) { skipped++; continue; }
+          if (existing && await storage.exists(key) && await storage.exists(thumbKey)) { skipped++; continue; }
 
           const pipeline = sharp(abs).rotate();
           const meta = await pipeline.metadata();
@@ -421,9 +407,8 @@ const importDefaults = async (srcDir = DEFAULT_SRC) => {
             .resize({ width: IMAGE_WIDTH, withoutEnlargement: true })
             .webp({ quality: WEBP_QUALITY, effort: 6 })
             .toBuffer();
-          fs.writeFileSync(imgDest, out);
-          await makeThumb(abs, thumbDest);
-          const thumbUrl = `${URL_PREFIX}/${slug}/${id}-t.webp`;
+          await storage.put(key, out, 'image/webp');
+          const thumbUrl = await storage.put(thumbKey, await makeThumbBuffer(abs), 'image/webp');
 
           if (existing) {
             if (!existing.thumbUrl) { existing.thumbUrl = thumbUrl; await existing.save(); }
@@ -442,6 +427,16 @@ const importDefaults = async (srcDir = DEFAULT_SRC) => {
   return { added, restored, skipped, failed };
 };
 
+/**
+ * One-time repair for a storage switch (e.g. disk → R2): drop all media records
+ * (their files may be gone from the old/ephemeral disk) and re-import the
+ * built-in gallery into the current storage backend. Sections are preserved.
+ */
+const rebuild = async () => {
+  await Media.deleteMany({});
+  return importDefaults();
+};
+
 module.exports = {
   list,
   addSection,
@@ -449,6 +444,7 @@ module.exports = {
   addMedia,
   deleteMedia,
   importDefaults,
+  rebuild,
   slugify,
   ensureSeeded,
   makeThumb,

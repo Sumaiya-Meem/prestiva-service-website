@@ -123,10 +123,19 @@ data, so changes are live on the site immediately.
   server's disk under `server/uploads/gallery/<section>/` and are served at `/uploads/...`.
 - Images are auto-compressed to WebP; videos are stored as-is and a **poster frame** is
   extracted automatically (via the bundled `ffmpeg-static` — no system install needed).
-- ⚠️ Because files are on the server's disk, deploy the backend to a host with a
-  **persistent filesystem** (VPS, Render/Railway with a disk). On ephemeral/serverless
-  hosts, uploads would be lost between deploys — switch `server/utils/galleryStore.js`
-  to object storage (S3/R2) in that case.
+- **Durable storage (production):** set the three `CLOUDINARY_*` variables
+  (Cloudinary free tier — **no credit card**) so uploads persist across
+  deploys/restarts and are served from a fast CDN. Steps:
+  1. Sign up at <https://cloudinary.com> (free; no card).
+  2. On the dashboard (Product Environment / API Keys), copy **Cloud name**,
+     **API Key**, and **API Secret** → `CLOUDINARY_CLOUD_NAME`,
+     `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
+  3. Add all three to your host's environment (e.g. Render → Environment) and redeploy.
+  4. In the admin **Gallery** tab, click **Rebuild gallery to cloud** once.
+- Without the `CLOUDINARY_*` vars, files use the server disk — on
+  ephemeral/serverless hosts (e.g. Render free tier) they are lost between
+  deploys/restarts. The public site also falls back to the built-in bundled
+  photos if a server file is missing, so it never shows broken images.
 
 ### One-time import of existing photos
 

@@ -149,6 +149,17 @@ export const importDefaultGallery = async () => {
   return data;
 };
 
+/** Rebuild the gallery into the server's current storage (cloud). Clears + re-imports. */
+export const rebuildGallery = async () => {
+  const res = await fetch(`${BASE}/api/gallery/rebuild`, {
+    method: 'POST',
+    headers: authHeaders(),
+  });
+  const data = await handle(res);
+  clearGalleryCache();
+  return data;
+};
+
 export const deleteGalleryMedia = async (slug, id) => {
   const res = await fetch(
     `${BASE}/api/gallery/sections/${encodeURIComponent(slug)}/media/${encodeURIComponent(id)}`,

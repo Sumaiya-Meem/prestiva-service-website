@@ -6,6 +6,7 @@ import {
   uploadGalleryMedia,
   deleteGalleryMedia,
   importDefaultGallery,
+  rebuildGallery,
   clearGalleryCache,
   mediaUrl,
 } from '../../services/adminApi';
@@ -49,6 +50,7 @@ const GalleryPanel = () => {
   const [upload, setUpload] = useState(null); // { slug, progress, name }
   const [dragSlug, setDragSlug] = useState('');
   const [importing, setImporting] = useState(false);
+  const [rebuilding, setRebuilding] = useState(false);
   const fileInputs = useRef({}); // slug -> <input> ref
 
   const load = async () => {
@@ -79,6 +81,21 @@ const GalleryPanel = () => {
       flash('error', err.message);
     } finally {
       setImporting(false);
+    }
+  };
+
+  const onRebuild = async () => {
+    if (!window.confirm('Rebuild the gallery into cloud storage? This clears the current photo list and re-imports the built-in photos & videos. Use this once after setting up cloud storage.')) return;
+    setRebuilding(true);
+    setMsg(null);
+    try {
+      const r = await rebuildGallery();
+      await load();
+      flash('success', `Rebuild complete — ${r.added} added, ${r.restored} restored, ${r.skipped} already present${r.failed ? `, ${r.failed} failed` : ''}.`);
+    } catch (err) {
+      flash('error', err.message);
+    } finally {
+      setRebuilding(false);
     }
   };
 
@@ -200,8 +217,11 @@ const GalleryPanel = () => {
             Imports the built-in photos &amp; videos onto this server. Safe to run anytime.
           </div>
         </div>
-        <button className="admin-btn" onClick={onImport} disabled={importing || busy}>
+        <button className="admin-btn" onClick={onImport} disabled={importing || rebuilding || busy}>
           {importing ? 'Importing… (may take a minute)' : 'Import built-in gallery'}
+        </button>
+        <button className="admin-btn" onClick={onRebuild} disabled={rebuilding || importing || busy} style={{ marginLeft: 8 }}>
+          {rebuilding ? 'Rebuilding…' : 'Rebuild gallery to cloud'}
         </button>
       </div>
 
