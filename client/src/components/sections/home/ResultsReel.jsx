@@ -2,24 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Play } from 'lucide-react';
 import { fetchGalleryCached, mediaUrl } from '../../../services/adminApi';
+import { bundledResultsClips, bundledVideoFor, bundledImageFor } from '../../../config/bundledGallery';
 
-// Bundled fallback clips (with poster frames) — used if the API has no videos
-// yet (e.g. before the gallery is seeded), so the homepage is never empty.
-import v1 from '../../../assets/gallery/results/1.mp4';
-import v2 from '../../../assets/gallery/results/2.mp4';
-import v3 from '../../../assets/gallery/results/3.mp4';
-import v4 from '../../../assets/gallery/results/4.mp4';
-import p1 from '../../../assets/gallery/results/1.jpg';
-import p2 from '../../../assets/gallery/results/2.jpg';
-import p3 from '../../../assets/gallery/results/3.jpg';
-import p4 from '../../../assets/gallery/results/4.jpg';
+// Bundled fallback clips (with poster frames) — shipped in the build and served
+// by the CDN, so the homepage is never empty (API has no videos yet) and never
+// shows broken media (a server file went missing from the ephemeral disk).
+const FALLBACK_CLIPS = bundledResultsClips();
 
-const FALLBACK_CLIPS = [
-  { src: v1, poster: p1 },
-  { src: v2, poster: p2 },
-  { src: v3, poster: p3 },
-  { src: v4, poster: p4 },
-];
+/** onError: swap a broken <img>/<video> to a bundled fallback (once). */
+const swapToFallback = (fallback) => (e) => {
+  const el = e.currentTarget;
+  if (!fallback || el.dataset.fb) return; // nothing to use, or already swapped
+  el.dataset.fb = '1';
+  el.src = fallback;
+  if (typeof el.load === 'function') el.load(); // <video> needs a reload to pick up the new src
+};
 
 // Pull videos from the admin-managed gallery, preferring the "results" section.
 const videosFromSections = (sections) => {
@@ -28,11 +25,17 @@ const videosFromSections = (sections) => {
   for (const s of sections || []) {
     const vids = (s.media || [])
       .filter((m) => m.type === 'video')
-      .map((m) => ({
-        src: mediaUrl(m.url),
-        poster: m.posterUrl ? mediaUrl(m.posterUrl) : '',
-        thumb: m.thumbUrl ? mediaUrl(m.thumbUrl) : '',
-      }));
+      .map((m, i) => {
+        const vf = bundledVideoFor(s.slug, i);
+        return {
+          src: mediaUrl(m.url),
+          poster: m.posterUrl ? mediaUrl(m.posterUrl) : '',
+          thumb: m.thumbUrl ? mediaUrl(m.thumbUrl) : '',
+          // Bundled stand-ins used only if the server file 404s (ephemeral disk).
+          fallbackSrc: vf ? vf.src : '',
+          fallbackPoster: vf && vf.poster ? vf.poster : bundledImageFor(s.slug, i),
+        };
+      });
     if (s.slug === 'results') preferred = vids;
     all.push(...vids);
   }
@@ -47,7 +50,7 @@ const ResultClip = ({ clip }) => {
   if (playing) {
     return (
       <figure className="result-clip">
-        <video src={clip.src} poster={clip.poster || undefined} controls autoPlay playsInline />
+        <video src={clip.src} poster={clip.poster || undefined} controls autoPlay playsInline onError={swapToFallback(clip.fallbackSrc)} />
       </figure>
     );
   }
@@ -56,9 +59,9 @@ const ResultClip = ({ clip }) => {
     <figure className="result-clip">
       <button type="button" className="result-clip__play" onClick={() => setPlaying(true)} aria-label="Play cleaning result video">
         {clip.thumb || clip.poster ? (
-          <img src={clip.thumb || clip.poster} alt="Prestiva cleaning result" loading="lazy" decoding="async" />
+          <img src={clip.thumb || clip.poster} alt="Prestiva cleaning result" loading="lazy" decoding="async" onError={swapToFallback(clip.fallbackPoster)} />
         ) : (
-          <video src={clip.src} preload="metadata" muted playsInline />
+          <video src={clip.src} preload="metadata" muted playsInline onError={swapToFallback(clip.fallbackSrc)} />
         )}
         <span className="result-clip__icon"><Play fill="currentColor" /></span>
       </button>

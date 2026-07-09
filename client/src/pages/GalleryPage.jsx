@@ -6,6 +6,7 @@ import siteConfig from '../config/siteConfig';
 import Seo from '../components/utils/Seo';
 import ContactLine from '../components/sections/ContactLine';
 import { fetchGalleryCached, mediaUrl } from '../services/adminApi';
+import { bundledItems, bundledImageFor, bundledVideoFor } from '../config/bundledGallery';
 import { heroBgStyle } from '../config/pageBackgrounds';
 
 const prefersReducedMotion = () =>
@@ -15,15 +16,26 @@ const prefersReducedMotion = () =>
 // most engaging content leads, then grouped by section tag.
 const toItems = (sections) => {
   const items = [];
+  const seen = {}; // slug -> count so far, to rotate through bundled fallbacks
   for (const s of sections || []) {
     for (const m of s.media || []) {
+      const slug = s.slug;
+      const i = (seen[slug] = (seen[slug] || 0) + 1) - 1;
+      const vf = m.type === 'video' ? bundledVideoFor(slug, i) : null;
+      const fallbackImg = bundledImageFor(slug, i);
       items.push({
         id: m.id,
         src: mediaUrl(m.url),
         thumb: m.thumbUrl ? mediaUrl(m.thumbUrl) : undefined, // small tile image
         poster: m.posterUrl ? mediaUrl(m.posterUrl) : undefined,
         tag: s.tag,
+        slug,
         type: m.type,
+        // Bundled stand-ins, used only if the server file 404s (ephemeral disk):
+        // fallbackSrc matches the element (video → clip, image → photo);
+        // fallbackPoster is always an image (for the poster/thumbnail <img>).
+        fallbackSrc: vf ? vf.src : fallbackImg,
+        fallbackPoster: vf && vf.poster ? vf.poster : fallbackImg,
       });
     }
   }
@@ -32,37 +44,13 @@ const toItems = (sections) => {
   );
 };
 
-// ── Bundled built-in media (fallback) ──
-// Used when the API has no items yet (e.g. before the gallery has been seeded or
-// any media uploaded), so the Gallery page is never empty — mirroring the
-// homepage. Once media exists in the database, that takes over automatically.
-const imageModules = import.meta.glob('../assets/gallery/**/*.webp', { eager: true, query: '?url', import: 'default' });
-const videoModules = import.meta.glob('../assets/gallery/**/*.mp4', { eager: true, query: '?url', import: 'default' });
-const posterModules = import.meta.glob('../assets/gallery/**/*.jpg', { eager: true, query: '?url', import: 'default' });
-
-const FOLDER_META = {
-  office: 'Office Cleaning', commercial: 'Commercial Cleaning', builders: 'Builders Cleaning',
-  'end-of-lease': 'End of Lease', airbnb: 'Airbnb Cleaning', 'real-estate': 'Real Estate Cleaning',
-  pressure: 'Pressure Washing', property: 'Property Maintenance', landscaping: 'Landscaping',
-  window: 'Window Cleaning', carpet: 'Carpet Cleaning', results: 'Cleaning Results',
-};
-
-const POSTERS = {};
-for (const [p, url] of Object.entries(posterModules)) POSTERS[p.replace(/\.jpg$/, '')] = url;
-
-const slugOf = (p) => p.split('/').slice(-2, -1)[0];
-
-const bundledItems = () => {
-  const items = [];
-  for (const [p, url] of Object.entries(imageModules)) {
-    items.push({ id: p, src: url, tag: FOLDER_META[slugOf(p)] || 'Our Work', type: 'image' });
-  }
-  for (const [p, url] of Object.entries(videoModules)) {
-    items.push({ id: p, src: url, poster: POSTERS[p.replace(/\.mp4$/, '')], tag: FOLDER_META[slugOf(p)] || 'Our Work', type: 'video' });
-  }
-  return items.sort((a, b) =>
-    a.type !== b.type ? (a.type === 'video' ? -1 : 1) : a.tag.localeCompare(b.tag)
-  );
+/** onError handler: swap a broken <img>/<video> to a bundled fallback (once). */
+const swapToFallback = (fallback) => (e) => {
+  const el = e.currentTarget;
+  if (!fallback || el.dataset.fb) return; // nothing to use, or already swapped
+  el.dataset.fb = '1';
+  el.src = fallback;
+  if (typeof el.load === 'function') el.load(); // <video> needs a reload to pick up the new src
 };
 
 const GalleryPage = () => {
@@ -156,7 +144,7 @@ const GalleryPage = () => {
       aria-label={`View ${item.tag} ${item.type === 'video' ? 'video' : 'photo'}`}
     >
       {item.type === 'video' && !item.thumb && !item.poster ? (
-        <video src={item.src} preload="metadata" muted playsInline />
+        <video src={item.src} preload="metadata" muted playsInline onError={swapToFallback(item.fallbackSrc)} />
       ) : (
         <img
           // Tile shows the lightweight thumbnail; the full image loads only in
@@ -165,6 +153,7 @@ const GalleryPage = () => {
           alt={`${item.tag} — Prestiva`}
           loading="lazy"
           decoding="async"
+          onError={swapToFallback(item.fallbackPoster)}
         />
       )}
       <span className="gallery-tile__zoom">{item.type === 'video' ? <Play fill="currentColor" /> : <ZoomIn />}</span>
@@ -290,9 +279,9 @@ const GalleryPage = () => {
           <button className="lightbox__btn lightbox__prev" onClick={(e) => { e.stopPropagation(); stepLb(-1); }} aria-label="Previous"><ChevronLeft /></button>
           <figure className="lightbox__content" onClick={(e) => e.stopPropagation()}>
             {items[lightbox].type === 'video' ? (
-              <video src={items[lightbox].src} poster={items[lightbox].poster} controls autoPlay loop playsInline />
+              <video src={items[lightbox].src} poster={items[lightbox].poster} controls autoPlay loop playsInline onError={swapToFallback(items[lightbox].fallbackSrc)} />
             ) : (
-              <img src={items[lightbox].src} alt={items[lightbox].tag} />
+              <img src={items[lightbox].src} alt={items[lightbox].tag} onError={swapToFallback(items[lightbox].fallbackSrc)} />
             )}
             <figcaption className="lightbox__caption">
               <span className="gallery-tile__tag">{items[lightbox].tag}</span>
