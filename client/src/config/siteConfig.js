@@ -8,6 +8,9 @@
  */
 
 const siteConfig = {
+  // ── SEO overrides (managed from the admin "SEO" tab; keyed by page path) ──
+  seo: {},
+
   // ── Business Identity ──
   businessName: "Prestiva Property Services",
   businessNameShort: "Prestiva",

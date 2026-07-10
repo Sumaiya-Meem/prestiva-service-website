@@ -1,5 +1,6 @@
 import React from 'react';
 import siteConfig from '../../config/siteConfig';
+import { resolveSeo } from '../../utils/resolveSeo';
 
 /**
  * Per-page SEO tags. React 19 automatically hoists <title>/<meta>/<link>
@@ -43,6 +44,11 @@ const localBusinessSchema = {
 const Seo = ({ title, description, path = '', schema }) => {
   const url = `${SITE_URL}${path}`;
 
+  // Admin overrides (from the "SEO" tab) win; a blank override falls back to the
+  // page's built-in default, so a page can never render a blank title/description.
+  const { title: seoTitle, description: seoDescription, noindex } =
+    resolveSeo(siteConfig.seo?.[path], { title, description });
+
   // Build a single @graph so all nodes share one script tag.
   const extra = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
   const graph = {
@@ -52,18 +58,19 @@ const Seo = ({ title, description, path = '', schema }) => {
 
   return (
     <>
-      <title>{title}</title>
-      <meta name="description" content={description} />
+      <title>{seoTitle}</title>
+      <meta name="description" content={seoDescription} />
+      {noindex && <meta name="robots" content="noindex" />}
       <link rel="canonical" href={url} />
 
       <meta property="og:type" content="website" />
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
+      <meta property="og:title" content={seoTitle} />
+      <meta property="og:description" content={seoDescription} />
       <meta property="og:url" content={url} />
 
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
+      <meta name="twitter:title" content={seoTitle} />
+      <meta name="twitter:description" content={seoDescription} />
 
       <script
         type="application/ld+json"

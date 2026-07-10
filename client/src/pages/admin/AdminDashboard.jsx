@@ -5,6 +5,7 @@ import QuotesPanel from '../../components/admin/QuotesPanel';
 import SettingsPanel from '../../components/admin/SettingsPanel';
 import GalleryPanel from '../../components/admin/GalleryPanel';
 import BackgroundsPanel from '../../components/admin/BackgroundsPanel';
+import SeoPanel from '../../components/admin/SeoPanel';
 import '../../styles/admin.css';
 
 const AdminDashboard = () => {
@@ -40,6 +41,12 @@ const AdminDashboard = () => {
             Page Backgrounds
           </button>
           <button
+            className={`admin-tab ${tab === 'seo' ? 'admin-tab--active' : ''}`}
+            onClick={() => setTab('seo')}
+          >
+            SEO
+          </button>
+          <button
             className={`admin-tab ${tab === 'settings' ? 'admin-tab--active' : ''}`}
             onClick={() => setTab('settings')}
           >
@@ -53,6 +60,7 @@ const AdminDashboard = () => {
         {tab === 'quotes' && <QuotesPanel />}
         {tab === 'gallery' && <GalleryPanel />}
         {tab === 'backgrounds' && <BackgroundsPanel />}
+        {tab === 'seo' && <SeoPanel />}
         {tab === 'settings' && <SettingsPanel />}
       </div>
     </div>
