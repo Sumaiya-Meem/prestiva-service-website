@@ -6,6 +6,7 @@ import { Phone, Mail, MapPin, Clock, CheckCircle2, Crosshair, CloudUpload } from
 import { heroBgStyle } from '../config/pageBackgrounds';
 import axios from 'axios';
 import siteConfig from '../config/siteConfig';
+import { getContent } from '../config/content';
 import Seo from '../components/utils/Seo';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -195,7 +196,7 @@ const ContactPage = () => {
           {submitStatus === 'success' ? (
             <>
               <CheckCircle2 className="form-toast__icon" />
-              <div><strong>Thank you.</strong> Your quote request has been received. Our team will contact you shortly.</div>
+              <div><strong>{getContent('contact.toast.successTitle')}</strong> {getContent('contact.toast.successBody')}</div>
             </>
           ) : (
             <>
@@ -215,9 +216,9 @@ const ContactPage = () => {
       {/* Hero / Header */}
       <section className="section subpage-hero bg-navy" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '30vh', ...heroBgStyle('contact') }}>
         <div className="container" style={{ textAlign: 'center' }}>
-          <h1 className="hero-title" style={{ color: '#fff' }}>Get in Touch with Prestiva</h1>
+          <h1 className="hero-title" style={{ color: '#fff' }}>{getContent('contact.hero.title')}</h1>
           <p className="contact-hero-subtitle">
-            Professional support. Fast response. Reliable service.
+            {getContent('contact.hero.subtitle')}
           </p>
         </div>
       </section>
@@ -227,13 +228,13 @@ const ContactPage = () => {
           <div className="contact-container">
             {/* Contact Info */}
             <div className="contact-info">
-              <h2 className="section-title" style={{ marginBottom: '40px' }}>Contact Options</h2>
+              <h2 className="section-title" style={{ marginBottom: '40px' }}>{getContent('contact.options.heading')}</h2>
 
               <div style={{ marginBottom: '50px' }}>
                 <div style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '30px' }}>
                   <div style={{ padding: '15px', backgroundColor: 'var(--off-white)', borderRadius: '50%', color: 'var(--primary-gold)' }}><Phone fontSize="1.5rem" /></div>
                   <div>
-                    <h4 style={{ marginBottom: '5px' }}>Call Us</h4>
+                    <h4 style={{ marginBottom: '5px' }}>{getContent('contact.label.call')}</h4>
                     <a href={`tel:${siteConfig.phoneRaw}`} style={{ fontWeight: '700', fontSize: '1.2rem' }}>{siteConfig.phone}</a>
                   </div>
                 </div>
@@ -241,7 +242,7 @@ const ContactPage = () => {
                 <div style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '30px' }}>
                   <div style={{ padding: '15px', backgroundColor: 'var(--off-white)', borderRadius: '50%', color: 'var(--primary-gold)' }}><Mail fontSize="1.5rem" /></div>
                   <div>
-                    <h4 style={{ marginBottom: '5px' }}>Email Us</h4>
+                    <h4 style={{ marginBottom: '5px' }}>{getContent('contact.label.email')}</h4>
                     <a href={`mailto:${siteConfig.email}`} style={{ fontWeight: '700', fontSize: '1.2rem' }}>{siteConfig.email}</a>
                   </div>
                 </div>
@@ -249,14 +250,14 @@ const ContactPage = () => {
                 <div style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '30px' }}>
                   <div style={{ padding: '15px', backgroundColor: 'var(--off-white)', borderRadius: '50%', color: 'var(--primary-gold)' }}><FaWhatsapp fontSize="1.5rem" /></div>
                   <div>
-                    <h4 style={{ marginBottom: '5px' }}>SMS / WhatsApp</h4>
+                    <h4 style={{ marginBottom: '5px' }}>{getContent('contact.label.whatsapp')}</h4>
                     <a href={`https://wa.me/${siteConfig.whatsappRaw}`} target="_blank" rel="noopener noreferrer" style={{ fontWeight: '700', fontSize: '1.2rem' }}>{siteConfig.whatsapp}</a>
                   </div>
                 </div>
               </div>
 
               <div style={{ padding: '40px', backgroundColor: 'var(--off-white)', borderRadius: '20px' }}>
-                <h3 style={{ marginBottom: '25px' }}>Business Details</h3>
+                <h3 style={{ marginBottom: '25px' }}>{getContent('contact.businessDetails.heading')}</h3>
                 <ul style={{ listStyle: 'none', color: 'var(--medium-gray)' }}>
                   <li style={{ display: 'flex', gap: '15px', marginBottom: '15px', alignItems: 'center' }}>
                     <MapPin color="var(--primary-gold)" /> <span><strong>Service Areas:</strong> {siteConfig.locationText}</span>
@@ -276,8 +277,8 @@ const ContactPage = () => {
 
             {/* Contact Form */}
             <div className="contact-form-container" style={{ padding: '50px', backgroundColor: 'var(--surface)', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)' }}>
-              <h2 className="section-title" style={{ marginBottom: '10px', fontSize: '2rem' }}>Request a Free Quote</h2>
-              <p style={{ marginBottom: '30px', color: 'var(--medium-gray)' }}>Fill in your details and we'll get back to you within 2 hours.</p>
+              <h2 className="section-title" style={{ marginBottom: '10px', fontSize: '2rem' }}>{getContent('contact.form.heading')}</h2>
+              <p style={{ marginBottom: '30px', color: 'var(--medium-gray)' }}>{getContent('contact.form.intro')}</p>
 
               <form onSubmit={handleSubmit}>
                 {/* Honeypot: hidden from users, catches spam bots */}

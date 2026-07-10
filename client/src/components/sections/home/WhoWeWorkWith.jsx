@@ -1,33 +1,30 @@
 import React from 'react';
 import { HardHat, Handshake, Store, UserRound, Home, Building2 } from 'lucide-react';
-import siteConfig from '../../../config/siteConfig';
+import { getContent } from '../../../config/content';
 
-const clients = [
-  { icon: <HardHat />, label: 'Builders & Contractors' },
-  { icon: <Handshake />, label: 'Real Estate Agents' },
-  { icon: <Store />, label: 'Offices & Retail Stores' },
-  { icon: <UserRound />, label: 'Property Managers' },
-  { icon: <Home />, label: 'Homeowners' },
-  { icon: <Building2 />, label: 'Commercial Sites' },
-];
+// Icons stay in code, matched to client types by position (extras fall back to a building).
+const ICONS = [<HardHat />, <Handshake />, <Store />, <UserRound />, <Home />, <Building2 />];
 
-const WhoWeWorkWith = () => (
-  <section className="section who-we-work">
-    <div className="container">
-      <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
-        <h2 className="section-title">Who We Work With</h2>
-        <p className="section-subtitle">Trusted by businesses, trades and homeowners across {siteConfig.locationText}</p>
+const WhoWeWorkWith = () => {
+  const clients = getContent('home.who.items');
+  return (
+    <section className="section who-we-work">
+      <div className="container">
+        <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
+          <h2 className="section-title">{getContent('home.who.heading')}</h2>
+          <p className="section-subtitle">{getContent('home.who.subheading')}</p>
+        </div>
+        <div className="who-grid">
+          {clients.map((label, index) => (
+            <div key={index} className="who-card">
+              <span className="who-icon">{ICONS[index] || <Building2 />}</span>
+              <span className="who-label">{label}</span>
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="who-grid">
-        {clients.map((c) => (
-          <div key={c.label} className="who-card">
-            <span className="who-icon">{c.icon}</span>
-            <span className="who-label">{c.label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export default WhoWeWorkWith;

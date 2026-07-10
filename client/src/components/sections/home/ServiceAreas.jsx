@@ -1,18 +1,19 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
-import siteConfig from '../../../config/siteConfig';
+import { getContent } from '../../../config/content';
 
 const ServiceAreas = () => {
+  const areas = getContent('home.areas.items');
   return (
     <section className="section service-areas">
       <div className="container">
         <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <h2 className="section-title">We Come to You</h2>
-          <p className="section-subtitle">Serving major metropolitan areas across Australia</p>
+          <h2 className="section-title">{getContent('home.areas.heading')}</h2>
+          <p className="section-subtitle">{getContent('home.areas.subheading')}</p>
         </div>
 
         <div className="areas-grid" style={{ display: 'flex', gap: '30px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          {siteConfig.serviceAreasDetailed.map((area, index) => (
+          {areas.map((area, index) => (
             <div key={index} className="area-card" style={{ flex: '1', maxWidth: '400px', padding: '40px', backgroundColor: 'var(--surface)', borderRadius: '20px', boxShadow: '0 10px 40px rgba(0,0,0,0.05)', textAlign: 'center' }}>
               <div className="area-icon" style={{ fontSize: '2.5rem', color: 'var(--accent)', marginBottom: '20px' }}><MapPin /></div>
               <h3 style={{ fontSize: '1.5rem', marginBottom: area.region ? '6px' : '15px' }}>{area.city}</h3>

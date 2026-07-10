@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, CheckCircle2, ShieldCheck } from 'lucide-react';
 import siteConfig from '../config/siteConfig';
+import { getContent } from '../config/content';
 import Seo from '../components/utils/Seo';
+import RichText from '../components/utils/RichText';
 import ContactLine from '../components/sections/ContactLine';
 import { pageBgUrl } from '../config/pageBackgrounds';
 
@@ -10,20 +12,13 @@ const ResidentialPage = () => {
   const [activeTab, setActiveTab] = useState('kitchen');
   const heroImg = pageBgUrl('residential');
 
-  const services = [
-    { title: "House Cleaning", desc: "Regular maintenance for a spotless home." },
-    { title: "End of Lease", desc: "Professional cleaning for a full bond refund." },
-    { title: "Deep Clean", desc: "Thorough sanitisation for a fresh start." },
-    { title: "Move In/Out", desc: "Seamless cleaning for your transition." },
-    { title: "Carpet Steam", desc: "Removal of stains and allergens." },
-    { title: "Spring Clean", desc: "Reviving your home for the new season." }
-  ];
+  const services = getContent('residential.services.items');
 
   const checklistData = {
-    kitchen: ["Oven Exterior", "Stovetop", "Countertops", "Sinks & Taps", "Cupboard Faces"],
-    living: ["Dusting", "Vacuuming", "Glass Surfaces", "Skirting Boards", "Door Handles"],
-    bathrooms: ["Showers", "Vanity", "Toilets", "Mirrors", "Towel Rails"],
-    balcony: ["Sweeping", "Railing Wipe", "Glass Door Tracks", "General Tidy"]
+    kitchen: getContent('residential.checklist.kitchen'),
+    living: getContent('residential.checklist.living'),
+    bathrooms: getContent('residential.checklist.bathrooms'),
+    balcony: getContent('residential.checklist.balcony'),
   };
 
   return (
@@ -37,11 +32,11 @@ const ResidentialPage = () => {
       <section className="hero-section subpage-hero" style={{ backgroundImage: `linear-gradient(rgba(10, 22, 40, 0.6), rgba(10, 22, 40, 0.6)), url(${heroImg})` }}>
         <div className="container">
           <div className="hero-content">
-            <h1 className="hero-title">Professional Home Cleaning — {siteConfig.locationText}</h1>
+            <h1 className="hero-title">{getContent('residential.hero.title')}</h1>
             <div className="hero-btns cta-btns">
-              <Link to="/contact" className="btn btn-primary">Get a Home Clean Quote</Link>
+              <Link to="/contact" className="btn btn-primary">{getContent('residential.hero.quoteButton')}</Link>
               <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', borderColor: '#fff' }}>
-                <Phone /> Call Now
+                <Phone /> {getContent('residential.hero.callButton')}
               </a>
             </div>
           </div>
@@ -51,12 +46,12 @@ const ResidentialPage = () => {
       {/* Services Grid */}
       <section className="section">
         <div className="container">
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '50px' }}>Our Home Cleaning Services</h2>
+          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '50px' }}>{getContent('residential.services.heading')}</h2>
           <div className="services-grid responsive-grid-3">
             {services.map((s, i) => (
               <div key={i} className="service-card" style={{ padding: '30px', textAlign: 'center', backgroundColor: 'var(--off-white)', borderRadius: '15px' }}>
                 <h4 style={{ marginBottom: '10px', color: 'var(--primary-navy)' }}>{s.title}</h4>
-                <p style={{ fontSize: '0.9rem', color: 'var(--medium-gray)' }}>{s.desc}</p>
+                <RichText as="p" style={{ fontSize: '0.9rem', color: 'var(--medium-gray)' }} html={s.desc} />
               </div>
             ))}
           </div>
@@ -68,17 +63,17 @@ const ResidentialPage = () => {
         <div className="container">
           <div style={{ display: 'flex', gap: '50px', alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ flex: '1', minWidth: '300px' }}>
-              <h2 className="section-title" style={{ color: 'var(--primary-gold)', marginBottom: '20px' }}>100% Bond Back Guarantee</h2>
-              <p style={{ fontSize: '1.2rem', marginBottom: '20px' }}>Moving out? Leave the hard work to us. Our End of Lease cleaning service is designed to meet the strict standards of real estate agents and landlords.</p>
+              <h2 className="section-title" style={{ color: 'var(--primary-gold)', marginBottom: '20px' }}>{getContent('residential.bond.heading')}</h2>
+              <RichText as="p" style={{ fontSize: '1.2rem', marginBottom: '20px' }} html={getContent('residential.bond.body')} />
               <ul className="spotlight-list">
-                <li style={{ marginBottom: '10px' }}>✓ 72-Hour re-clean guarantee</li>
-                <li style={{ marginBottom: '10px' }}>✓ Agency-approved checklist</li>
-                <li style={{ marginBottom: '10px' }}>✓ Professional equipment used</li>
+                {getContent('residential.bond.items').map((item, i) => (
+                  <li key={i} style={{ marginBottom: '10px' }}>✓ {item}</li>
+                ))}
               </ul>
             </div>
             <div style={{ textAlign: 'center', padding: '40px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '20px', border: '2px solid var(--primary-gold)' }}>
               <ShieldCheck style={{ fontSize: '4rem', color: 'var(--primary-gold)', marginBottom: '20px' }} />
-              <h3>Fully Guaranteed</h3>
+              <h3>{getContent('residential.bond.cardTitle')}</h3>
             </div>
           </div>
         </div>
@@ -87,7 +82,7 @@ const ResidentialPage = () => {
       {/* Checklist */}
       <section className="section cleaning-checklist">
         <div className="container">
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '50px' }}>Room-by-Room Checklist</h2>
+          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '50px' }}>{getContent('residential.checklist.heading')}</h2>
           <div className="checklist-tabs" style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '40px' }}>
             {Object.keys(checklistData).map(tab => (
               <button key={tab} onClick={() => setActiveTab(tab)} className={`tab-btn ${activeTab === tab ? 'active' : ''}`}>
@@ -109,7 +104,7 @@ const ResidentialPage = () => {
       {/* Pricing Table */}
       <section className="section">
         <div className="container">
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '50px' }}>Transparent Home Pricing</h2>
+          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '50px' }}>{getContent('residential.pricing.heading')}</h2>
           <div style={{ maxWidth: '800px', margin: '0 auto', backgroundColor: 'var(--surface)', borderRadius: '20px', overflowX: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '400px' }}>
               <thead>
@@ -134,11 +129,11 @@ const ResidentialPage = () => {
       {/* CTA */}
       <section className="section cta-banner bg-navy" style={{ textAlign: 'center' }}>
         <div className="container">
-          <h2 className="section-title" style={{ color: '#fff' }}>Book a Cleaning Service</h2>
-          <p style={{ color: '#fff', marginBottom: '30px' }}>Ready to enjoy a sparkling clean home?</p>
+          <h2 className="section-title" style={{ color: '#fff' }}>{getContent('residential.cta.heading')}</h2>
+          <p style={{ color: '#fff', marginBottom: '30px' }}>{getContent('residential.cta.text')}</p>
           <div className="cta-btns" style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-            <Link to="/contact" className="btn btn-primary">Get Cleaning Quote</Link>
-            <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ color: '#fff', borderColor: '#fff' }}>Call Now</a>
+            <Link to="/contact" className="btn btn-primary">{getContent('residential.cta.primaryButton')}</Link>
+            <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ color: '#fff', borderColor: '#fff' }}>{getContent('residential.cta.callButton')}</a>
           </div>
           <ContactLine />
         </div>

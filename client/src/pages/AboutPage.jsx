@@ -3,22 +3,17 @@ import { Link } from 'react-router-dom';
 import Seo from '../components/utils/Seo';
 import { Phone, ShieldCheck, UserCheck, Award, Star, Leaf, Wrench, Handshake } from 'lucide-react';
 import siteConfig from '../config/siteConfig';
+import { getContent } from '../config/content';
+import RichText from '../components/utils/RichText';
 import { heroBgStyle } from '../config/pageBackgrounds';
 
-const AboutPage = () => {
-  const values = [
-    { icon: <ShieldCheck />, title: "Reliability", desc: "We show up on time and deliver consistent results you can depend on." },
-    { icon: <Wrench />, title: "Quality Workmanship", desc: "Every job is approached with care and finished to the highest standard." },
-    { icon: <Leaf />, title: "Eco-Conscious", desc: "We use sustainable products that are safe for you and the environment." },
-    { icon: <Handshake />, title: "Customer First", desc: "Our service is built around your specific needs and long-term satisfaction." }
-  ];
+// Icons stay in code, matched to items by position.
+const VALUE_ICONS = [<ShieldCheck />, <Wrench />, <Leaf />, <Handshake />];
+const BADGE_ICONS = [<ShieldCheck />, <UserCheck />, <Award />, <Star fill="currentColor" />];
 
-  const badges = [
-    { icon: <ShieldCheck />, label: "Fully Insured" },
-    { icon: <UserCheck />, label: "Police Checked" },
-    { icon: <Award />, label: "Guarantee" },
-    { icon: <Star fill="currentColor" />, label: "5-Star Rated" }
-  ];
+const AboutPage = () => {
+  const values = getContent('about.values.items');
+  const badges = getContent('about.badges');
 
   return (
     <div className="about-page">
@@ -31,11 +26,11 @@ const AboutPage = () => {
       <section className="hero-section subpage-hero bg-navy" style={heroBgStyle('about')}>
         <div className="container">
           <div className="hero-content">
-            <h1 className="hero-title">Your Partner in Property Excellence</h1>
-            <p className="hero-subtitle">Serving {siteConfig.locationText} with pride and professional care.</p>
+            <h1 className="hero-title">{getContent('about.hero.title')}</h1>
+            <p className="hero-subtitle">{getContent('about.hero.subtitle')}</p>
             <div className="hero-btns cta-btns">
               <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Phone /> Call Us
+                <Phone /> {getContent('about.hero.button')}
               </a>
             </div>
           </div>
@@ -45,20 +40,12 @@ const AboutPage = () => {
       {/* Our Story */}
       <section className="section our-story">
         <div className="container" style={{ maxWidth: '900px' }}>
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '40px' }}>Our Story</h2>
+          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '40px' }}>{getContent('about.story.heading')}</h2>
           <div style={{ color: 'var(--medium-gray)', fontSize: '1.1rem', lineHeight: '1.8' }}>
-            <p style={{ marginBottom: '20px' }}>
-              {siteConfig.businessName} was founded on a clear standard — to deliver a level of reliability, detail, and professionalism that clients can consistently depend on.
-            </p>
-            <p style={{ marginBottom: '20px' }}>
-              After seeing how often services were rushed, inconsistent, or lacking accountability, we set out to build something different. A service where every job is approached with care, every space is treated with respect, and every client receives the attention they deserve.
-            </p>
-            <p style={{ marginBottom: '20px' }}>
-              From a small, hands-on operation, {siteConfig.businessNameShort} has grown into a trusted provider working with businesses, property managers, and homeowners across {siteConfig.locationText}. What remains unchanged is our commitment to quality, consistency, and doing the job properly — not just quickly.
-            </p>
-            <p>
-              We believe a well-maintained space reflects the people behind it. That’s why we focus not only on results, but on delivering a service experience that is professional, dependable, and built for long-term relationships.
-            </p>
+            <RichText as="p" style={{ marginBottom: '20px' }} html={getContent('about.story.p1')} />
+            <RichText as="p" style={{ marginBottom: '20px' }} html={getContent('about.story.p2')} />
+            <RichText as="p" style={{ marginBottom: '20px' }} html={getContent('about.story.p3')} />
+            <RichText as="p" html={getContent('about.story.p4')} />
           </div>
         </div>
       </section>
@@ -66,13 +53,13 @@ const AboutPage = () => {
       {/* Our Values */}
       <section className="section bg-navy" style={{ color: '#fff' }}>
         <div className="container">
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '60px', color: 'var(--primary-gold)' }}>Our Values</h2>
+          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '60px', color: 'var(--primary-gold)' }}>{getContent('about.values.heading')}</h2>
           <div className="responsive-grid-4">
             {values.map((v, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '3rem', color: 'var(--primary-gold)', marginBottom: '20px' }}>{v.icon}</div>
+                <div style={{ fontSize: '3rem', color: 'var(--primary-gold)', marginBottom: '20px' }}>{VALUE_ICONS[i] || <ShieldCheck />}</div>
                 <h3 style={{ fontSize: '1.25rem', marginBottom: '15px', color: '#fff' }}>{v.title}</h3>
-                <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>{v.desc}</p>
+                <RichText as="p" style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }} html={v.desc} />
               </div>
             ))}
           </div>
@@ -83,10 +70,10 @@ const AboutPage = () => {
       <section className="section trust-badges-section">
         <div className="container">
           <div className="trust-badges">
-            {badges.map((b, i) => (
+            {badges.map((label, i) => (
               <div key={i} className="trust-badge">
-                <div className="trust-badge__icon">{b.icon}</div>
-                <h4 className="trust-badge__label">{b.label}</h4>
+                <div className="trust-badge__icon">{BADGE_ICONS[i] || <ShieldCheck />}</div>
+                <h4 className="trust-badge__label">{label}</h4>
               </div>
             ))}
           </div>
@@ -96,11 +83,11 @@ const AboutPage = () => {
       {/* CTA */}
       <section className="section cta-banner bg-navy" style={{ textAlign: 'center' }}>
         <div className="container">
-          <h2 className="section-title" style={{ color: '#fff' }}>Ready to Get Started?</h2>
-          <p style={{ color: '#fff', marginBottom: '30px' }}>Contact our friendly team for a free consultation.</p>
+          <h2 className="section-title" style={{ color: '#fff' }}>{getContent('about.cta.heading')}</h2>
+          <p style={{ color: '#fff', marginBottom: '30px' }}>{getContent('about.cta.text')}</p>
           <div className="cta-btns" style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-            <Link to="/contact" className="btn btn-primary">Get a Free Quote</Link>
-            <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ color: '#fff', borderColor: '#fff' }}>Call Now</a>
+            <Link to="/contact" className="btn btn-primary">{getContent('about.cta.primaryButton')}</Link>
+            <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ color: '#fff', borderColor: '#fff' }}>{getContent('about.cta.callButton')}</a>
           </div>
         </div>
       </section>

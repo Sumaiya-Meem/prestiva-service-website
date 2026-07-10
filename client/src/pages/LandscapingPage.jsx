@@ -2,15 +2,21 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Leaf, Clock, CheckCircle2 } from 'lucide-react';
 import siteConfig from '../config/siteConfig';
+import { getContent } from '../config/content';
 import Seo from '../components/utils/Seo';
+import RichText from '../components/utils/RichText';
 import ContactLine from '../components/sections/ContactLine';
 import { pageBgUrl } from '../config/pageBackgrounds';
 import BeforeAfterGallery from '../components/sections/home/BeforeAfterGallery';
+
+// Icons stay in code, matched to why-cards by position.
+const WHY_ICONS = [<Clock />, <Leaf />, <CheckCircle2 />];
 
 const LandscapingPage = () => {
   const landscapingCat = siteConfig.serviceCategories.find((c) => c.slug === 'landscaping');
   const services = landscapingCat ? landscapingCat.services : [];
   const heroImg = pageBgUrl('landscaping');
+  const whyCards = getContent('landscaping.why.items');
 
   return (
     <div className="landscaping-page">
@@ -23,11 +29,11 @@ const LandscapingPage = () => {
       <section className="hero-section subpage-hero" style={{ backgroundImage: `linear-gradient(rgba(10, 22, 40, 0.4), rgba(10, 22, 40, 0.4)), url(${heroImg})` }}>
         <div className="container">
           <div className="hero-content">
-            <h1 className="hero-title">Landscaping & Garden Services — {siteConfig.locationText}</h1>
+            <h1 className="hero-title">{getContent('landscaping.hero.title')}</h1>
             <div className="hero-btns cta-btns">
-              <Link to="/contact" className="btn btn-primary">Get Landscaping Quote</Link>
+              <Link to="/contact" className="btn btn-primary">{getContent('landscaping.hero.quoteButton')}</Link>
               <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', borderColor: '#fff' }}>
-                <Phone /> Call Now
+                <Phone /> {getContent('landscaping.hero.callButton')}
               </a>
             </div>
           </div>
@@ -37,7 +43,7 @@ const LandscapingPage = () => {
       {/* Services Grid */}
       <section className="section">
         <div className="container">
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '50px' }}>Our Garden Services</h2>
+          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '50px' }}>{getContent('landscaping.services.heading')}</h2>
           <div className="services-grid responsive-grid-5">
             {services.map((s, i) => (
               <div key={i} className="service-card" style={{ padding: '25px', textAlign: 'center', backgroundColor: 'var(--off-white)', borderRadius: '12px', opacity: s.comingSoon ? 0.7 : 1 }}>
@@ -54,25 +60,17 @@ const LandscapingPage = () => {
       <section className="section bg-navy" style={{ color: '#fff' }}>
         <div className="container">
           <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <h2 className="section-title" style={{ color: 'var(--white)' }}>Why Choose {siteConfig.businessNameShort}?</h2>
-            <p className="section-subtitle" style={{ color: 'rgba(255,255,255,0.8)' }}>Reliable outdoor maintenance for your property</p>
+            <h2 className="section-title" style={{ color: 'var(--white)' }}>{getContent('landscaping.why.heading')}</h2>
+            <p className="section-subtitle" style={{ color: 'rgba(255,255,255,0.8)' }}>{getContent('landscaping.why.subheading')}</p>
           </div>
           <div className="responsive-grid-3">
-            <div className="why-card">
-              <div className="why-icon"><Clock /></div>
-              <h3>Same Crew</h3>
-              <p>We send the same team to your property for consistent results every time.</p>
-            </div>
-            <div className="why-card">
-              <div className="why-icon"><Leaf /></div>
-              <h3>Green Removal</h3>
-              <p>We include full green waste removal in every booking, leaving your site pristine.</p>
-            </div>
-            <div className="why-card">
-              <div className="why-icon"><CheckCircle2 /></div>
-              <h3>One-off or Regular</h3>
-              <p>Whether you need a quick clean-up or monthly maintenance, we've got you covered.</p>
-            </div>
+            {whyCards.map((card, i) => (
+              <div key={i} className="why-card">
+                <div className="why-icon">{WHY_ICONS[i] || <CheckCircle2 />}</div>
+                <h3>{card.title}</h3>
+                <RichText as="p" html={card.text} />
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -84,11 +82,9 @@ const LandscapingPage = () => {
       <section className="section gardening-pricing">
         <div className="container">
           <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '12px' }}>
-            <h2 className="section-title">Transparent Gardening Pricing</h2>
+            <h2 className="section-title">{getContent('landscaping.pricing.heading')}</h2>
           </div>
-          <p style={{ textAlign: 'center', color: 'var(--medium-gray)', maxWidth: '620px', margin: '0 auto 55px' }}>
-            Clear, upfront starting prices — no hidden fees. Your exact quote is always free and tailored to your garden.
-          </p>
+          <RichText as="p" style={{ textAlign: 'center', color: 'var(--medium-gray)', maxWidth: '620px', margin: '0 auto 55px' }} html={getContent('landscaping.pricing.intro')} />
 
           <div className="pricing-grid">
             {/* Lawn Mowing */}
@@ -146,7 +142,7 @@ const LandscapingPage = () => {
           </div>
 
           <p style={{ textAlign: 'center', color: 'var(--medium-gray)', fontSize: '0.86rem', marginTop: '35px' }}>
-            * Starting estimates. Final pricing is confirmed in your free, no-obligation quote.
+            {getContent('landscaping.pricing.footnote')}
           </p>
         </div>
       </section>
@@ -154,11 +150,11 @@ const LandscapingPage = () => {
       {/* CTA */}
       <section className="section cta-banner bg-navy" style={{ textAlign: 'center' }}>
         <div className="container">
-          <h2 className="section-title" style={{ color: '#fff' }}>Book a Landscaping Service</h2>
-          <p style={{ color: '#fff', marginBottom: '30px' }}>Ready to transform your outdoor space?</p>
+          <h2 className="section-title" style={{ color: '#fff' }}>{getContent('landscaping.cta.heading')}</h2>
+          <p style={{ color: '#fff', marginBottom: '30px' }}>{getContent('landscaping.cta.text')}</p>
           <div className="cta-btns" style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-            <Link to="/contact" className="btn btn-primary">Get Landscaping Quote</Link>
-            <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ color: '#fff', borderColor: '#fff' }}>Call Now</a>
+            <Link to="/contact" className="btn btn-primary">{getContent('landscaping.cta.primaryButton')}</Link>
+            <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ color: '#fff', borderColor: '#fff' }}>{getContent('landscaping.cta.callButton')}</a>
           </div>
           <ContactLine />
         </div>

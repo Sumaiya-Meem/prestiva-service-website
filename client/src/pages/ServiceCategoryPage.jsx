@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, CheckCircle2, ArrowRight, Clock } from 'lucide-react';
 import siteConfig from '../config/siteConfig';
+import { getContent } from '../config/content';
 import Seo from '../components/utils/Seo';
 import ContactLine from '../components/sections/ContactLine';
 import { pageBgUrl } from '../config/pageBackgrounds';
@@ -55,12 +56,12 @@ const ServiceCategoryPage = ({ slug }) => {
             <h1 className="hero-title">{cat.title} — {siteConfig.locationText}</h1>
             <p className="hero-subtitle">{cat.blurb}</p>
             {cat.fromPrice && (
-              <p className="hero-price">Starting from <span>{cat.fromPrice}</span></p>
+              <p className="hero-price">{getContent('servicecat.hero.priceLabel')} <span>{cat.fromPrice}</span></p>
             )}
             <div className="hero-btns cta-btns">
-              <Link to="/contact" className="btn btn-primary">Get a Free Quote</Link>
+              <Link to="/contact" className="btn btn-primary">{getContent('servicecat.hero.quoteButton')}</Link>
               <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', borderColor: '#fff' }}>
-                <Phone /> Call Now
+                <Phone /> {getContent('servicecat.hero.callButton')}
               </a>
             </div>
           </div>
@@ -71,7 +72,7 @@ const ServiceCategoryPage = ({ slug }) => {
       <section className="section">
         <div className="container">
           <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
-            <h2 className="section-title">What We Offer</h2>
+            <h2 className="section-title">{getContent('servicecat.services.heading')}</h2>
             <p className="section-subtitle">Professional {cat.title.toLowerCase()} across {siteConfig.locationText}</p>
           </div>
 
@@ -83,9 +84,9 @@ const ServiceCategoryPage = ({ slug }) => {
                     {s.comingSoon ? <Clock /> : <CheckCircle2 />}
                   </span>
                   <h3 className="svc-card__name">{s.name}</h3>
-                  {s.comingSoon && <span className="svc-badge">Coming Soon</span>}
-                  {s.to && <span className="svc-card__more">Learn more <ArrowRight /></span>}
-                  {!s.to && !s.comingSoon && <span className="svc-card__more">Get a quote <ArrowRight /></span>}
+                  {s.comingSoon && <span className="svc-badge">{getContent('servicecat.card.comingSoon')}</span>}
+                  {s.to && <span className="svc-card__more">{getContent('servicecat.card.learnMore')} <ArrowRight /></span>}
+                  {!s.to && !s.comingSoon && <span className="svc-card__more">{getContent('servicecat.card.getQuote')} <ArrowRight /></span>}
                 </>
               );
 
@@ -106,10 +107,10 @@ const ServiceCategoryPage = ({ slug }) => {
       <section className="section cta-banner bg-navy" style={{ textAlign: 'center' }}>
         <div className="container">
           <h2 className="section-title" style={{ color: '#fff' }}>Get a Free {cat.title} Quote</h2>
-          <p style={{ color: '#fff', marginBottom: '30px' }}>Tell us what you need — we'll tailor a no-obligation quote.</p>
+          <p style={{ color: '#fff', marginBottom: '30px' }}>{getContent('servicecat.cta.text')}</p>
           <div className="cta-btns" style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/contact" className="btn btn-primary">Get a Free Quote</Link>
-            <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ color: '#fff', borderColor: '#fff' }}>Call Now</a>
+            <Link to="/contact" className="btn btn-primary">{getContent('servicecat.cta.primaryButton')}</Link>
+            <a href={`tel:${siteConfig.phoneRaw}`} className="btn btn-outline" style={{ color: '#fff', borderColor: '#fff' }}>{getContent('servicecat.cta.callButton')}</a>
           </div>
           <ContactLine />
         </div>

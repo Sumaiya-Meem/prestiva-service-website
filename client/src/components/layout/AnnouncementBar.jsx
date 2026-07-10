@@ -1,5 +1,5 @@
 import React from 'react';
-import siteConfig from '../../config/siteConfig';
+import { getContent } from '../../config/content';
 
 // Match emails (and keep them as a captured part when splitting)
 const EMAIL_RE = /([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})/i;
@@ -14,11 +14,12 @@ const renderAnnouncement = (text) =>
   );
 
 const AnnouncementBar = () => {
+  const announcements = getContent('announcements.items');
   return (
     <div className="announcement-bar">
       <div className="ticker-wrapper">
         <div className="ticker">
-          {[...siteConfig.announcements, ...siteConfig.announcements].map((text, index) => (
+          {[...announcements, ...announcements].map((text, index) => (
             <span key={index} className="ticker-item">{renderAnnouncement(text)}</span>
           ))}
         </div>
