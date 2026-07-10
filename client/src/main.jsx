@@ -5,6 +5,7 @@ import App from './App.jsx'
 import ErrorBoundary from './components/utils/ErrorBoundary.jsx'
 import siteConfig from './config/siteConfig'
 import applyOverrides from './config/applyOverrides'
+import { setContentOverrides } from './config/content'
 
 const render = () =>
   createRoot(document.getElementById('root')).render(
@@ -28,7 +29,13 @@ async function boot() {
     clearTimeout(timeout)
     if (res.ok) {
       const data = await res.json()
-      if (data && data.settings) applyOverrides(siteConfig, data.settings)
+      if (data && data.settings) {
+        // Content resolves via its own store (whole-value replace, so list
+        // deletes persist); everything else deep-merges into siteConfig.
+        const { content, ...rest } = data.settings
+        applyOverrides(siteConfig, rest)
+        setContentOverrides(content || {})
+      }
     }
   } catch {
     // ignore — defaults are fine

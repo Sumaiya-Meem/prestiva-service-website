@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Play } from 'lucide-react';
 import { fetchGalleryCached, mediaUrl } from '../../../services/adminApi';
 import { bundledResultsClips, bundledVideoFor, bundledImageFor } from '../../../config/bundledGallery';
+import { getContent } from '../../../config/content';
 
 // Bundled fallback clips (with poster frames) — shipped in the build and served
 // by the CDN, so the homepage is never empty (API has no videos yet) and never
@@ -88,8 +89,8 @@ const ResultsReel = () => {
     <section className="section results-reel">
       <div className="container">
         <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h2 className="section-title">See the Results</h2>
-          <p className="section-subtitle">Real footage from our recent jobs — tap to play.</p>
+          <h2 className="section-title">{getContent('home.results.heading')}</h2>
+          <p className="section-subtitle">{getContent('home.results.subheading')}</p>
         </div>
 
         <div className="results-grid">
@@ -99,7 +100,7 @@ const ResultsReel = () => {
         </div>
 
         <div style={{ textAlign: 'center', marginTop: '40px' }}>
-          <Link to="/gallery" className="btn btn-primary">View Full Gallery</Link>
+          <Link to="/gallery" className="btn btn-primary">{getContent('home.results.button')}</Link>
         </div>
       </div>
     </section>

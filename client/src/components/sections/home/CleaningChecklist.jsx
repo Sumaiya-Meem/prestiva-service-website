@@ -1,50 +1,23 @@
 import React, { useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
+import { getContent } from '../../../config/content';
 
 const CleaningChecklist = () => {
   const [activeTab, setActiveTab] = useState('kitchen');
 
   const checklistData = {
-    kitchen: [
-      "Benchtop and splashback cleaned",
-      "Sinks and taps sanitised and polished",
-      "Stovetop thoroughly cleaned",
-      "Exterior of oven and rangehood cleaned",
-      "Exterior of cupboards and drawers wiped",
-      "Microwave cleaned inside and out"
-    ],
-    bathrooms: [
-      "Shower, bathtub and tiles scrubbed",
-      "Toilets sanitised and cleaned",
-      "Vantiy and mirrors polished",
-      "Sinks and taps sanitised",
-      "Cabinets wiped down",
-      "Towel rails and light switches cleaned"
-    ],
-    bedrooms: [
-      "All surfaces dusted and wiped",
-      "Mirrors and glass surfaces cleaned",
-      "Window sills and tracks wiped",
-      "Light switches and door handles cleaned",
-      "Skirting boards dusted",
-      "Carpets vacuumed or floors mopped"
-    ],
-    living: [
-      "General dusting of all surfaces",
-      "Electronics dusted carefully",
-      "Coffee tables and dining areas cleaned",
-      "Upholstery vacuumed",
-      "Floor areas thoroughly cleaned",
-      "Internal cobwebs removed"
-    ]
+    kitchen: getContent('home.checklist.kitchen'),
+    bathrooms: getContent('home.checklist.bathrooms'),
+    bedrooms: getContent('home.checklist.bedrooms'),
+    living: getContent('home.checklist.living'),
   };
 
   return (
     <section className="section cleaning-checklist">
       <div className="container">
         <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <h2 className="section-title">What’s Included in Every Clean</h2>
-          <p className="section-subtitle">Our comprehensive checklist ensures no corner is missed</p>
+          <h2 className="section-title">{getContent('home.checklist.heading')}</h2>
+          <p className="section-subtitle">{getContent('home.checklist.subheading')}</p>
         </div>
         
         <div className="checklist-tabs">

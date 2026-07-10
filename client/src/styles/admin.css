@@ -350,3 +350,25 @@
 .seo-preview__noindex {
   margin-top: 8px; font-size: .78rem; font-weight: 600; color: #c0392b;
 }
+
+/* ── Content tab: rich-text editor & list rows ── */
+.admin-label--sm { font-size: .78rem; color: var(--adm-muted); margin-bottom: 4px; }
+
+.admin-rte { border: 1px solid var(--adm-border); border-radius: 8px; overflow: hidden; }
+.admin-rte__bar {
+  display: flex; gap: 4px; padding: 6px;
+  background: #f7f9fc; border-bottom: 1px solid var(--adm-border);
+}
+.admin-rte__area {
+  min-height: 90px; border: 0; border-radius: 0; outline: none;
+  padding: 10px 12px; background: #fff;
+}
+.admin-rte__area:focus { box-shadow: inset 0 0 0 2px var(--adm-gold); }
+
+.admin-listrow {
+  display: flex; gap: 8px; align-items: flex-start;
+  margin-bottom: 12px; padding: 12px; border: 1px solid var(--adm-border);
+  border-radius: 8px; background: #fbfcfe;
+}
+.admin-listrow__body { flex: 1; min-width: 0; }
+.admin-listrow__ctrls { display: flex; flex-direction: column; gap: 4px; }

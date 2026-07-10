@@ -1,50 +1,37 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
+import { getContent } from '../../../config/content';
 
-const plans = [
-  {
-    title: 'Property Maintenance',
-    price: 'From $65',
-    unit: '/service',
-    features: ['Lawn mowing', 'Weeding & edging', 'Gutter cleaning', 'Pressure cleaning', 'Green waste removal', 'Site clean-ups'],
-    buttonText: 'Get Maintenance Quote',
-    service: 'Property Maintenance',
-  },
-  {
-    title: 'Landscaping',
-    price: 'From $99',
-    unit: '/service',
-    features: ['Turf laying', 'Irrigation', 'Soil preparation', 'Lawn repair', 'Garden clean-up', 'Outdoor area preparation'],
-    buttonText: 'Get Landscaping Quote',
-    service: 'Turf Laying',
-  },
-  {
-    title: 'Cleaning Services',
-    price: 'From $120',
-    unit: '/service',
-    features: ['End-of-lease cleaning', 'Builders cleaning', 'After-construction cleaning', 'Deep cleaning', 'Carpet cleaning', 'Window cleaning'],
-    buttonText: 'Get Cleaning Quote',
-    service: 'End-of-Lease Cleaning',
-  },
-  {
-    title: 'Commercial Cleaning',
-    price: 'From $35',
-    unit: '/hour',
-    features: ['Office cleaning', 'Retail cleaning', 'After-hours cleaning', 'Regular maintenance plans', 'Fully insured team', 'Police checked staff'],
-    buttonText: 'Get Commercial Quote',
-    service: 'Commercial Cleaning',
-    popular: true,
-  },
+// Structural bits (contact-link service + "popular" styling) stay in code;
+// all visible text, prices and features are editable content.
+const PLAN_META = [
+  { service: 'Property Maintenance', popular: false },
+  { service: 'Turf Laying', popular: false },
+  { service: 'End-of-Lease Cleaning', popular: false },
+  { service: 'Commercial Cleaning', popular: true },
 ];
 
 const PricingOverview = () => {
+  const plans = PLAN_META.map((meta, i) => {
+    const n = i + 1;
+    return {
+      title: getContent(`home.pricing.p${n}.title`),
+      price: getContent(`home.pricing.p${n}.price`),
+      unit: getContent(`home.pricing.p${n}.unit`),
+      features: getContent(`home.pricing.p${n}.features`),
+      buttonText: getContent(`home.pricing.p${n}.button`),
+      service: meta.service,
+      popular: meta.popular,
+    };
+  });
+
   return (
     <section id="pricing" className="section pricing-overview">
       <div className="container">
         <div data-reveal className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
-          <h2 className="section-title">Simple, Transparent Pricing</h2>
-          <p className="section-subtitle">Premium quality service with no hidden costs</p>
+          <h2 className="section-title">{getContent('home.pricing.heading')}</h2>
+          <p className="section-subtitle">{getContent('home.pricing.subheading')}</p>
         </div>
 
         <div className="price-grid-4">
