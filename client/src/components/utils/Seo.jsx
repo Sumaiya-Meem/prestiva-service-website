@@ -41,13 +41,16 @@ const localBusinessSchema = {
   },
 };
 
-const Seo = ({ title, description, path = '', schema }) => {
+const Seo = ({ title, description, path = '', schema, noindex: noindexProp }) => {
   const url = `${SITE_URL}${path}`;
 
   // Admin overrides (from the "SEO" tab) win; a blank override falls back to the
   // page's built-in default, so a page can never render a blank title/description.
-  const { title: seoTitle, description: seoDescription, noindex } =
+  const { title: seoTitle, description: seoDescription, noindex: overrideNoindex } =
     resolveSeo(siteConfig.seo?.[path], { title, description });
+
+  // Dynamic (page-builder) pages pass noindex directly; fixed pages use the SEO-tab override.
+  const noindex = noindexProp ?? overrideNoindex;
 
   // Build a single @graph so all nodes share one script tag.
   const extra = schema ? (Array.isArray(schema) ? schema : [schema]) : [];

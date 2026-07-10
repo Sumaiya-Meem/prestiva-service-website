@@ -160,8 +160,17 @@ const ContentPanel = () => {
     <div className="admin-card">
       <div className="admin-card__title">Content</div>
       <div className="admin-card__sub">
-        Edit the words on your website. Pick a section, change the text, and Save — changes are
-        live immediately. Clear a field to restore the original wording.
+        Edit the words on your website — no developer needed.
+      </div>
+      <div className="admin-help">
+        <strong>What this tab is for:</strong> changing the text across your website —
+        headings, paragraphs, FAQs, reviews, service lists and more.
+        <ol>
+          <li>Pick a <strong>Section</strong> from the dropdown.</li>
+          <li>Edit the text. On paragraphs use the <strong>Bold / Italic / Link</strong> buttons; on lists use <strong>+ Add</strong>, <strong>✕</strong> to delete, and <strong>↑ ↓</strong> to reorder.</li>
+          <li>Click <strong>Save changes</strong> — updates go live on the website immediately.</li>
+        </ol>
+        Tip: clear a field and Save to restore its original wording.
       </div>
 
       {loading && <div className="admin-empty">Loading…</div>}

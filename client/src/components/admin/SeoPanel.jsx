@@ -86,9 +86,19 @@ const SeoPanel = () => {
     <div className="admin-card">
       <div className="admin-card__title">SEO</div>
       <div className="admin-card__sub">
-        Edit each page’s Google title &amp; description, and choose whether it shows in
-        Google. Leaving a field blank keeps the current built-in text. Changes are live
-        immediately — no redeploy.
+        Control how your pages appear in Google search.
+      </div>
+      <div className="admin-help">
+        <strong>What this tab is for:</strong> setting the <strong>title</strong> and
+        <strong> description</strong> Google shows for each page, and whether a page appears
+        in search at all.
+        <ol>
+          <li>Pick a <strong>Page</strong> from the dropdown.</li>
+          <li>Edit the <strong>SEO title</strong> and <strong>meta description</strong> — keep them under the character counts, and use the <strong>Google preview</strong> to see how they’ll look.</li>
+          <li>Optionally switch on <strong>Hide this page from Google</strong> for pages you don’t want found.</li>
+          <li>Click <strong>Save changes</strong> — updates go live immediately.</li>
+        </ol>
+        Tip: leave a field blank to keep the page’s current wording.
       </div>
 
       {loading && <div className="admin-empty">Loading…</div>}

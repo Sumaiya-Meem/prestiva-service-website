@@ -43,6 +43,7 @@ app.use('/api/contact', require('./routes/contactRoutes'));
 app.use('/api/settings', require('./routes/settingsRoutes'));
 app.use('/api/gallery', require('./routes/galleryRoutes'));
 app.use('/api/backgrounds', require('./routes/backgroundRoutes'));
+app.use('/api/pages', require('./routes/pageRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 
 app.listen(PORT, () => {

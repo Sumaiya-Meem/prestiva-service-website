@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Phone, Mail, Menu, X, Bell, ChevronDown, Search } from 'lucide-react';
 import siteConfig from '../../config/siteConfig';
+import { fetchNavPages } from '../../services/adminApi';
 import ThemeToggle from '../utils/ThemeToggle';
 import SearchModal from './SearchModal';
 import logo from '../../assets/logos/prestiva-logo-horizontal-navy-gold.webp';
@@ -18,7 +19,18 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [customNav, setCustomNav] = useState([]);
   const location = useLocation();
+
+  // Pull marketing-built pages flagged "show in menu". Fault-tolerant — on any
+  // failure the menu simply shows no extra links.
+  useEffect(() => {
+    let alive = true;
+    fetchNavPages()
+      .then((d) => alive && setCustomNav(d.pages || []))
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
 
   const closeMenu = () => {
     setIsMobileMenuOpen(false);
@@ -121,6 +133,18 @@ const Header = () => {
 
         <nav className={`nav-links ${isMobileMenuOpen ? 'active' : ''}`}>
           {navItems.map(renderItem)}
+
+          {/* Marketing-built pages flagged to show in the menu */}
+          {customNav.map((p) => (
+            <NavLink
+              key={`custom-${p.slug}`}
+              to={`/${p.slug}`}
+              className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+              onClick={closeMenu}
+            >
+              {p.navLabel || p.title}
+            </NavLink>
+          ))}
 
           {/* Contact details + CTA inside the mobile slide-out menu */}
           <div className="mobile-menu-contact">

@@ -18,6 +18,7 @@ const GalleryPage = lazy(() => import('./pages/GalleryPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
+const DynamicPage = lazy(() => import('./pages/DynamicPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // Admin (separate from the public site — no shared header/footer)
@@ -55,6 +56,9 @@ function App() {
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsPage />} />
+            {/* Marketing-built pages (DB-backed). Static routes above always win;
+                unknown single-segment slugs resolve here, else render 404. */}
+            <Route path="/:slug" element={<DynamicPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>

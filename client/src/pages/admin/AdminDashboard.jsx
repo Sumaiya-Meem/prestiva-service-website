@@ -7,6 +7,7 @@ import GalleryPanel from '../../components/admin/GalleryPanel';
 import BackgroundsPanel from '../../components/admin/BackgroundsPanel';
 import SeoPanel from '../../components/admin/SeoPanel';
 import ContentPanel from '../../components/admin/ContentPanel';
+import PagesPanel from '../../components/admin/PagesPanel';
 import '../../styles/admin.css';
 
 const AdminDashboard = () => {
@@ -48,6 +49,12 @@ const AdminDashboard = () => {
             Content
           </button>
           <button
+            className={`admin-tab ${tab === 'pages' ? 'admin-tab--active' : ''}`}
+            onClick={() => setTab('pages')}
+          >
+            Pages
+          </button>
+          <button
             className={`admin-tab ${tab === 'seo' ? 'admin-tab--active' : ''}`}
             onClick={() => setTab('seo')}
           >
@@ -68,6 +75,7 @@ const AdminDashboard = () => {
         {tab === 'gallery' && <GalleryPanel />}
         {tab === 'backgrounds' && <BackgroundsPanel />}
         {tab === 'content' && <ContentPanel />}
+        {tab === 'pages' && <PagesPanel />}
         {tab === 'seo' && <SeoPanel />}
         {tab === 'settings' && <SettingsPanel />}
       </div>

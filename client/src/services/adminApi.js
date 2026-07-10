@@ -216,3 +216,43 @@ export const saveSettings = async (settings) => {
   });
   return handle(res);
 };
+
+/* ── Pages (page builder) ── */
+/** Public: published pages flagged for the nav menu (for the site header). */
+export const fetchNavPages = async () => {
+  const res = await fetch(`${BASE}/api/pages/nav`);
+  return handle(res); // { success, pages }
+};
+
+export const fetchPageBySlug = async (slug) => {
+  const res = await fetch(`${BASE}/api/pages/slug/${encodeURIComponent(slug)}`);
+  return handle(res); // { success, page } — throws on 404
+};
+
+export const fetchPages = async () => {
+  const res = await fetch(`${BASE}/api/pages`, { headers: authHeaders() });
+  return handle(res); // { success, pages }
+};
+
+export const createPage = async (page) => {
+  const res = await fetch(`${BASE}/api/pages`, {
+    method: 'POST',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ page }),
+  });
+  return handle(res);
+};
+
+export const updatePage = async (id, page) => {
+  const res = await fetch(`${BASE}/api/pages/${id}`, {
+    method: 'PUT',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ page }),
+  });
+  return handle(res);
+};
+
+export const deletePage = async (id) => {
+  const res = await fetch(`${BASE}/api/pages/${id}`, { method: 'DELETE', headers: authHeaders() });
+  return handle(res);
+};
